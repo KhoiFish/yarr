@@ -1,4 +1,5 @@
 use crate::vec3;
+use crate::log_print;
 use crate::utils;
 pub type Color64 = vec3::Vec3<f64>;
 pub type Color32 = vec3::Vec3<f32>;
@@ -11,7 +12,7 @@ pub fn write_color64(color: &Color64, samples_per_pixel: u32) {
     let g = (color.y() * scale).sqrt().clamp(0.0, 0.999);
     let b = (color.z() * scale).sqrt().clamp(0.0, 0.999);
 
-    print!("{0} {1} {2}\n", (r * 256.0) as i32 , (g * 256.0) as i32, (b * 256.0) as i32);
+    log_print!("{0} {1} {2}\n", (r * 256.0) as i32 , (g * 256.0) as i32, (b * 256.0) as i32);
 }
 
 #[allow(dead_code)]

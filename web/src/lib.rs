@@ -1,11 +1,36 @@
 use std::io;
 use std::io::Write;
 use sowr::{ray_color, random_scene};
-use sowr::{log_print, vec3::Vec3, camera::Camera, utils, color, color::Color64};
+use sowr::{log_print, vec3::Vec3, camera::Camera, color, color::Color64};
+use sowr::utils as sowr_utils;
 
-// --------------------------------------------------------------------------------------------------------------------
+#[macro_use]
+mod utils;
+use wasm_bindgen::prelude::*;
 
-pub fn main() {
+// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
+// allocator.
+#[cfg(feature = "wee_alloc")]
+#[global_allocator]
+static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+
+#[wasm_bindgen]
+pub fn init() {
+    utils::set_panic_hook();
+}
+
+#[wasm_bindgen]
+extern {
+    fn alert(s: &str);
+}
+
+#[wasm_bindgen]
+pub fn greet() {
+    alert("Hello, Raytracer on the web!");
+}
+
+#[wasm_bindgen]
+pub fn test_sowr() {
     // Image
     let aspect_ratio = 3.0 / 2.0;
     let image_width = 320_i32;
@@ -42,8 +67,8 @@ pub fn main() {
         for i in 0..image_width {
             let mut pixel_color = Color64::default();
             for _s in 0..samples_per_pixel {
-                let u = ((i as f64) + utils::random_range(0.0, 1.0)) / ((image_width - 1) as f64);
-                let v = ((j as f64) + utils::random_range(0.0, 1.0)) / ((image_height - 1) as f64);
+                let u = ((i as f64) + sowr_utils::random_range(0.0, 1.0)) / ((image_width - 1) as f64);
+                let v = ((j as f64) + sowr_utils::random_range(0.0, 1.0)) / ((image_height - 1) as f64);
                 let r = camera.get_ray(u, v);
                 pixel_color = pixel_color + ray_color(&r, &world, max_depth);
             }

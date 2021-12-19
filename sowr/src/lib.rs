@@ -1,11 +1,13 @@
+#![macro_use]
+
 pub mod color;
 pub mod ray;
 pub mod vec3;
 pub mod hittable;
 pub mod sphere;
 pub mod camera;
-pub mod utils;
 pub mod material;
+pub mod utils;
 
 use std::rc::Rc;
 use vec3::Vec3;

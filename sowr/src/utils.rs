@@ -1,13 +1,55 @@
 #![allow(dead_code)]
 use crate::vec3::{Vec3};
-use fastrand;
 
 // --------------------------------------------------------------------------------------------------------------------
-// Random generation methods
 
+#[cfg(not(target_family = "wasm"))]
+#[macro_export]
+macro_rules! log_print{
+    ($($elem: expr),+ ) => {
+        println!(concat!($(concat!(stringify!($elem), " - {:?}\n")),+), $($elem),+);
+    };
+}
+
+#[cfg(not(target_family = "wasm"))]
+use fastrand;
+
+#[cfg(not(target_family = "wasm"))]
 pub fn random_float() -> f64 {
     fastrand::f64()
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+
+#[cfg(target_family = "wasm")]
+extern crate web_sys;
+
+#[cfg(target_family = "wasm")]
+#[macro_export]
+macro_rules! log_print {
+    ( $( $t:tt )* ) => {
+        web_sys::console::log_1(&format!( $( $t )* ).into());
+    }
+}
+
+#[cfg(target_family = "wasm")]
+pub fn unsafe_pseudo_rand_u32() -> u32 {
+    static mut NEXT : u32 = 1;
+    let rand_value;
+    unsafe {
+        NEXT = NEXT * 1103515245 + 12345;
+        rand_value = (NEXT/65536) % 32768
+    }
+
+    rand_value
+}
+
+#[cfg(target_family = "wasm")]
+pub fn random_float() -> f64 {
+    (unsafe_pseudo_rand_u32() as f64) / (u32::MAX as f64)
+}
+
+// --------------------------------------------------------------------------------------------------------------------
 
 pub fn random_range(min: f64, max: f64) -> f64 {
     min + (random_float() * (max - min))
