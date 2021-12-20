@@ -21,8 +21,8 @@ pub fn example_params() -> RaytracerParams {
         aspect_ratio,
         image_width,
         image_height: ((image_width as Float) / aspect_ratio) as u32,
-        samples_per_pixel: 32,
-        max_depth: 32
+        samples_per_pixel: 1,
+        max_depth: 50
     }
 }
 
@@ -34,7 +34,7 @@ pub fn example_camera(aspect_ratio: Float) -> camera::Camera {
         let look_from = Vec3::new(13.0, 2.0, 3.0);
         let look_at = Vec3::new(0.0, 0.0, 0.0);
         let up = Vec3::new(0.0, 1.0, 0.0);
-        let dist_to_focus = 10.0;
+        let focus_dist = 10.0;
         let aperture = 0.1;
 
         camera = camera::Camera::new(
@@ -44,7 +44,7 @@ pub fn example_camera(aspect_ratio: Float) -> camera::Camera {
             90.0,
             aspect_ratio,
             aperture,
-            dist_to_focus
+            focus_dist
         );
     }
 
