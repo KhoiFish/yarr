@@ -1,6 +1,7 @@
 #![allow(dead_code)]
 use vecmath;
 use std::ops::{Add, Sub, Mul, Div};
+use crate::types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
 // Vec3 class definition & implementation
@@ -48,13 +49,7 @@ impl<T: Copy> Vec3<T> {
     }
 }
 
-impl Vec3<f64> {
-    pub fn reverse_dir(&self) -> Self {
-        *self * -1.0
-    }
-}
-
-impl Vec3<f32> {
+impl Vec3<Float> {
     pub fn reverse_dir(&self) -> Self {
         *self * -1.0
     }
