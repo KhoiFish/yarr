@@ -1,32 +1,32 @@
 use crate::ray::{Ray};
 use crate::hittable::{HitRecord};
-use crate::color::{Color64};
+use crate::types::*;
 use crate::utils;
 
 // --------------------------------------------------------------------------------------------------------------------
 // Scatter result
 
 pub struct ScatterResult {
-    pub scattered: Ray<f64>,
-    pub attenuation: Color64
+    pub scattered: Ray<Float>,
+    pub attenuation: Color
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 // Material trait
 
 pub trait Material {
-    fn scatter(&self, r_in : &Ray<f64>, hit: &HitRecord) -> Option<ScatterResult>;
+    fn scatter(&self, r_in : &Ray<Float>, hit: &HitRecord) -> Option<ScatterResult>;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 // Lambert
 
 pub struct Lambertian {
-    pub albedo: Color64
+    pub albedo: Color
 }
 
 impl Material for Lambertian {
-    fn scatter(&self, _r_in : &Ray<f64>, hit: &HitRecord) -> Option<ScatterResult> {
+    fn scatter(&self, _r_in : &Ray<Float>, hit: &HitRecord) -> Option<ScatterResult> {
         let mut scatter_direction = hit.normal + utils::random_unit_vec3();
         if utils::near_zero(&scatter_direction) {
             scatter_direction = hit.normal;
@@ -43,12 +43,12 @@ impl Material for Lambertian {
 // Metal
 
 pub struct Metal {
-    pub albedo: Color64,
-    pub fuzz: f64
+    pub albedo: Color,
+    pub fuzz: Float
 }
 
 impl Material for Metal {
-    fn scatter(&self, r_in : &Ray<f64>, hit: &HitRecord) -> Option<ScatterResult> { 
+    fn scatter(&self, r_in : &Ray<Float>, hit: &HitRecord) -> Option<ScatterResult> { 
         let reflected = utils::reflect(&r_in.dir.unit_vector(), &hit.normal);
         let mut return_option = Option::None;
         if reflected.dot(&hit.normal) > 0.0 {
@@ -66,11 +66,11 @@ impl Material for Metal {
 // Dielectric
 
 pub struct Dielectric {
-    pub index_of_refraction: f64
+    pub index_of_refraction: Float
 }
 
 impl Dielectric {
-    fn reflectance(cosine: f64, ref_idx: f64) -> f64 {
+    fn reflectance(cosine: Float, ref_idx: Float) -> Float {
         let mut r0 = (1.0-ref_idx) / (1.0+ref_idx);
         r0 = r0*r0;
         
@@ -79,11 +79,11 @@ impl Dielectric {
 }
 
 impl Material for Dielectric {
-    fn scatter(&self, r_in : &Ray<f64>, hit: &HitRecord) -> Option<ScatterResult> { 
+    fn scatter(&self, r_in : &Ray<Float>, hit: &HitRecord) -> Option<ScatterResult> { 
         let refraction_ratio = if hit.front_facing { 1.0/self.index_of_refraction } else { self.index_of_refraction };
 
         let unit_direction = r_in.dir.unit_vector();
-        let cos_theta = f64::min(unit_direction.reverse_dir().dot(&hit.normal), 1.0);
+        let cos_theta = Float::min(unit_direction.reverse_dir().dot(&hit.normal), 1.0);
         let sin_theta = (1.0 - cos_theta*cos_theta).sqrt();
 
         let cannot_refract = (refraction_ratio * sin_theta) > 1.0 || (Dielectric::reflectance(cos_theta, refraction_ratio) > utils::random_float());
@@ -96,7 +96,7 @@ impl Material for Dielectric {
 
         Some(ScatterResult {
             scattered: Ray { orig: hit.point, dir: direction },
-            attenuation: Color64::new(1.0, 1.0, 1.0)
+            attenuation: Color::new(1.0, 1.0, 1.0)
         })
     }
 }

@@ -2,20 +2,21 @@ use crate::ray::Ray;
 use crate::vec3::Vec3;
 use crate::material::{Material};
 use std::rc::Rc;
+use crate::types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
 // Hit record
 
 pub struct HitRecord {
-    pub point: Vec3<f64>,
-    pub normal: Vec3<f64>,
-    pub t: f64,
+    pub point: Vec3<Float>,
+    pub normal: Vec3<Float>,
+    pub t: Float,
     pub front_facing: bool,
     pub material: Rc<dyn Material>
 }
 
 impl HitRecord {
-    pub fn new(ray: &Ray<f64>, point: &Vec3<f64>, normal: &Vec3<f64>, t: f64, material: Rc<dyn Material>) -> HitRecord {
+    pub fn new(ray: &Ray<Float>, point: &Vec3<Float>, normal: &Vec3<Float>, t: Float, material: Rc<dyn Material>) -> HitRecord {
         let front_face = ray.dir.dot(&normal) < 0.0;
         let new_normal;
         if front_face {
@@ -38,7 +39,7 @@ impl HitRecord {
 // Hittable trait
 
 pub trait Hittable {
-    fn hit(&self, r: &Ray<f64>, t_min: f64, t_max: f64) -> Option<HitRecord>; 
+    fn hit(&self, r: &Ray<Float>, t_min: Float, t_max: Float) -> Option<HitRecord>; 
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -50,7 +51,7 @@ pub struct HittableList {
 }
 
 impl Hittable for HittableList {
-    fn hit(&self, r: &Ray<f64>, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray<Float>, t_min: Float, t_max: Float) -> Option<HitRecord> {
         let mut return_option = Option::None;
         let mut closest_so_far = t_max;
 

@@ -3,13 +3,14 @@ use crate::ray::{Ray};
 use crate::hittable::{Hittable, HitRecord};
 use crate::material::{Material};
 use std::rc::Rc;
+use crate::types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
 // Sphere definition & implementation
 
 pub struct Sphere {
-    pub center: Vec3<f64>,
-    pub radius: f64,
+    pub center: Vec3<Float>,
+    pub radius: Float,
     pub material: Rc<dyn Material>
 }
 
@@ -17,13 +18,13 @@ pub struct Sphere {
 // Hittable trait implementation
 
 impl Hittable for Sphere {
-    fn hit(&self, r: &Ray<f64>, t_min: f64, t_max: f64) -> Option<HitRecord> {
+    fn hit(&self, r: &Ray<Float>, t_min: Float, t_max: Float) -> Option<HitRecord> {
         let oc = r.orig - self.center;
         let a = r.dir.length_squared();
         let half_b = oc.dot(&r.dir);
         let c = oc.length_squared() - (self.radius * self.radius);
 
-        let discriminant : f64 = (half_b * half_b) - (a*c);
+        let discriminant = (half_b * half_b) - (a*c);
         if discriminant < 0.0 {
             return Option::None;
         }

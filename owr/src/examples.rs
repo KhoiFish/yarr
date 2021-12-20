@@ -4,24 +4,23 @@ use std::rc::Rc;
 use crate::vec3::Vec3;
 use crate::hittable::{HittableList};
 use crate::sphere::Sphere;
-use crate::color::{Color64};
 use crate::utils;
 use crate::{ray_color, log_print};
 use crate::color;
 use crate::material;
-use crate::types;
+use crate::types::*;
 use crate::camera;
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn example_params() -> types::RaytracerParams {
+pub fn example_params() -> RaytracerParams {
     let aspect_ratio = 3.0 / 2.0;
     let image_width = 320;
 
-    types::RaytracerParams {
+    RaytracerParams {
         aspect_ratio,
         image_width,
-        image_height: ((image_width as f64) / aspect_ratio) as u32,
+        image_height: ((image_width as Float) / aspect_ratio) as u32,
         samples_per_pixel: 500,
         max_depth: 50
     }
@@ -29,7 +28,7 @@ pub fn example_params() -> types::RaytracerParams {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn example_camera(aspect_ratio: f64) -> camera::Camera {
+pub fn example_camera(aspect_ratio: Float) -> camera::Camera {
     let camera;
     {
         let look_from = Vec3::new(13.0, 2.0, 3.0);
@@ -58,13 +57,13 @@ pub fn random_scene() -> HittableList {
     let mut world = HittableList::default();
 
     // Ground
-    let ground_material = Rc::new(material::Lambertian { albedo: Color64::new(0.5, 0.5, 0.5) });
+    let ground_material = Rc::new(material::Lambertian { albedo: Color::new(0.5, 0.5, 0.5) });
     world.list.push(Rc::new(Sphere { center: Vec3::new(0.0, -1000.0, 0.0), radius: 1000.0, material: ground_material }));
 
     for a in -11..11 {
         for b in -11..11 {
             let choose_mat = utils::random_float();
-            let center = Vec3::new((a as f64) + 0.9*utils::random_float(), 0.2, (b as f64) + 0.9*utils::random_float());
+            let center = Vec3::new((a as Float) + 0.9*utils::random_float(), 0.2, (b as Float) + 0.9*utils::random_float());
             let radius = 0.2;
 
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
@@ -94,12 +93,12 @@ pub fn random_scene() -> HittableList {
     }
 
     {
-        let material2 = Rc::new(material::Lambertian { albedo: Color64::new(0.4, 0.2, 0.1)});
+        let material2 = Rc::new(material::Lambertian { albedo: Color::new(0.4, 0.2, 0.1)});
         world.list.push(Rc::new(Sphere { center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0, material: material2 }));
     }
 
     {
-        let material3 = Rc::new(material::Metal { albedo: Color64::new(0.7, 0.6, 0.5), fuzz: 0.0});
+        let material3 = Rc::new(material::Metal { albedo: Color::new(0.7, 0.6, 0.5), fuzz: 0.0});
         world.list.push(Rc::new(Sphere { center: Vec3::new(4.0, 1.0, 0.0), radius: 1.0, material: material3 }));
     }
 
@@ -108,19 +107,19 @@ pub fn random_scene() -> HittableList {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn run_and_print_ppm(params: &types::RaytracerParams, camera: &camera::Camera, world: &HittableList) {
+pub fn run_and_print_ppm(params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) {
     log_print!("P3\n{0} {1}\n255\n", params.image_width, params.image_height);
 
     for j in (0..params.image_height).rev() {
         for i in 0..params.image_width {
-            let mut pixel_color = Color64::default();
+            let mut pixel_color = Color::default();
             for _s in 0..params.samples_per_pixel {
-                let u = ((i as f64) + utils::random_range(0.0, 1.0)) / ((params.image_width - 1) as f64);
-                let v = ((j as f64) + utils::random_range(0.0, 1.0)) / ((params.image_height - 1) as f64);
+                let u = ((i as Float) + utils::random_range(0.0, 1.0)) / ((params.image_width - 1) as Float);
+                let v = ((j as Float) + utils::random_range(0.0, 1.0)) / ((params.image_height - 1) as Float);
                 let r = camera.get_ray(u, v);
                 pixel_color = pixel_color + ray_color(&r, &world, params.max_depth);
             }
-            color::write_color64(&pixel_color, params.samples_per_pixel);
+            color::write_color(&pixel_color, params.samples_per_pixel);
         }
     }
     io::stdout().flush().unwrap();

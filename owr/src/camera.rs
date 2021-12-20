@@ -1,23 +1,24 @@
 use crate::vec3::{Vec3};
 use crate::ray::{Ray};
 use crate::utils;
+use crate::types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
 
 #[allow(dead_code)]
 pub struct Camera {
-    origin: Vec3<f64>,
-    lower_left_corner: Vec3<f64>,
-    horizontal: Vec3<f64>,
-    vertical: Vec3<f64>,
-    u: Vec3<f64>,
-    v: Vec3<f64>,
-    w: Vec3<f64>,
-    lens_radius: f64
+    origin: Vec3<Float>,
+    lower_left_corner: Vec3<Float>,
+    horizontal: Vec3<Float>,
+    vertical: Vec3<Float>,
+    u: Vec3<Float>,
+    v: Vec3<Float>,
+    w: Vec3<Float>,
+    lens_radius: Float
 }
 
 impl Camera {
-    pub fn new(look_from: &Vec3<f64>, look_at: &Vec3<f64>, up: &Vec3<f64>, fov: f64, aspect_ratio: f64, aperture: f64, focus_dist: f64) -> Self {
+    pub fn new(look_from: &Vec3<Float>, look_at: &Vec3<Float>, up: &Vec3<Float>, fov: Float, aspect_ratio: Float, aperture: Float, focus_dist: Float) -> Self {
         let theta = fov.to_radians();
         let h = (theta/2.0).tan();
         let viewport_height = 2.0 * h;
@@ -45,11 +46,11 @@ impl Camera {
         }
     }
 
-    pub fn get_ray(&self, s: f64, t: f64) -> Ray<f64> {
+    pub fn get_ray(&self, s: Float, t: Float) -> Ray<Float> {
         let rd = utils::random_unitdisk_vec3() * self.lens_radius;
         let offset = self.u*rd.x() + self.v*rd.y();
 
-        Ray::<f64> { 
+        Ray::<Float> { 
             orig: self.origin + offset,
             dir: self.lower_left_corner + self.horizontal*s + self.vertical*t - self.origin - offset
         }

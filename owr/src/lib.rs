@@ -10,17 +10,17 @@ pub mod examples;
 pub mod types;
 
 use hittable::{Hittable, HittableList};
-use color::{Color64};
 use ray::{Ray};
+use types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn ray_color(r : &Ray<f64>, world: &HittableList, depth: u32) -> Color64 {
+pub fn ray_color(r : &Ray<Float>, world: &HittableList, depth: u32) -> Color {
     if depth <= 0 {
-        return Color64::default();
+        return Color::default();
     }
 
-    match world.hit(&r, 0.001, f64::MAX) {
+    match world.hit(&r, 0.001, Float::MAX) {
         Some(hit) => {
             match hit.material.scatter(&r, &hit) {
                 Some(scatter_result) => {
@@ -30,7 +30,7 @@ pub fn ray_color(r : &Ray<f64>, world: &HittableList, depth: u32) -> Color64 {
                     );
                 }
                 _ => {
-                    return Color64::default();
+                    return Color::default();
                 }
             }
         }
@@ -40,5 +40,5 @@ pub fn ray_color(r : &Ray<f64>, world: &HittableList, depth: u32) -> Color64 {
     let unit_direction = r.dir.unit_vector();
     let t = 0.5 * (unit_direction.y() + 1.0);
 
-    (Color64::new(1.0, 1.0, 1.0) * (1.0 - t)) + (Color64::new(0.5, 0.7, 1.0) * t)
+    (Color::new(1.0, 1.0, 1.0) * (1.0 - t)) + (Color::new(0.5, 0.7, 1.0) * t)
 }
