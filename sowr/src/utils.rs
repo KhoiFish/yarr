@@ -5,10 +5,8 @@ use crate::vec3::{Vec3};
 
 #[cfg(not(target_family = "wasm"))]
 #[macro_export]
-macro_rules! log_print{
-    ($($elem: expr),+ ) => {
-        println!(concat!($(concat!(stringify!($elem), " - {:?}\n")),+), $($elem),+);
-    };
+macro_rules! log_print {
+    ($($arg:tt)*) => { print!($($arg)*) };
 }
 
 #[cfg(not(target_family = "wasm"))]
