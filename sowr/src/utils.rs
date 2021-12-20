@@ -46,7 +46,7 @@ pub fn unsafe_pseudo_rand_u32() -> u32 {
 
 #[cfg(target_family = "wasm")]
 pub fn random_float() -> f64 {
-    (unsafe_pseudo_rand_u32() as f64) / (u32::MAX as f64)
+    (unsafe_pseudo_rand_u32() as f64) / (32768.0)
 }
 
 // --------------------------------------------------------------------------------------------------------------------
