@@ -5,7 +5,7 @@ use crate::vec3::Vec3;
 use crate::hittable::{HittableList};
 use crate::sphere::Sphere;
 use crate::utils;
-use crate::{ray_color, log_print};
+use crate::{sample_rays, log_print};
 use crate::color;
 use crate::material;
 use crate::types::*;
@@ -21,8 +21,8 @@ pub fn example_params() -> RaytracerParams {
         aspect_ratio,
         image_width,
         image_height: ((image_width as Float) / aspect_ratio) as u32,
-        samples_per_pixel: 500,
-        max_depth: 50
+        samples_per_pixel: 32,
+        max_depth: 32
     }
 }
 
@@ -110,16 +110,10 @@ pub fn random_scene() -> HittableList {
 pub fn run_and_print_ppm(params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) {
     log_print!("P3\n{0} {1}\n255\n", params.image_width, params.image_height);
 
-    for j in (0..params.image_height).rev() {
-        for i in 0..params.image_width {
-            let mut pixel_color = Color::default();
-            for _s in 0..params.samples_per_pixel {
-                let u = ((i as Float) + utils::random_range(0.0, 1.0)) / ((params.image_width - 1) as Float);
-                let v = ((j as Float) + utils::random_range(0.0, 1.0)) / ((params.image_height - 1) as Float);
-                let r = camera.get_ray(u, v);
-                pixel_color = pixel_color + ray_color(&r, &world, params.max_depth);
-            }
-            color::write_color(&pixel_color, params.samples_per_pixel);
+    for image_y in (0..params.image_height).rev() {
+        for image_x in 0..params.image_width {
+            let color = sample_rays(image_x, image_y, &params, &camera, &world);
+            color::print_color(&color);
         }
     }
     io::stdout().flush().unwrap();

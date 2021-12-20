@@ -4,13 +4,13 @@ use crate::utils;
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn write_color(color: &Color, samples_per_pixel: u32) {
+pub fn normalize_color(src: &Color, samples_per_pixel: u32) -> Color{
     let scale = 1.0 / samples_per_pixel as Float;
-    let r = (color.x() * scale).sqrt().clamp(0.0, 0.999);
-    let g = (color.y() * scale).sqrt().clamp(0.0, 0.999);
-    let b = (color.z() * scale).sqrt().clamp(0.0, 0.999);
 
-    log_print!("{0} {1} {2}\n", (r * 256.0) as i32 , (g * 256.0) as i32, (b * 256.0) as i32);
+    Color::new(
+    (src.x() * scale).sqrt().clamp(0.0, 0.999),
+    (src.y() * scale).sqrt().clamp(0.0, 0.999),
+    (src.z() * scale).sqrt().clamp(0.0, 0.999))
 }
 
 pub fn multiply_colors(c1: &Color, c2: &Color) -> Color {
@@ -20,6 +20,12 @@ pub fn multiply_colors(c1: &Color, c2: &Color) -> Color {
         c1.z() * c2.z()
     )
 }
+
+pub fn print_color(color: &Color) {
+    log_print!("{0} {1} {2}\n", (color.x() * 256.0) as i32 , (color.y() * 256.0) as i32, (color.z() * 256.0) as i32);
+}
+
+// --------------------------------------------------------------------------------------------------------------------
 
 pub fn random() -> Color {
     Color::new(utils::random_float(), utils::random_float(), utils::random_float())

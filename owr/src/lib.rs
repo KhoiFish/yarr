@@ -42,3 +42,18 @@ pub fn ray_color(r : &Ray<Float>, world: &HittableList, depth: u32) -> Color {
 
     (Color::new(1.0, 1.0, 1.0) * (1.0 - t)) + (Color::new(0.5, 0.7, 1.0) * t)
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+
+pub fn sample_rays(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Color {
+    let mut pixel_color = Color::default();
+    for _s in 0..params.samples_per_pixel {
+        let u = ((image_x as Float) + utils::random_range(0.0, 1.0)) / ((params.image_width - 1) as Float);
+        let v = ((image_y as Float) + utils::random_range(0.0, 1.0)) / ((params.image_height - 1) as Float);
+        let r = camera.get_ray(u, v);
+        pixel_color = pixel_color + ray_color(&r, &world, params.max_depth);
+    }
+    let final_color = color::normalize_color(&pixel_color, params.samples_per_pixel);
+    
+    final_color
+}

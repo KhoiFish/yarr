@@ -1,7 +1,9 @@
-mod utils;
+pub mod utils;
 
 use owr::examples::*;
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{prelude::*, convert::{FromWasmAbi, IntoWasmAbi}};
+use owr::types::*;
+use std::rc::Rc;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
