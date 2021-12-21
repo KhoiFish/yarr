@@ -15,7 +15,7 @@ use types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn ray_color(r : &Ray<Float>, world: &HittableList, depth: u32) -> Color {
+pub fn shoot_ray(r : &Ray<Float>, world: &HittableList, depth: u32) -> Color {
     if depth <= 0 {
         return Color::default();
     }
@@ -25,7 +25,7 @@ pub fn ray_color(r : &Ray<Float>, world: &HittableList, depth: u32) -> Color {
             match hit.material.scatter(&r, &hit) {
                 Some(scatter_result) => {
                     return color::multiply_colors(
-                        &ray_color(&scatter_result.scattered, world, depth-1),
+                        &shoot_ray(&scatter_result.scattered, world, depth-1),
                         &scatter_result.attenuation
                     );
                 }
@@ -45,15 +45,21 @@ pub fn ray_color(r : &Ray<Float>, world: &HittableList, depth: u32) -> Color {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn sample_rays(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Color {
+pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Color {
+    let u = ((image_x as Float) + utils::random_range(0.0, 1.0)) / ((params.image_width - 1) as Float);
+    let v = ((image_y as Float) + utils::random_range(0.0, 1.0)) / ((params.image_height - 1) as Float);
+    let r = camera.get_ray(u, v);
+    
+    shoot_ray(&r, &world, params.max_depth)
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+pub fn multi_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Color {
     let mut pixel_color = Color::default();
     for _s in 0..params.samples_per_pixel {
-        let u = ((image_x as Float) + utils::random_range(0.0, 1.0)) / ((params.image_width - 1) as Float);
-        let v = ((image_y as Float) + utils::random_range(0.0, 1.0)) / ((params.image_height - 1) as Float);
-        let r = camera.get_ray(u, v);
-        pixel_color = pixel_color + ray_color(&r, &world, params.max_depth);
+        pixel_color = pixel_color + one_sample(image_x, image_y, &params, &camera, &world);
     }
-    let final_color = color::normalize_color(&pixel_color, params.samples_per_pixel);
-    
-    final_color
+
+    color::normalize_color(&pixel_color, params.samples_per_pixel)
 }
