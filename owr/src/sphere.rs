@@ -2,7 +2,7 @@ use crate::vec3::*;
 use crate::ray::{Ray};
 use crate::hittable::{Hittable, HitRecord};
 use crate::material::{Material};
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -11,7 +11,7 @@ use crate::types::*;
 pub struct Sphere {
     pub center: Vec3<Float>,
     pub radius: Float,
-    pub material: Rc<dyn Material>
+    pub material: Arc<dyn Material>
 }
 
 // --------------------------------------------------------------------------------------------------------------------

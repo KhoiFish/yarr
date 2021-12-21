@@ -1,7 +1,7 @@
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 use crate::material::{Material};
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -12,11 +12,11 @@ pub struct HitRecord {
     pub normal: Vec3<Float>,
     pub t: Float,
     pub front_facing: bool,
-    pub material: Rc<dyn Material>
+    pub material: Arc<dyn Material>
 }
 
 impl HitRecord {
-    pub fn new(ray: &Ray<Float>, point: &Vec3<Float>, normal: &Vec3<Float>, t: Float, material: Rc<dyn Material>) -> HitRecord {
+    pub fn new(ray: &Ray<Float>, point: &Vec3<Float>, normal: &Vec3<Float>, t: Float, material: Arc<dyn Material>) -> HitRecord {
         let front_face = ray.dir.dot(&normal) < 0.0;
         let new_normal;
         if front_face {
@@ -47,7 +47,7 @@ pub trait Hittable {
 
 #[derive(Default)]
 pub struct HittableList {
-    pub list: Vec<Rc<dyn Hittable>>
+    pub list: Vec<Arc<dyn Hittable>>
 }
 
 impl Hittable for HittableList {
@@ -68,3 +68,6 @@ impl Hittable for HittableList {
         return_option
     }
 }
+
+unsafe impl Sync for HittableList {}
+unsafe impl Send for HittableList {}

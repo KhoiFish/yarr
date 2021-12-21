@@ -3,7 +3,6 @@ use owr::examples::*;
 use owr::types::*;
 use owr::camera;
 use owr::hittable;
-use owr::sampling;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.

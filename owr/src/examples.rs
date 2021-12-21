@@ -1,12 +1,12 @@
 use std::io;
 use std::io::Write;
-use std::rc::Rc;
+use std::sync::Arc;
 use crate::{log_print};
 use crate::vec3::Vec3;
 use crate::hittable::{HittableList};
 use crate::sphere::Sphere;
 use crate::utils;
-use crate::sampling::{multi_sample};
+use crate::sampling::{render_multisample_image};
 use crate::color;
 use crate::material;
 use crate::types::*;
@@ -22,8 +22,8 @@ pub fn example_params() -> RaytracerParams {
         aspect_ratio,
         image_width,
         image_height: ((image_width as Float) / aspect_ratio) as u32,
-        samples_per_pixel: 1,
-        max_depth: 50
+        samples_per_pixel: 4,
+        max_depth: 32
     }
 }
 
@@ -58,8 +58,8 @@ pub fn random_scene() -> HittableList {
     let mut world = HittableList::default();
 
     // Ground
-    let ground_material = Rc::new(material::Lambertian { albedo: Color::new(0.5, 0.5, 0.5) });
-    world.list.push(Rc::new(Sphere { center: Vec3::new(0.0, -1000.0, 0.0), radius: 1000.0, material: ground_material }));
+    let ground_material = Arc::new(material::Lambertian { albedo: Color::new(0.5, 0.5, 0.5) });
+    world.list.push(Arc::new(Sphere { center: Vec3::new(0.0, -1000.0, 0.0), radius: 1000.0, material: ground_material }));
 
     for a in -11..11 {
         for b in -11..11 {
@@ -71,36 +71,36 @@ pub fn random_scene() -> HittableList {
                 if choose_mat < 0.8 {
                     // Diffuse
                     let albedo = color::multiply_colors(&color::random(), &color::random());
-                    let material = Rc::new(material::Lambertian { albedo });
-                    world.list.push(Rc::new(Sphere { center, radius, material }));
+                    let material = Arc::new(material::Lambertian { albedo });
+                    world.list.push(Arc::new(Sphere { center, radius, material }));
                 } else if choose_mat < 0.95 {
                     // Metal
                     let albedo = color::random_range(0.5, 1.0);
                     let fuzz = utils::random_range(0.0, 0.5);
-                    let material = Rc::new(material::Metal { albedo, fuzz });
-                    world.list.push(Rc::new(Sphere { center, radius, material }));
+                    let material = Arc::new(material::Metal { albedo, fuzz });
+                    world.list.push(Arc::new(Sphere { center, radius, material }));
                 } else {
                     // Glass
-                    let material = Rc::new(material::Dielectric { index_of_refraction: 1.5 });
-                    world.list.push(Rc::new(Sphere { center, radius, material }));
+                    let material = Arc::new(material::Dielectric { index_of_refraction: 1.5 });
+                    world.list.push(Arc::new(Sphere { center, radius, material }));
                 }
             }
         }
     }
 
     {
-        let material1 = Rc::new(material::Dielectric { index_of_refraction: 1.5 });
-        world.list.push(Rc::new(Sphere { center: Vec3::new(0.0, 1.0, 0.0), radius: 1.0, material: material1 }));
+        let material1 = Arc::new(material::Dielectric { index_of_refraction: 1.5 });
+        world.list.push(Arc::new(Sphere { center: Vec3::new(0.0, 1.0, 0.0), radius: 1.0, material: material1 }));
     }
 
     {
-        let material2 = Rc::new(material::Lambertian { albedo: Color::new(0.4, 0.2, 0.1)});
-        world.list.push(Rc::new(Sphere { center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0, material: material2 }));
+        let material2 = Arc::new(material::Lambertian { albedo: Color::new(0.4, 0.2, 0.1)});
+        world.list.push(Arc::new(Sphere { center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0, material: material2 }));
     }
 
     {
-        let material3 = Rc::new(material::Metal { albedo: Color::new(0.7, 0.6, 0.5), fuzz: 0.0});
-        world.list.push(Rc::new(Sphere { center: Vec3::new(4.0, 1.0, 0.0), radius: 1.0, material: material3 }));
+        let material3 = Arc::new(material::Metal { albedo: Color::new(0.7, 0.6, 0.5), fuzz: 0.0});
+        world.list.push(Arc::new(Sphere { center: Vec3::new(4.0, 1.0, 0.0), radius: 1.0, material: material3 }));
     }
 
     world
@@ -111,10 +111,10 @@ pub fn random_scene() -> HittableList {
 pub fn run_and_print_ppm(params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) {
     log_print!("P3\n{0} {1}\n255\n", params.image_width, params.image_height);
 
-    for y in (0..params.image_height).rev() {
-        for x in 0..params.image_width {
-            color::print_color(&multi_sample(x, y, &params, &camera, &world));
-        }
+    let results = render_multisample_image(&params, &camera, &world);
+    for &color in &results {
+        color::print_color(&color);
     }
+
     io::stdout().flush().unwrap();
 }
