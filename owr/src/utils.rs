@@ -3,6 +3,7 @@ use crate::vec3::{Vec3};
 use crate::types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
+// Non-wasm targets (Windows, Linux, MacOS, etc.)
 
 #[cfg(not(target_family = "wasm"))]
 #[macro_export]
@@ -19,12 +20,13 @@ pub fn random_float() -> Float {
 }
 
 // --------------------------------------------------------------------------------------------------------------------
-
-#[cfg(target_family = "wasm")]
-extern crate web_sys;
+// WASM target
 
 #[cfg(target_family = "wasm")]
 use std::cell::RefCell;
+
+#[cfg(target_family = "wasm")]
+extern crate web_sys;
 
 #[cfg(target_family = "wasm")]
 #[macro_export]
