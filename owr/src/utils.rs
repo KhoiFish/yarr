@@ -24,6 +24,9 @@ pub fn random_float() -> Float {
 extern crate web_sys;
 
 #[cfg(target_family = "wasm")]
+use std::cell::RefCell;
+
+#[cfg(target_family = "wasm")]
 #[macro_export]
 macro_rules! log_print {
     ( $( $t:tt )* ) => {
@@ -32,20 +35,25 @@ macro_rules! log_print {
 }
 
 #[cfg(target_family = "wasm")]
-pub fn unsafe_pseudo_rand_u32() -> u32 {
-    static mut NEXT : u32 = 1;
-    let rand_value;
-    unsafe {
-        NEXT = NEXT * 1103515245 + 12345;
-        rand_value = (NEXT/65536) % 32768
-    }
+thread_local! {
+    static NEXT_RAND: RefCell<u32> = RefCell::new(1);
+}
+
+#[cfg(target_family = "wasm")]
+pub fn rand_u32() -> u32 {
+    let mut rand_value = 0;
+    NEXT_RAND.with(|next_rand| {
+        let mut next = next_rand.borrow_mut();
+        *next = *next * 1103515245 + 12345;
+        rand_value = (*next/65536) % 32768
+    });
 
     rand_value
 }
 
 #[cfg(target_family = "wasm")]
 pub fn random_float() -> Float {
-    (unsafe_pseudo_rand_u32() as Float) / (32768.0)
+    (rand_u32() as Float) / (32768.0)
 }
 
 // --------------------------------------------------------------------------------------------------------------------
