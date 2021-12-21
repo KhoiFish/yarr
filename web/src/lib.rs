@@ -3,6 +3,7 @@ use owr::examples::*;
 use owr::types::*;
 use owr::camera;
 use owr::hittable;
+use owr::sampling;
 
 // When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
 // allocator.
@@ -59,7 +60,7 @@ impl WebRaytracer {
 
     #[wasm_bindgen]
     pub fn sample(&self, x: u32, y: u32) -> WebColor {
-        let color = owr::multi_sample(x, y, &self.params, &self.camera, &self.world);
+        let color = owr::sampling::multi_sample(x, y, &self.params, &self.camera, &self.world);
         let mut ret_color = WebColor::default();
         owr::color::get_color_components(&color, &mut ret_color.r, &mut ret_color.g, &mut ret_color.b);
 

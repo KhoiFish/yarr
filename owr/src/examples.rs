@@ -1,11 +1,12 @@
 use std::io;
 use std::io::Write;
 use std::rc::Rc;
+use crate::{log_print};
 use crate::vec3::Vec3;
 use crate::hittable::{HittableList};
 use crate::sphere::Sphere;
 use crate::utils;
-use crate::{multi_sample, log_print};
+use crate::sampling::{multi_sample};
 use crate::color;
 use crate::material;
 use crate::types::*;
