@@ -65,6 +65,11 @@ impl WebRaytracer {
 
         ret_color
     }
+
+    #[wasm_bindgen]
+    pub fn multi_threaded_render(&self) {
+        owr::sampling::render_multisample_image(&self.params, &self.camera, &self.world);
+    }
 }
 
 #[wasm_bindgen]

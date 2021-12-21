@@ -363,6 +363,7 @@ dependencies = [
  "console_error_panic_hook",
  "owr",
  "wasm-bindgen",
+ "wasm-bindgen-futures",
  "wasm-bindgen-test",
  "wee_alloc",
 ]

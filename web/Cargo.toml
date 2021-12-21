@@ -12,7 +12,8 @@ crate-type = ["cdylib", "rlib"]
 default = ["console_error_panic_hook"]
 
 [dependencies]
-wasm-bindgen = "0.2.63"
+wasm-bindgen = "0.2.78"
+wasm-bindgen-futures = "0.4.28"
 owr = { path = "../owr" }
 
 # The `console_error_panic_hook` crate provides better debugging of panics by
