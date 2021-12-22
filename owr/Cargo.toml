@@ -1,4 +1,5 @@
-#cargo-features = ["edition2021"]
+# Required for wasm using nightly build of rust (shared memory, atomics)
+cargo-features = ["edition2021"]
 
 [package]
 name = "owr"
