@@ -1,23 +1,29 @@
-use wasm_bindgen::prelude::*;
 use owr::examples::*;
 use owr::types::*;
 use owr::camera;
 use owr::hittable;
+use owr::log_print;
 
-// When the `wee_alloc` feature is enabled, use `wee_alloc` as the global
-// allocator.
-#[cfg(feature = "wee_alloc")]
-#[global_allocator]
-static ALLOC: wee_alloc::WeeAlloc = wee_alloc::WeeAlloc::INIT;
+use wasm_bindgen::prelude::*;
+
+// Uncomment the following if you want to try building for shared memory and atomics
+//pub use wasm_bindgen_rayon::init_thread_pool;
+
+// Called when the wasm module is instantiated
+#[wasm_bindgen(start)]
+pub fn main() -> Result<(), JsValue> {
+    Ok(())
+}
 
 #[wasm_bindgen]
-extern {
+extern "C" {
     fn alert(s: &str);
 }
 
 #[wasm_bindgen]
-pub fn greet() {
-    alert("Hello, Raytracer on the web!");
+pub fn greet(name: &str) {
+    alert(name);
+    log_print!("{}", name);
 }
 
 #[wasm_bindgen]
@@ -66,10 +72,10 @@ impl WebRaytracer {
         ret_color
     }
 
-    #[wasm_bindgen]
-    pub fn multi_threaded_render(&self) {
-        owr::sampling::render_multisample_image(&self.params, &self.camera, &self.world);
-    }
+    // #[wasm_bindgen]
+    // pub fn multi_threaded_render(&self) {
+    //     owr::sampling::render_multisample_image(&self.params, &self.camera, &self.world);
+    // }
 }
 
 #[wasm_bindgen]
