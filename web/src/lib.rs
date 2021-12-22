@@ -64,7 +64,7 @@ impl WebRaytracer {
     }
 
     #[wasm_bindgen]
-    pub fn sample(&self, x: u32, y: u32) -> WebColor {
+    pub fn multi_sample(&self, x: u32, y: u32) -> WebColor {
         let color = owr::sampling::multi_sample(x, y, &self.params, &self.camera, &self.world);
         let mut ret_color = WebColor::default();
         owr::color::get_color_components(&color, &mut ret_color.r, &mut ret_color.g, &mut ret_color.b);

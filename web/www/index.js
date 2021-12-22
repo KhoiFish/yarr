@@ -43,7 +43,7 @@ function main_function() {
         // Raytrace
         for (var y = 0; y < render_height; y++) {
             for (var x = 0; x < render_width; x++) {
-                const color = raytracer.sample(x, y);
+                const color = raytracer.multi_sample(x, y);
                 const offset = (((render_height-y) * render_width) + x) * 4;
                 data[offset + 0] = color.r(); 
                 data[offset + 1] = color.g(); 
