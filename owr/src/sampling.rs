@@ -9,22 +9,19 @@ use rayon::prelude::*;
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn shoot_ray(r : &Ray<Float>, world: &HittableList, depth: u32) -> Color {
+pub fn shoot_ray(r : &Ray<Float>, world: &HittableList, depth: u32) -> Vec3<Float> {
     if depth <= 0 {
-        return Color::default();
+        return Vec3::<Float>::default();
     }
 
     match world.hit(&r, 0.001, Float::MAX) {
         Some(hit) => {
             match hit.material.scatter(&r, &hit) {
                 Some(scatter_result) => {
-                    return color::multiply_colors(
-                        &shoot_ray(&scatter_result.scattered, world, depth-1),
-                        &scatter_result.attenuation
-                    );
+                    return shoot_ray(&scatter_result.scattered, world, depth-1) * scatter_result.attenuation;
                 }
                 _ => {
-                    return Color::default();
+                    return Vec3::<Float>::default();
                 }
             }
         }
@@ -33,14 +30,13 @@ pub fn shoot_ray(r : &Ray<Float>, world: &HittableList, depth: u32) -> Color {
 
     let unit_direction = r.dir.unit_vector();
     let t = 0.5 * (unit_direction.y() + 1.0);
-    let result = (Vec3::new(1.0, 1.0, 1.0) * (1.0 - t)) + (Vec3::new(0.5, 0.7, 1.0) * t);
 
-    result.to_vec4(1.0)
+    (Vec3::new(1.0, 1.0, 1.0) * (1.0 - t)) + (Vec3::new(0.5, 0.7, 1.0) * t)
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Color {
+pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec3<Float> {
     let u = ((image_x as Float) + utils::random_range(0.0, 1.0)) / ((params.image_width - 1) as Float);
     let v = ((image_y as Float) + utils::random_range(0.0, 1.0)) / ((params.image_height - 1) as Float);
     let r = camera.get_ray(u, v);
@@ -50,13 +46,16 @@ pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn multi_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Color {
-    let mut pixel_color = Color::default();
+pub fn multi_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec3<Float> {
+    let mut pixel_color = Vec3::default();
     for _s in 0..params.samples_per_pixel {
-        pixel_color = color::add_colors(&pixel_color, &one_sample(image_x, image_y, &params, &camera, &world));
+        pixel_color = pixel_color + one_sample(image_x, image_y, &params, &camera, &world);
     }
 
-    color::normalize_color(&pixel_color, params.samples_per_pixel)
+    // Average out with num samples
+    pixel_color = pixel_color * (1.0 / params.samples_per_pixel as Float);
+
+    pixel_color
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -77,7 +76,7 @@ pub fn render_multisample_image(params: &RaytracerParams, camera: &camera::Camer
     let mut results = Vec::<Color>::with_capacity(num_pixels);
     grid.par_iter().map(
         |&point| -> Color {
-            multi_sample(point.0, point.1, &params, &camera, &world)
+           color::vec3_to_color(&multi_sample(point.0, point.1, &params, &camera, &world), 1.0)
         }).collect_into_vec(&mut results);
 
     results

@@ -64,6 +64,10 @@ pub fn random_range(min: Float, max: Float) -> Float {
     min + (random_float() * (max - min))
 }
 
+pub fn random_vec3() -> Vec3<Float> {
+    Vec3::<Float>::new(random_float(), random_float(), random_float())
+}
+
 pub fn random_range_vec3(min: Float, max: Float) -> Vec3<Float> {
     Vec3::<Float>::new(random_range(min, max), random_range(min, max), random_range(min, max))
 }

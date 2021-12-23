@@ -2,14 +2,14 @@ use crate::ray::{Ray};
 use crate::hittable::{HitRecord};
 use crate::types::*;
 use crate::utils;
-use crate::color;
+use crate::vec3::Vec3;
 
 // --------------------------------------------------------------------------------------------------------------------
 // Scatter result
 
 pub struct ScatterResult {
     pub scattered: Ray<Float>,
-    pub attenuation: Color
+    pub attenuation: Vec3<Float>
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -23,7 +23,7 @@ pub trait Material {
 // Lambert
 
 pub struct Lambertian {
-    pub albedo: Color
+    pub albedo: Vec3<Float>
 }
 
 impl Material for Lambertian {
@@ -44,7 +44,7 @@ impl Material for Lambertian {
 // Metal
 
 pub struct Metal {
-    pub albedo: Color,
+    pub albedo: Vec3<Float>,
     pub fuzz: Float
 }
 
@@ -97,7 +97,7 @@ impl Material for Dielectric {
 
         Some(ScatterResult {
             scattered: Ray { orig: hit.point, dir: direction },
-            attenuation: color::new_color(1.0, 1.0, 1.0, 1.0)
+            attenuation: Vec3::new(1.0, 1.0, 1.0)
         })
     }
 }

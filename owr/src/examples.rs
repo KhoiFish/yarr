@@ -58,7 +58,7 @@ pub fn random_scene() -> HittableList {
     let mut world = HittableList::default();
 
     // Ground
-    let ground_material = Arc::new(material::Lambertian { albedo: color::new_color(0.5, 0.5, 0.5, 1.0) });
+    let ground_material = Arc::new(material::Lambertian { albedo: Vec3::new(0.5, 0.5, 0.5) });
     world.list.push(Arc::new(Sphere { center: Vec3::new(0.0, -1000.0, 0.0), radius: 1000.0, material: ground_material }));
 
     for a in -11..11 {
@@ -70,12 +70,12 @@ pub fn random_scene() -> HittableList {
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
                     // Diffuse
-                    let albedo = color::multiply_colors(&color::random(), &color::random());
+                    let albedo = utils::random_vec3() * utils::random_vec3();
                     let material = Arc::new(material::Lambertian { albedo });
                     world.list.push(Arc::new(Sphere { center, radius, material }));
                 } else if choose_mat < 0.95 {
                     // Metal
-                    let albedo = color::random_range(0.5, 1.0);
+                    let albedo = utils::random_range_vec3(0.5, 1.0);
                     let fuzz = utils::random_range(0.0, 0.5);
                     let material = Arc::new(material::Metal { albedo, fuzz });
                     world.list.push(Arc::new(Sphere { center, radius, material }));
@@ -94,12 +94,12 @@ pub fn random_scene() -> HittableList {
     }
 
     {
-        let material2 = Arc::new(material::Lambertian { albedo: color::new_color(0.4, 0.2, 0.1, 1.0)});
+        let material2 = Arc::new(material::Lambertian { albedo: Vec3::new(0.4, 0.2, 0.1)});
         world.list.push(Arc::new(Sphere { center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0, material: material2 }));
     }
 
     {
-        let material3 = Arc::new(material::Metal { albedo: color::new_color(0.7, 0.6, 0.5, 1.0), fuzz: 0.0});
+        let material3 = Arc::new(material::Metal { albedo: Vec3::new(0.7, 0.6, 0.5), fuzz: 0.0});
         world.list.push(Arc::new(Sphere { center: Vec3::new(4.0, 1.0, 0.0), radius: 1.0, material: material3 }));
     }
 

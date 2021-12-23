@@ -81,6 +81,15 @@ impl<T> Sub for Vec3<T> where T: Copy + Sub<T, Output = T> {
         }
     }
 }
+impl<T> Mul for Vec3<T> where T: Copy + Mul<T, Output = T> {
+    type Output = Self;
+
+    fn mul(self, other: Self) -> Self {
+        Self {
+            data: vecmath::vec3_mul(self.data, other.data)
+        }
+    }
+}
 
 impl<T> Mul<T> for Vec3<T> where T: Copy + Mul<T, Output = T> {
     type Output = Self;
