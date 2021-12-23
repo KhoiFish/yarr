@@ -4,16 +4,26 @@ use owr::camera;
 use owr::hittable;
 use owr::log_print;
 
-use wasm_bindgen::prelude::*;
+use wasm_bindgen::{prelude::*, Clamped};
 
-// Uncomment the following if you want to try building for shared memory and atomics
-//pub use wasm_bindgen_rayon::init_thread_pool;
+// --------------------------------------------------------------------------------------------------------------------
+
+#[cfg(feature = "parallel")]
+use rayon::prelude::*;
+
+#[cfg(feature = "parallel")]
+pub use wasm_bindgen_rayon::init_thread_pool;
+
+// --------------------------------------------------------------------------------------------------------------------
 
 // Called when the wasm module is instantiated
 #[wasm_bindgen(start)]
 pub fn main() -> Result<(), JsValue> {
+    console_error_panic_hook::set_once();
     Ok(())
 }
+
+// --------------------------------------------------------------------------------------------------------------------
 
 #[wasm_bindgen]
 extern "C" {
@@ -21,77 +31,58 @@ extern "C" {
 }
 
 #[wasm_bindgen]
-pub fn greet(name: &str) {
+pub fn wasm_alert(name: &str) {
     alert(name);
     log_print!("{}", name);
 }
 
-#[wasm_bindgen]
-pub struct WebRaytracer {
+// --------------------------------------------------------------------------------------------------------------------
+
+struct WebRaytracer {
     params: RaytracerParams,
     camera: camera::Camera,
     world: hittable::HittableList
 }
 
-#[wasm_bindgen]
-#[derive(Copy, Clone, Default)]
-pub struct WebColor {
-    r : u8,
-    g : u8,
-    b : u8
-}
-
-#[wasm_bindgen]
 impl WebRaytracer {
-
-    #[wasm_bindgen(constructor)]
-    pub fn new() -> Result<WebRaytracer, JsValue> {
-        // Set panic hook
-        #[cfg(feature = "console_error_panic_hook")]
-        console_error_panic_hook::set_once();
-
+    pub fn new() -> Self {
         // Default stuff
         let params = example_params(); 
         let camera = example_camera(params.aspect_ratio);
         let world = random_scene();
 
-        // Return 
-        Ok(WebRaytracer {
+        Self {
             params,
             camera,
             world
-        })
+        }
     }
 
-    #[wasm_bindgen]
-    pub fn multi_sample(&self, x: u32, y: u32) -> WebColor {
-        let color = owr::sampling::multi_sample(x, y, &self.params, &self.camera, &self.world);
-        let mut ret_color = WebColor::default();
-        owr::color::get_color_components(&color, &mut ret_color.r, &mut ret_color.g, &mut ret_color.b);
+    // pub fn render_image(&self, x: u32, y: u32) -> Vec<u8> {
+    //     let color = owr::sampling::multi_sample(x, y, &self.params, &self.camera, &self.world);
+    //     let mut ret_color = WebColor::default();
+    //     owr::color::get_color_components(&color, &mut ret_color.r, &mut ret_color.g, &mut ret_color.b);
 
-        ret_color
-    }
-
-    // #[wasm_bindgen]
-    // pub fn multi_threaded_render(&self) {
-    //     owr::sampling::render_multisample_image(&self.params, &self.camera, &self.world);
+    //     ret_color
     // }
+
+    #[cfg(feature = "parallel")]
+    pub fn render_image(&self) -> Vec<u8> {
+         owr::sampling::render_image_parallel(&self.params, &self.camera, &self.world)
+    }
+
+    #[cfg(not(feature = "parallel"))]
+    pub fn render_image(&self) -> Vec<u8> {
+         owr::sampling::render_image(&self.params, &self.camera, &self.world)
+    }
 }
 
+// --------------------------------------------------------------------------------------------------------------------
+
 #[wasm_bindgen]
-impl WebColor {
-    #[wasm_bindgen]
-    pub fn r(&self) -> u8 {
-        self.r
-    }
-
-    #[wasm_bindgen]
-    pub fn g(&self) -> u8 {
-        self.g
-    }
-
-    #[wasm_bindgen]
-    pub fn b(&self) -> u8 {
-        self.b
-    }
+pub fn generate(_width: u32, _height: u32, _max_iterations: u32) -> Clamped<Vec<u8>> {
+    let raytracer = WebRaytracer::new();
+    Clamped(
+        raytracer.render_image()
+    )
 }

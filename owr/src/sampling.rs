@@ -58,7 +58,7 @@ pub fn multi_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn render_multisample_image(params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec::<Color> {
+pub fn render_image(params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec::<u8> {
     // How many pixels?
     let num_pixels = (params.image_width * params.image_height) as usize;
 
@@ -71,11 +71,29 @@ pub fn render_multisample_image(params: &RaytracerParams, camera: &camera::Camer
     }
 
     // Run in parallel and collect results
-    let mut results = Vec::<Color>::with_capacity(num_pixels);
-    grid.par_iter().map(
-        |&point| -> Color {
-           color::vec3_to_color(&multi_sample(point.0, point.1, &params, &camera, &world), 1.0)
-        }).collect_into_vec(&mut results);
+    grid.iter()
+        .flat_map(|&point| -> Color {
+            color::vec3_to_color(&multi_sample(point.0, point.1, &params, &camera, &world), 1.0)
+        }).collect()
+}
 
-    results
+// --------------------------------------------------------------------------------------------------------------------
+
+pub fn render_image_parallel(params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec::<u8> {
+    // How many pixels?
+    let num_pixels = (params.image_width * params.image_height) as usize;
+
+    // Create a grid so we can divide the work
+    let mut grid = Vec::<(u32, u32)>::with_capacity(num_pixels);
+    for y in (0..params.image_height).rev() {
+        for x in 0..params.image_width {
+            grid.push((x,y));
+        }
+    }
+
+    // Run in parallel and collect results
+    grid.par_iter()
+        .flat_map(|&point| -> Color {
+            color::vec3_to_color(&multi_sample(point.0, point.1, &params, &camera, &world), 1.0)
+        }).collect()
 }

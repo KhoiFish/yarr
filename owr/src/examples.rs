@@ -6,8 +6,7 @@ use crate::vec3::Vec3;
 use crate::hittable::{HittableList};
 use crate::sphere::Sphere;
 use crate::utils;
-use crate::sampling::{render_multisample_image};
-use crate::color;
+use crate::sampling::{render_image_parallel};
 use crate::material;
 use crate::types::*;
 use crate::camera;
@@ -111,9 +110,15 @@ pub fn random_scene() -> HittableList {
 pub fn run_and_print_ppm(params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) {
     log_print!("P3\n{0} {1}\n255\n", params.image_width, params.image_height);
 
-    let results = render_multisample_image(&params, &camera, &world);
+    let results = render_image_parallel(&params, &camera, &world);
+    let mut count = 0;
     for &color in &results {
-        color::print_color(&color);
+        count = count + 1;
+        if (count % 4) == 0 {
+            log_print!("\n");
+        } else {
+            log_print!("{0} ", color);
+        }
     }
 
     io::stdout().flush().unwrap();

@@ -1,3 +1,6 @@
 /target
+pkg
+pkg-parallel
+dist
+node_modules
 *.ppm
-localhost.pem

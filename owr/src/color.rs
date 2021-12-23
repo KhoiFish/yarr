@@ -22,5 +22,5 @@ pub fn vec3_to_color(v: &Vec3<Float>, a: Float) -> Color {
 }
 
 pub fn print_color(color: &Color) {
-    log_print!("{0} {1} {2}\n", color[0], color[1], color[2]);
+    log_print!("{} {} {}\n", color[0], color[1], color[2]);
 }

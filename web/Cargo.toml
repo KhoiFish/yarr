@@ -6,25 +6,17 @@ name = "web"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [lib]
 crate-type = ["cdylib"]
 
-[features]
-default = ["console_error_panic_hook"]
-
 [dependencies]
-rayon = "1.5.1"
 wasm-bindgen = { version = "0.2.78" }
+wasm-bindgen-rayon = { version = "1.0.3", optional = true }
+rayon = { version = "1.5.1", optional = true }
 web-sys = { version = "0.3.55", features = ["console"] }
 owr = { path = "../owr" }
-
-# Shared memory is disabled on Mobile, so not worth trying this out yet
-#wasm-bindgen-rayon = { version = "1.0.3", features = ["no-bundler"] }
-
-# The `console_error_panic_hook` crate provides better debugging of panics by
-# logging them with `console.error`. This is great for development, but requires
-# all the `std::fmt` and `std::panicking` infrastructure, so isn't great for
-# code size when deploying.
 console_error_panic_hook = { version = "0.1.6", optional = true }
+
+[features]
+default = ["console_error_panic_hook"]
+parallel = ["rayon", "wasm-bindgen-rayon"]
