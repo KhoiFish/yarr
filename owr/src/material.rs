@@ -2,6 +2,7 @@ use crate::ray::{Ray};
 use crate::hittable::{HitRecord};
 use crate::types::*;
 use crate::utils;
+use crate::color;
 
 // --------------------------------------------------------------------------------------------------------------------
 // Scatter result
@@ -96,7 +97,7 @@ impl Material for Dielectric {
 
         Some(ScatterResult {
             scattered: Ray { orig: hit.point, dir: direction },
-            attenuation: Color::new(1.0, 1.0, 1.0)
+            attenuation: color::new_color(1.0, 1.0, 1.0, 1.0)
         })
     }
 }

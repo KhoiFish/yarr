@@ -58,7 +58,7 @@ pub fn random_scene() -> HittableList {
     let mut world = HittableList::default();
 
     // Ground
-    let ground_material = Arc::new(material::Lambertian { albedo: Color::new(0.5, 0.5, 0.5) });
+    let ground_material = Arc::new(material::Lambertian { albedo: color::new_color(0.5, 0.5, 0.5, 1.0) });
     world.list.push(Arc::new(Sphere { center: Vec3::new(0.0, -1000.0, 0.0), radius: 1000.0, material: ground_material }));
 
     for a in -11..11 {
@@ -94,12 +94,12 @@ pub fn random_scene() -> HittableList {
     }
 
     {
-        let material2 = Arc::new(material::Lambertian { albedo: Color::new(0.4, 0.2, 0.1)});
+        let material2 = Arc::new(material::Lambertian { albedo: color::new_color(0.4, 0.2, 0.1, 1.0)});
         world.list.push(Arc::new(Sphere { center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0, material: material2 }));
     }
 
     {
-        let material3 = Arc::new(material::Metal { albedo: Color::new(0.7, 0.6, 0.5), fuzz: 0.0});
+        let material3 = Arc::new(material::Metal { albedo: color::new_color(0.7, 0.6, 0.5, 1.0), fuzz: 0.0});
         world.list.push(Arc::new(Sphere { center: Vec3::new(4.0, 1.0, 0.0), radius: 1.0, material: material3 }));
     }
 

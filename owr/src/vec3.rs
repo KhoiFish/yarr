@@ -47,6 +47,10 @@ impl<T: Copy> Vec3<T> {
     pub fn unit_vector(&self) -> Self where T: Copy + float::One + float::Sqrt + Copy + Add<T, Output = T> + Mul<T, Output = T> + Div<T, Output = T> {
         Self { data: vecmath::vec3_normalized(self.data) }
     }
+
+    pub fn to_vec4(&self, w: T) -> [T; 4] {
+        [self.x(), self.y(), self.z(), w]
+    }
 }
 
 impl Vec3<Float> {

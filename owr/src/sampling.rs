@@ -1,5 +1,6 @@
 use crate::hittable::{Hittable, HittableList};
 use crate::ray::{Ray};
+use crate::vec3::Vec3;
 use crate::types::*;
 use crate::color;
 use crate::camera;
@@ -32,8 +33,9 @@ pub fn shoot_ray(r : &Ray<Float>, world: &HittableList, depth: u32) -> Color {
 
     let unit_direction = r.dir.unit_vector();
     let t = 0.5 * (unit_direction.y() + 1.0);
+    let result = (Vec3::new(1.0, 1.0, 1.0) * (1.0 - t)) + (Vec3::new(0.5, 0.7, 1.0) * t);
 
-    (Color::new(1.0, 1.0, 1.0) * (1.0 - t)) + (Color::new(0.5, 0.7, 1.0) * t)
+    result.to_vec4(1.0)
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -51,7 +53,7 @@ pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: 
 pub fn multi_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Color {
     let mut pixel_color = Color::default();
     for _s in 0..params.samples_per_pixel {
-        pixel_color = pixel_color + one_sample(image_x, image_y, &params, &camera, &world);
+        pixel_color = color::add_colors(&pixel_color, &one_sample(image_x, image_y, &params, &camera, &world));
     }
 
     color::normalize_color(&pixel_color, params.samples_per_pixel)
