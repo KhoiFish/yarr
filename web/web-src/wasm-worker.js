@@ -18,7 +18,7 @@ function wrapExports({ generate }) {
 async function initHandlers() {
   let [singleThread, multiThread] = await Promise.all([
     (async () => {
-      const singleThread = await import('./pkg/web.js');
+      const singleThread = await import('../../target/web/pkg/web.js');
       await singleThread.default();
       return wrapExports(singleThread);
     })(),
@@ -26,7 +26,7 @@ async function initHandlers() {
       // If threads are unsupported in this browser, skip this handler.
       if (!(await threads())) return;
       const multiThread = await import(
-        './pkg-parallel/web.js'
+        '../../target/web/pkg-parallel/web.js'
       );
       await multiThread.default();
       await multiThread.initThreadPool(navigator.hardwareConcurrency);

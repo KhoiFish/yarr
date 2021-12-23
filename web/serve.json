@@ -1,5 +1,5 @@
 {
-    "public": "./dist",
+    "public": "../target/web/dist",
     "cleanUrls": false,
     "redirects": [
         { "source": "/", "destination": "/index.html" }
