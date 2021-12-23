@@ -47,15 +47,13 @@ pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: 
 // --------------------------------------------------------------------------------------------------------------------
 
 pub fn multi_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec3<Float> {
-    let mut pixel_color = Vec3::default();
+    let mut sample_sum = Vec3::default();
     for _s in 0..params.samples_per_pixel {
-        pixel_color = pixel_color + one_sample(image_x, image_y, &params, &camera, &world);
+        sample_sum = sample_sum + one_sample(image_x, image_y, &params, &camera, &world);
     }
 
     // Average out with num samples
-    pixel_color = pixel_color * (1.0 / params.samples_per_pixel as Float);
-
-    pixel_color
+    sample_sum * (1.0 / params.samples_per_pixel as Float)
 }
 
 // --------------------------------------------------------------------------------------------------------------------
