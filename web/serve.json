@@ -1,0 +1,16 @@
+{
+    "public": "./dist",
+    "cleanUrls": false,
+    "redirects": [
+        { "source": "/", "destination": "/index.html" }
+      ],
+    "headers": [
+        {
+        "source": "**/*.@(js|html)",
+        "headers": [
+            { "key": "Cross-Origin-Embedder-Policy", "value": "require-corp" },
+            { "key": "Cross-Origin-Opener-Policy", "value": "same-origin" }
+        ]
+        }
+    ]
+}

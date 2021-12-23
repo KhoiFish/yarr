@@ -2,4 +2,4 @@
 set -ex
 
 npm run build
-npm run host-http
+npm run host
