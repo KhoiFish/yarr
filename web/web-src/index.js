@@ -1,10 +1,15 @@
 import * as Comlink from 'comlink';
 
-const maxIterations = 1000;
+// --------------------------------------------------------------------------------------------------------------------
+
+const numSamples = 16;
+const maxDepth = 64;
 const canvas = document.getElementById('canvas');
 const { width, height } = canvas;
 const ctx = canvas.getContext('2d');
 const timeOutput = document.getElementById('time');
+
+// --------------------------------------------------------------------------------------------------------------------
 
 (async function init() {
   // Create a separate thread from wasm-worker.js and get a proxy to its handlers.
@@ -14,18 +19,14 @@ const timeOutput = document.getElementById('time');
     })
   ).handlers;
 
-  function setupBtn(id) {
-    // Handlers are named in the same way as buttons.
-    let handler = handlers[id];
-    // If handler doesn't exist, it's not supported.
-    if (!handler) return;
-    // Assign onclick handler + enable the button.
-    Object.assign(document.getElementById(id), {
+  function setupBtn(button, handler) {
+    Object.assign(button, {
       async onclick() {
-        let { rawImageData, time } = await handler({
+        let { rawImageData, time } = await handler.renderImage({
           width,
           height,
-          maxIterations
+          numSamples,
+          maxDepth
         });
         timeOutput.value = `${time.toFixed(2)} ms`;
         const imgData = new ImageData(rawImageData, width, height);
@@ -35,8 +36,8 @@ const timeOutput = document.getElementById('time');
     });
   }
 
-  setupBtn('singleThread');
+  setupBtn(document.getElementById('singleThread'), handlers['singleThread']);
   if (await handlers.supportsThreads) {
-    setupBtn('multiThread');
+    setupBtn(document.getElementById('multiThread'), handlers['multiThread']);
   }
 })();
