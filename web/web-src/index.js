@@ -2,7 +2,7 @@ import * as Comlink from 'comlink';
 
 // --------------------------------------------------------------------------------------------------------------------
 
-const numSamples = 16;
+const numSamples = 1;
 const maxDepth = 64;
 const canvas = document.getElementById('canvas');
 const { width, height } = canvas;
@@ -19,7 +19,7 @@ const timeOutput = document.getElementById('time');
     })
   ).handlers;
 
-  function setupThreadBtn(button, handler) {
+  function setupRenderBtn(button, handler) {
     Object.assign(button, {
       async onclick() {
         let { rawImageData, time } = await handler.renderImage({
@@ -36,8 +36,8 @@ const timeOutput = document.getElementById('time');
     });
   }
 
-  setupThreadBtn(document.getElementById('singleThreadBtn'), handlers.singleThread);
+  setupRenderBtn(document.getElementById('singleThreadBtn'), handlers.singleThread);
   if (await handlers.supportsThreads) {
-    setupThreadBtn(document.getElementById('multiThreadBtn'), handlers.multiThread);
+    setupRenderBtn(document.getElementById('multiThreadBtn'), handlers.multiThread);
   }
 })();

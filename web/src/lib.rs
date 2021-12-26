@@ -61,14 +61,17 @@ impl WebRaytracer {
         }
     }
 
-    #[cfg(feature = "parallel")]
-    pub fn render_image(&self) -> Vec<u8> {
-         owr::sampling::render_image_parallel(&self.params, &self.camera, &self.world)
-    }
+    // ------------------------------------------------------------------------
+    // Single-threaded
 
     #[cfg(not(feature = "parallel"))]
     pub fn render_image(&self) -> Vec<u8> {
-         owr::sampling::render_image(&self.params, &self.camera, &self.world)
+         owr::sampling::render_image(false, &self.params, &self.camera, &self.world)
+    }
+
+    #[cfg(feature = "parallel")]
+    pub fn render_image(&self) -> Vec<u8> {
+         owr::sampling::render_image(true, &self.params, &self.camera, &self.world)
     }
 }
 

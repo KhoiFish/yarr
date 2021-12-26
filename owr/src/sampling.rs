@@ -58,7 +58,7 @@ pub fn multi_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn render_image(params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec::<u8> {
+pub fn render_image(enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec::<u8> {
     // How many pixels?
     let num_pixels = (params.image_width * params.image_height) as usize;
 
@@ -70,30 +70,16 @@ pub fn render_image(params: &RaytracerParams, camera: &camera::Camera, world: &H
         }
     }
 
-    // Run in parallel and collect results
-    grid.iter()
-        .flat_map(|&point| -> Color {
-            color::vec3_to_color(&multi_sample(point.0, point.1, &params, &camera, &world), 1.0)
-        }).collect()
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-pub fn render_image_parallel(params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec::<u8> {
-    // How many pixels?
-    let num_pixels = (params.image_width * params.image_height) as usize;
-
-    // Create a grid so we can divide the work
-    let mut grid = Vec::<(u32, u32)>::with_capacity(num_pixels);
-    for y in (0..params.image_height).rev() {
-        for x in 0..params.image_width {
-            grid.push((x,y));
-        }
+    // Iterate and collect results
+    if enable_parallel {
+        return grid.par_iter()
+            .flat_map(|&point| -> Color {
+                color::vec3_to_color(&multi_sample(point.0, point.1, &params, &camera, &world), 1.0)
+            }).collect();
+    } else {
+        return grid.iter()
+            .flat_map(|&point| -> Color {
+                color::vec3_to_color(&multi_sample(point.0, point.1, &params, &camera, &world), 1.0)
+            }).collect();
     }
-
-    // Run in parallel and collect results
-    grid.par_iter()
-        .flat_map(|&point| -> Color {
-            color::vec3_to_color(&multi_sample(point.0, point.1, &params, &camera, &world), 1.0)
-        }).collect()
 }

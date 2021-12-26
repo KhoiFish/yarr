@@ -5,9 +5,9 @@
     <title>Hello wasm-pack!</title>
   </head>
   <body>
-    <input type="button" id="singleThreadBtn" value="Draw using a single thread (slow)" disabled />
-    <input type="button" id="multiThreadBtn" value="Draw using all available threads via wasm-bindgen-rayon" disabled />
-    <input type="button" id="standardWebWorkersBtn" value="Draw using a manually manged and standard web worker threads" disabled />
+    <input type="button" id="singleThreadBtn" value="Render with single-thread" disabled />
+    <input type="button" id="multiThreadBtn" value="Render with multi-threads" disabled />
+    <input type="button" id="standardWebWorkersBtn" value="Render with standard web workers" disabled />
     <output id="time"></output>
     <br />
     <canvas id="canvas" width="640" height="360"></canvas>
