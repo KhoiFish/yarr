@@ -5,14 +5,14 @@ import * as Comlink from 'comlink';
 var wasmModule;
 var numWorkers = navigator.hardwareConcurrency;
 var workerPool = [];
-var numSamplesToProcess = [];
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function __init() {
+async function __init(workerId) {
     // Load our web assembly module
     wasmModule = await import('../../target/web/pkg/web.js');
     await wasmModule.default();
+    //await wasmModule.seed_rand(workerId);
 }
 
 async function __initWorkerPool() {
@@ -22,47 +22,49 @@ async function __initWorkerPool() {
             type: 'module'
             })
         );
-        await worker.init();
+        await worker.init(i);
         workerPool.push(worker);
-        numSamplesToProcess.push(0);
     }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
-function __workerRenderImage(image_width, image_height, samples_per_pixel, max_depth) {
-    return wasmModule.render_image(image_width, image_height, samples_per_pixel, max_depth);
+async function __workerRenderImage(image_width, image_height, samples_per_pixel, max_depth) {
+    return await wasmModule.multi_sample_image(false, image_width, image_height, samples_per_pixel, max_depth);
 }
 
 async function __startWorkerPool(image_width, image_height, samples_per_pixel, max_depth) {
-    var bufferSize = image_width * image_height * 4;
-    var finalResult = workerPool[0].workerRenderImage(image_width, image_height, samples_per_pixel, max_depth);
+    var numSamplesToProcess = [];
 
-    //var finalResult = new Uint8ClampedArray(bufferSize);
-    //var numSamplesPerWorker = samples_per_pixel / numWorkers;
-    //var remainderSamples = samples_per_pixel % numWorkers;
-    // var numSamplesPerWorker = 1;
-    // var remainderSamples = 0;
-    // for (var i = 0; i < numWorkers; i++ ) {
-    //     let worker = workerPool[i];
+    samples_per_pixel = 1;
 
-    //     // Render image
-    //     var workerResults = await worker.workerRenderImage(image_width, image_height, numWorkerSamples, max_depth);
+    // Kick off the work for the worker threads
+    var workerResults = []
+    for (var i = 0; i < 32; i++) {
+        workerResults.push(workerPool[i].workerRenderImage(image_width, image_height, samples_per_pixel, max_depth));
+    }
 
-    //     // Combine results
-    //     // for (var j = 0; j < bufferSize; j++) {
-    //     //     finalResult[j] += workerResults[j];
-    //     // }
-    //     finalResult = workerResults;
-    // }
+    // Get final list of results
+    var resultsList = []
+    for (var i = 0; i < 32; i++) {
+        var result = await workerResults[i];
+        resultsList.push(result);
+    }
 
-    // // Average out to num samples
-    // var scale = 1.0 / samples_per_pixel;
-    // for (j = 0; j < bufferSize; j++) {
-    //     finalResult[j] *= scale; 
-    // }
+    // Convert to final form
+    var finalBufferSize = image_width * image_height * 4;
+    var finalResults = new Uint8ClampedArray(finalBufferSize);
+    var scale = 1.0 / 32.0;
+    for (var i = 0; i < finalBufferSize; i++) {
+        var sum = 0.0;
+        for (var workerId = 0; workerId < numWorkers; workerId++) {
+            var workerResult = resultsList[workerId];
+            sum += workerResult[i];
+        }
+        finalResults[i] = (sum * scale) * 256.0;
+    }
 
-    return finalResult;
+    return finalResults;
 }
 
 // --------------------------------------------------------------------------------------------------------------------

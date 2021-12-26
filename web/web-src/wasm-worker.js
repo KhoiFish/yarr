@@ -50,6 +50,7 @@ async function initHandlers() {
         }
         const multiThreadImport = await import('../../target/web/pkg-parallel/web.js');
         await multiThreadImport.default();
+        await multiThreadImport.seed_rand(Date.now());
         await multiThreadImport.initThreadPool(navigator.hardwareConcurrency);
 
         return Comlink.proxy({

@@ -28,6 +28,10 @@ impl<T: Copy> Vec3<T> {
         self.data[2]
     }
 
+    pub fn array(&self) -> &[T; 3] {
+        &self.data
+    }
+
     pub fn dot(&self, other: &Self) -> T where T: Copy + Add<T, Output = T> + Mul<T, Output = T> {
         vecmath::vec3_dot(self.data, other.data)
     }

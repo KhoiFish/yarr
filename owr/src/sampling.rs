@@ -46,14 +46,48 @@ pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn multi_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec3<Float> {
+pub fn multi_sample(enable_average_sum: bool, image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec3<Float> {
     let mut sample_sum = Vec3::default();
     for _s in 0..params.samples_per_pixel {
         sample_sum = sample_sum + one_sample(image_x, image_y, &params, &camera, &world);
     }
 
     // Average out with num samples
-    sample_sum * (1.0 / params.samples_per_pixel as Float)
+    if enable_average_sum {
+        return sample_sum * (1.0 / params.samples_per_pixel as Float);
+    } else {
+        return sample_sum;
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+pub fn multi_sample_image(enable_average_sum: bool, enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec::<Float> {
+    // How many pixels?
+    let num_pixels = (params.image_width * params.image_height) as usize;
+
+    // Create a grid so we can divide the work
+    let mut grid = Vec::<(u32, u32)>::with_capacity(num_pixels);
+    for y in (0..params.image_height).rev() {
+        for x in 0..params.image_width {
+            grid.push((x,y));
+        }
+    }
+
+    // Iterate and collect results
+    if enable_parallel {
+        return grid.par_iter()
+            .flat_map(|&point| -> [Float; 4] {
+                let &result = multi_sample(enable_average_sum, point.0, point.1, &params, &camera, &world).array();
+                [result[0], result[1], result[2], 1.0]
+            }).collect();
+    } else {
+        return grid.iter()
+            .flat_map(|&point| -> [Float; 4] {
+                let &result = multi_sample(enable_average_sum, point.0, point.1, &params, &camera, &world).array();
+                [result[0], result[1], result[2], 1.0]
+            }).collect();
+    }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -74,12 +108,12 @@ pub fn render_image(enable_parallel: bool, params: &RaytracerParams, camera: &ca
     if enable_parallel {
         return grid.par_iter()
             .flat_map(|&point| -> Color {
-                color::vec3_to_color(&multi_sample(point.0, point.1, &params, &camera, &world), 1.0)
+                color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
             }).collect();
     } else {
         return grid.iter()
             .flat_map(|&point| -> Color {
-                color::vec3_to_color(&multi_sample(point.0, point.1, &params, &camera, &world), 1.0)
+                color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
             }).collect();
     }
 }

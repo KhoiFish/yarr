@@ -2,6 +2,7 @@ use owr::examples::*;
 use owr::types::*;
 use owr::camera;
 use owr::hittable;
+use owr::utils as owr_utils;
 use owr::log_print;
 
 use wasm_bindgen::{prelude::*, Clamped};
@@ -69,13 +70,31 @@ impl WebRaytracer {
          owr::sampling::render_image(false, &self.params, &self.camera, &self.world)
     }
 
+    #[cfg(not(feature = "parallel"))]
+    pub fn multi_sample_image(&self, enable_average_sum: bool) -> Vec<Float> {
+         owr::sampling::multi_sample_image(enable_average_sum, false, &self.params, &self.camera, &self.world)
+    }
+
+    // ------------------------------------------------------------------------
+    // Multi-threaded
+
     #[cfg(feature = "parallel")]
     pub fn render_image(&self) -> Vec<u8> {
          owr::sampling::render_image(true, &self.params, &self.camera, &self.world)
     }
+
+    #[cfg(feature = "parallel")]
+    pub fn multi_sample_image(&self, enable_average_sum: bool) -> Vec<Float> {
+        owr::sampling::multi_sample_image(enable_average_sum, true, &self.params, &self.camera, &self.world)
+   }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
+
+#[wasm_bindgen]
+pub fn seed_rand(seed: u32) {
+    owr_utils::seed_rand(seed)
+}
 
 #[wasm_bindgen]
 pub fn render_image(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> Clamped<Vec<u8>> {
@@ -83,4 +102,10 @@ pub fn render_image(image_width: u32, image_height: u32, samples_per_pixel: u32,
     Clamped(
         raytracer.render_image()
     )
+}
+
+#[wasm_bindgen]
+pub fn multi_sample_image(enable_average_sum: bool, image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> Vec<Float> {
+    let raytracer = WebRaytracer::new(image_width, image_height, samples_per_pixel, max_depth);
+    raytracer.multi_sample_image(enable_average_sum)
 }

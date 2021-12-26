@@ -26,6 +26,9 @@ pub fn random_float() -> Float {
 use std::cell::RefCell;
 
 #[cfg(target_family = "wasm")]
+use std::time::{SystemTime, UNIX_EPOCH};
+
+#[cfg(target_family = "wasm")]
 extern crate web_sys;
 
 #[cfg(target_family = "wasm")]
@@ -39,6 +42,14 @@ macro_rules! log_print {
 #[cfg(target_family = "wasm")]
 thread_local! {
     static NEXT_RAND: RefCell<u32> = RefCell::new(1);
+}
+
+#[cfg(target_family = "wasm")]
+pub fn seed_rand(seed: u32) {
+    NEXT_RAND.with(|next_rand| {
+        let mut next = next_rand.borrow_mut();
+        *next = seed;
+    })
 }
 
 #[cfg(target_family = "wasm")]
