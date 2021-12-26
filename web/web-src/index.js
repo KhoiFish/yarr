@@ -39,6 +39,7 @@ const timeOutput = document.getElementById('time');
   }
 
   setupRenderBtn(document.getElementById('singleThreadBtn'), handlers.singleThread);
+  setupRenderBtn(document.getElementById('manualWebWorkers'), handlers.manualWebWorkers);
   if (await handlers.supportsThreads) {
     setupRenderBtn(document.getElementById('multiThreadBtn'), handlers.multiThread);
   }

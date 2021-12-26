@@ -3,19 +3,24 @@ import * as Comlink from 'comlink';
 
 // --------------------------------------------------------------------------------------------------------------------
 
-function wrapExports(handler) {
-  return Comlink.proxy({
-    renderImage: wrapRenderImageFunc(handler)
-  });
-}
-
 function wrapRenderImageFunc({ render_image }) {
   return ({ width, height, numSamples, maxDepth }) => {
     const start = performance.now();
     const rawImageData = render_image(width, height, numSamples, maxDepth);
     const time = performance.now() - start;
     return {
-      // Little perf boost to transfer data to the main thread w/o copying.
+      rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
+      time
+    };
+  };
+}
+
+function wrapManualWebWorkersRenderImageFunc(handler) {
+  return async ({ width, height, numSamples, maxDepth }) => {
+    const start = performance.now();
+    var rawImageData = await handler.render_image(width, height, numSamples, maxDepth);
+    const time = performance.now() - start;
+    return {
       rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
       time
     };
@@ -25,13 +30,16 @@ function wrapRenderImageFunc({ render_image }) {
 // --------------------------------------------------------------------------------------------------------------------
 
 async function initHandlers() {
-  let [singleThreadExports, multiThreadExports] = await Promise.all(
+  let [singleThreadExports, multiThreadExports, manualWebWorkerExports] = await Promise.all(
     [
       // Single-thread
       (async () => {
         const singleThreadImport = await import('../../target/web/pkg/web.js');
         await singleThreadImport.default();
-        return wrapExports(singleThreadImport);
+
+        return Comlink.proxy({
+          renderImage: wrapRenderImageFunc(singleThreadImport)
+        });
       })(),
 
       // Multi-thread
@@ -43,13 +51,32 @@ async function initHandlers() {
         const multiThreadImport = await import('../../target/web/pkg-parallel/web.js');
         await multiThreadImport.default();
         await multiThreadImport.initThreadPool(navigator.hardwareConcurrency);
-        return wrapExports(multiThreadImport);
+
+        return Comlink.proxy({
+          renderImage: wrapRenderImageFunc(multiThreadImport)
+        });
+      })(),
+
+      // Manual Web workers
+      (async () => {
+        const manualWebWorkersImport = await Comlink.wrap(
+          new Worker(new URL('./manual-web-worker.js', import.meta.url), {
+            type: 'module'
+          })
+        );
+        await manualWebWorkersImport.init();
+        await manualWebWorkersImport.initWorkerPool();
+
+        return Comlink.proxy({
+          renderImage: wrapManualWebWorkersRenderImageFunc(manualWebWorkersImport)
+        });
       })(),
   ]);
 
   return Comlink.proxy({
     singleThread: singleThreadExports,
     multiThread: multiThreadExports,
+    manualWebWorkers: manualWebWorkerExports,
     supportsThreads: !!multiThreadExports,
   });
 }
