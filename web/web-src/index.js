@@ -12,14 +12,14 @@ const timeOutput = document.getElementById('time');
 // --------------------------------------------------------------------------------------------------------------------
 
 (async function init() {
-  // Create a separate thread from wasm-worker.js and get a proxy to its handlers.
+  // Spin up a web worker to get our exports
   let handlers = await Comlink.wrap(
     new Worker(new URL('./wasm-worker.js', import.meta.url), {
       type: 'module'
     })
   ).handlers;
 
-  function setupBtn(button, handler) {
+  function setupThreadBtn(button, handler) {
     Object.assign(button, {
       async onclick() {
         let { rawImageData, time } = await handler.renderImage({
@@ -36,8 +36,8 @@ const timeOutput = document.getElementById('time');
     });
   }
 
-  setupBtn(document.getElementById('singleThread'), handlers['singleThread']);
+  setupThreadBtn(document.getElementById('singleThreadBtn'), handlers.singleThread);
   if (await handlers.supportsThreads) {
-    setupBtn(document.getElementById('multiThread'), handlers['multiThread']);
+    setupThreadBtn(document.getElementById('multiThreadBtn'), handlers.multiThread);
   }
 })();

@@ -25,32 +25,32 @@ function wrapRenderImageFunc({ render_image }) {
 // --------------------------------------------------------------------------------------------------------------------
 
 async function initHandlers() {
-  let [singleThread, multiThread] = await Promise.all(
+  let [singleThreadExports, multiThreadExports] = await Promise.all(
     [
-      // Single-thread handler
+      // Single-thread
       (async () => {
-        const singleThread = await import('../../target/web/pkg/web.js');
-        await singleThread.default();
-        return wrapExports(singleThread);
+        const singleThreadImport = await import('../../target/web/pkg/web.js');
+        await singleThreadImport.default();
+        return wrapExports(singleThreadImport);
       })(),
 
-      // Multi-thread handler
+      // Multi-thread
       (async () => {
+        // Check to see if threads are supported
         if (!(await threads())) {
-          // Threads un-supported, skip
           return;
         }
-        const multiThread = await import('../../target/web/pkg-parallel/web.js');
-        await multiThread.default();
-        await multiThread.initThreadPool(navigator.hardwareConcurrency);
-        return wrapExports(multiThread);
+        const multiThreadImport = await import('../../target/web/pkg-parallel/web.js');
+        await multiThreadImport.default();
+        await multiThreadImport.initThreadPool(navigator.hardwareConcurrency);
+        return wrapExports(multiThreadImport);
       })(),
   ]);
 
   return Comlink.proxy({
-    singleThread,
-    supportsThreads: !!multiThread,
-    multiThread,
+    singleThread: singleThreadExports,
+    multiThread: multiThreadExports,
+    supportsThreads: !!multiThreadExports,
   });
 }
 
