@@ -10,7 +10,7 @@ cargo install -f wasm-bindgen-cli
 # Install npm
 https://nodejs.org/en/download/
 
-# Install node-js packages and dependencies:
+# Install npm packages and dependencies for the web target:
 cd web
 npm install
 
@@ -22,3 +22,10 @@ cargo build --release
 
 # Build web app, from root dir:
 npm --prefix ./web run build
+
+
+# Credits, references and helpful links
+
+https://rustwasm.github.io/docs/wasm-bindgen/introduction.html
+https://github.com/rustwasm/wasm-bindgen/tree/main/examples/raytrace-parallel
+https://github.com/GoogleChromeLabs/wasm-bindgen-rayon
