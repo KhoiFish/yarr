@@ -1,10 +1,43 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta content="text/html;charset=utf-8" http-equiv="Content-Type"/>
+    <meta content="text/html;charset=utf-8" http-equiv="Content-Type" content="width=device-width, initial-scale=1"/>
     <title>Hello wasm-pack!</title>
   </head>
   <body>
+      <!-- <label id="numSamplesTitle">Num Samples: </label>
+      <output id="numSamplesLabel">1</output> -->
+      <div>
+        <label id="numSamplesTitle">Num Samples</label>
+        <input type="range" min="1" max="1000" value="32" class="slider" list="numSamplesTickMarks" id="numSamplesSlider">
+        <datalist id="numSamplesTickMarks">
+          <option value="1" label="1"></option>
+          <option value="50" label="8"></option>
+          <option value="100" label="16"></option>
+          <option value="200" label="32"></option>
+          <option value="300" label="64"></option>
+          <option value="400" label="128"></option>
+          <option value="500" label="256"></option>
+          <option value="600" label="512"></option>
+          <option value="700" label="1024"></option>
+          <option value="800" label="1024"></option>
+          <option value="900" label="1024"></option>
+          <option value="1000" label="1024"></option>
+        </datalist>
+      </div>
+      <div>
+        <label id="maxDepthTitle">Max Ray Depth</label>
+        <input type="range" min="1" max="100" value="50" class="slider" list="maxDepthTickMarks" id="maxDepthSlider">
+        <datalist id="maxDepthTickMarks">
+          <option value="1" label="1"></option>
+          <option value="8" label="10"></option>
+          <option value="16" label="25"></option>
+          <option value="32" label="50"></option>
+          <option value="64" label="75"></option>
+          <option value="128" label="100"></option>
+        </datalist>
+      </div>
+    <br>
     <input type="button" id="singleThreadBtn" value="Render with single-thread" disabled />
     <input type="button" id="multiThreadBtn" value="Render with multi-threads" disabled />
     <input type="button" id="standardWebWorkersBtn" value="Render with standard web workers" disabled />

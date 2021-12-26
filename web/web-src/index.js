@@ -2,8 +2,8 @@ import * as Comlink from 'comlink';
 
 // --------------------------------------------------------------------------------------------------------------------
 
-const numSamples = 1;
-const maxDepth = 64;
+const numSamplesSlider = document.getElementById('numSamplesSlider');
+const maxDepthSlider = document.getElementById('maxDepthSlider');
 const canvas = document.getElementById('canvas');
 const { width, height } = canvas;
 const ctx = canvas.getContext('2d');
@@ -22,6 +22,8 @@ const timeOutput = document.getElementById('time');
   function setupRenderBtn(button, handler) {
     Object.assign(button, {
       async onclick() {
+        const numSamples = parseInt(numSamplesSlider.value);
+        const maxDepth = parseInt(maxDepthSlider.value);
         let { rawImageData, time } = await handler.renderImage({
           width,
           height,
