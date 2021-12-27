@@ -106,13 +106,47 @@ async function workerPoolRenderImage({ width, height, numSamples, maxDepth }) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function kickOffWorkerPoolRenderImageProgressive(progressiveCb, imageWidth, imageHeight, samplesPerPixel, maxDepth) {
-    
+async function kickOffWorkerPoolRenderImageProgressive(userCb, imageWidth, imageHeight, samplesPerPixel, maxDepth) {
+    // Allocate final buffer upfront
+    var finalBufferSize = imageWidth * imageHeight * 4;
+    var finalResults = new Uint8ClampedArray(finalBufferSize);
+
+    // Define our own callback
+    var ourCb = function (sample, x, y) {
+        // Write to our final results buffer
+        // Note we intentionally skip alpha (i = 4)
+        var offset = ((y * imageWidth) + x) * 4;
+        for (var i = 0; i < 3; i++) {
+            finalResults[offset + i] = convertToU8Range(gammaCorrect(sample[i]));
+        }
+        finalResults[offset + 3] = 255;
+
+        // Call user's callback
+        userCb(sample, x, y);
+    }
+
+    // Divide into regions
+    const maxRegionWidth = Math.floor(imageWidth / MAX_NUM_WORKERS);
+    const workersList = [];
+    var numWorkers = 0;
+    for (var x = 0; x < imageWidth; x += maxRegionWidth) {
+        var regionWidth = Math.min(maxRegionWidth, (imageWidth - x));
+        var regionHeight = imageHeight;
+        workersList.push(workerPool[numWorkers++].workerRenderImageProgressive(Comlink.proxy(ourCb), imageWidth, imageHeight, samplesPerPixel, maxDepth, x, 0, regionWidth, regionHeight));
+    }
+
+    // Wait for everything to come back
+    for (var i = 0; i < workersList.length; i++) {
+        await workersList[i];
+    }
+
+    // Done
+    return finalResults;
 }
   
-async function workerPoolRenderImageProgressive({ progressiveCb, width, height, numSamples, maxDepth }) {
+async function workerPoolRenderImageProgressive({ userCb, width, height, numSamples, maxDepth }) {
     const start = performance.now();
-    var rawImageData = await kickOffWorkerPoolRenderImage(width, height, numSamples, maxDepth);
+    var rawImageData = await kickOffWorkerPoolRenderImageProgressive(userCb, width, height, numSamples, maxDepth);
     const time = performance.now() - start;
     return {
         rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),

@@ -4,6 +4,7 @@ use owr::camera;
 use owr::hittable;
 use owr::utils as owr_utils;
 use owr::log_print;
+use owr::vec3::Vec3;
 
 use wasm_bindgen::{prelude::*, Clamped};
 
@@ -63,6 +64,10 @@ impl WebRaytracer {
         }
     }
 
+    pub fn multi_sample_point(&self, enable_average_sum: bool, x: u32, y: u32) -> Vec<Float> {
+        owr::sampling::multi_sample(enable_average_sum, x, y, &self.params, &self.camera, &self.world).to_vec4(1.0).to_vec()
+    }
+
     // ------------------------------------------------------------------------
     // Single-threaded
 
@@ -110,4 +115,9 @@ pub fn render_image(raytracer: &WebRaytracer) -> Clamped<Vec<u8>> {
 #[wasm_bindgen]
 pub fn multi_sample_image(raytracer: &WebRaytracer, enable_average_sum: bool) -> Vec<Float> {
     raytracer.multi_sample_image(enable_average_sum)
+}
+
+#[wasm_bindgen]
+pub fn multi_sample_point(raytracer: &WebRaytracer, enable_average_sum: bool, x: u32, y: u32) -> Vec<Float> {
+    raytracer.multi_sample_point(enable_average_sum, x, y)
 }

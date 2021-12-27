@@ -51,4 +51,11 @@ const numThreadsOutput = document.getElementById('numThreads');
     setupRenderBtn(document.getElementById('multiThreadBtn'), wasmHandlers.multiThread);
   }
   setupRenderBtn(document.getElementById('manualWebWorkers'), { renderImage: ManualWorkerPool.workerPoolRenderImage });
+
+  // var testFunc = async function ({ width, height, numSamples, maxDepth }) {
+  //   var userCb = function (sample, x, y ) {};
+  //   return await ManualWorkerPool.workerPoolRenderImageProgressive( { userCb, width, height, numSamples, maxDepth });
+  // }
+  // setupRenderBtn(document.getElementById('manualWebWorkers'), { renderImage: testFunc });
+
 })();

@@ -43,9 +43,19 @@ async function init(workerId) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function workerRenderImage(image_width, image_height, samples_per_pixel, max_depth) {
-    var raytracer = wasmModule.create_webraytracer(image_width, image_height, samples_per_pixel, max_depth);
+async function workerRenderImage(imageWidth, imageHeight, samplesPerPixel, maxDepth) {
+    var raytracer = wasmModule.create_webraytracer(imageWidth, imageHeight, samplesPerPixel, maxDepth);
     return await wasmModule.multi_sample_image(raytracer, false);
+}
+
+async function workerRenderImageProgressive(progressiveCb, imageWidth, imageHeight, samplesPerPixel, maxDepth, regionX, regionY, regionWidth, regionHeight)  {
+    var raytracer = wasmModule.create_webraytracer(imageWidth, imageHeight, samplesPerPixel, maxDepth);
+    for(var y = regionY; y < (regionY + regionHeight); y++) {
+        for(var x = regionX; x < (regionX + regionWidth); x++) {
+            var sample = await wasmModule.multi_sample_point(raytracer, true, x, (imageHeight-y));
+            await progressiveCb(sample, x, y);
+        }
+    }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -53,6 +63,7 @@ async function workerRenderImage(image_width, image_height, samples_per_pixel, m
 
 Comlink.expose({
     init,
-    workerRenderImage
+    workerRenderImage,
+    workerRenderImageProgressive
 });
   
