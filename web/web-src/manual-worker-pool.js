@@ -4,7 +4,7 @@ import * as Comlink from 'comlink';
 
 // TODO: navigator.hardwareConcurrency is undefined on iOS at the moment
 //const MAX_NUM_WORKERS = navigator.hardwareConcurrency;
-const MAX_NUM_WORKERS = 8;
+const MAX_NUM_WORKERS = 32;
 const workerPool = [];
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -22,6 +22,14 @@ async function initWorkerPool() {
 }
 
 // --------------------------------------------------------------------------------------------------------------------
+
+function gammaCorrect(c) {
+    return Math.max(0.0, Math.min(Math.sqrt(c), 0.999));
+}
+
+function convertToU8Range(c) {
+    return (c * 256);
+}
 
 async function startWorkerPool(imageWidth, imageHeight, samplesPerPixel, maxDepth) {
     // Distribute the sampling across the worker threads
@@ -62,10 +70,11 @@ async function startWorkerPool(imageWidth, imageHeight, samplesPerPixel, maxDept
     var sumScale = 1.0 / samplesPerPixel;
     for (var i = 0; i < finalBufferSize; i++) {
         var sum = 0.0;
+        var numSamplesThisPixel = 0;
         for (var resultIndex = 0; resultIndex < resultsList.length; resultIndex++) {
             sum += resultsList[resultIndex][i];
         }
-        finalResults[i] = (sum * sumScale) * 256.0;
+        finalResults[i] = convertToU8Range(gammaCorrect(sum * sumScale));
     }
 
     return finalResults;
