@@ -21,6 +21,12 @@ async function initWorkerPool() {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+function assert(condition, message) {
+    if (!condition) {
+        throw new Error(message || "Assertion failed");
+    }
+}
+
 function gammaCorrect(c) {
     return Math.max(0.0, Math.min(Math.sqrt(c), 0.999));
 }
@@ -66,9 +72,17 @@ async function startWorkerPool(imageWidth, imageHeight, samplesPerPixel, maxDept
     var finalBufferSize = imageWidth * imageHeight * 4;
     var finalResults = new Uint8ClampedArray(finalBufferSize);
     var sumScale = 1.0 / samplesPerPixel;
+    var componentCount = 0;
     for (var i = 0; i < finalBufferSize; i++) {
+        // Skip alpha, it is always 1.0
+        componentCount = (componentCount + 1) % 4;
+        if (componentCount == 0) {
+            finalResults[i] = 255;
+            continue;
+        }
+
+        // Sum up results and normalize the color
         var sum = 0.0;
-        var numSamplesThisPixel = 0;
         for (var resultIndex = 0; resultIndex < resultsList.length; resultIndex++) {
             sum += resultsList[resultIndex][i];
         }
