@@ -53,7 +53,7 @@ impl WebRaytracer {
         };
 
         let camera = example_camera(params.aspect_ratio);
-        let world = random_scene();
+        let world = first_weekend_scene();
 
         Self {
             params,

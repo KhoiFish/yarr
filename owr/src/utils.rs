@@ -1,6 +1,45 @@
 #![allow(dead_code)]
 use crate::vec3::{Vec3};
 use crate::types::*;
+use std::cell::RefCell;
+
+// --------------------------------------------------------------------------------------------------------------------
+
+thread_local! {
+    static NEXT_RAND: RefCell<u32> = RefCell::new(1);
+    static DETERMINISTIC_NEXT_RAND: RefCell<u32> = RefCell::new(1);
+}
+
+fn next_rand_u32(tls_int: &RefCell<u32>) -> u32 {
+    let mut next = tls_int.borrow_mut();
+    *next = *next * 1103515245 + 12345;
+
+    (*next/65536) % 32768
+}
+
+pub fn seed_rand(seed: u32) {
+    NEXT_RAND.with(|next_rand| {
+        let mut next = next_rand.borrow_mut();
+        *next = seed;
+    })
+}
+
+pub fn rand_u32() -> u32 {
+    // rand_value
+    NEXT_RAND.with(|next_rand| {
+        return next_rand_u32(next_rand);
+    })
+}
+
+pub fn det_rand_u32() -> u32 {
+    DETERMINISTIC_NEXT_RAND.with(|next_rand| {
+        return next_rand_u32(next_rand);
+    })
+}
+
+pub fn det_random_float() -> Float {
+    (det_rand_u32() as Float) / (32768.0)
+}
 
 // --------------------------------------------------------------------------------------------------------------------
 // Non-wasm targets (Windows, Linux, MacOS, etc.)
@@ -23,12 +62,6 @@ pub fn random_float() -> Float {
 // WASM target
 
 #[cfg(target_family = "wasm")]
-use std::cell::RefCell;
-
-#[cfg(target_family = "wasm")]
-use std::time::{SystemTime, UNIX_EPOCH};
-
-#[cfg(target_family = "wasm")]
 extern crate web_sys;
 
 #[cfg(target_family = "wasm")]
@@ -37,31 +70,6 @@ macro_rules! log_print {
     ( $( $t:tt )* ) => {
         web_sys::console::log_1(&format!( $( $t )* ).into());
     }
-}
-
-#[cfg(target_family = "wasm")]
-thread_local! {
-    static NEXT_RAND: RefCell<u32> = RefCell::new(1);
-}
-
-#[cfg(target_family = "wasm")]
-pub fn seed_rand(seed: u32) {
-    NEXT_RAND.with(|next_rand| {
-        let mut next = next_rand.borrow_mut();
-        *next = seed;
-    })
-}
-
-#[cfg(target_family = "wasm")]
-pub fn rand_u32() -> u32 {
-    let mut rand_value = 0;
-    NEXT_RAND.with(|next_rand| {
-        let mut next = next_rand.borrow_mut();
-        *next = *next * 1103515245 + 12345;
-        rand_value = (*next/65536) % 32768
-    });
-
-    rand_value
 }
 
 #[cfg(target_family = "wasm")]
@@ -116,6 +124,20 @@ pub fn random_in_hemisphere(normal: &Vec3<Float>) -> Vec3<Float> {
 
 pub fn random_unit_vec3() -> Vec3<Float> {
     random_in_unit_sphere().unit_vector()
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+pub fn det_random_range(min: Float, max: Float) -> Float {
+    min + (det_random_float() * (max - min))
+}
+
+pub fn det_random_vec3() -> Vec3<Float> {
+    Vec3::<Float>::new(det_random_float(), det_random_float(), det_random_float())
+}
+
+pub fn det_random_range_vec3(min: Float, max: Float) -> Vec3<Float> {
+    Vec3::<Float>::new(det_random_range(min, max), det_random_range(min, max), det_random_range(min, max))
 }
 
 // --------------------------------------------------------------------------------------------------------------------

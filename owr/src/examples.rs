@@ -53,7 +53,7 @@ pub fn example_camera(aspect_ratio: Float) -> camera::Camera {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn random_scene() -> HittableList {
+pub fn first_weekend_scene() -> HittableList {
     let mut world = HittableList::default();
 
     // Ground
@@ -62,20 +62,20 @@ pub fn random_scene() -> HittableList {
 
     for a in -11..11 {
         for b in -11..11 {
-            let choose_mat = utils::random_float();
-            let center = Vec3::new((a as Float) + 0.9*utils::random_float(), 0.2, (b as Float) + 0.9*utils::random_float());
+            let choose_mat = utils::det_random_float();
+            let center = Vec3::new((a as Float) + 0.9*utils::det_random_float(), 0.2, (b as Float) + 0.9*utils::det_random_float());
             let radius = 0.2;
 
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
                     // Diffuse
-                    let albedo = utils::random_vec3() * utils::random_vec3();
+                    let albedo = utils::det_random_vec3() * utils::det_random_vec3();
                     let material = Arc::new(material::Lambertian { albedo });
                     world.list.push(Arc::new(Sphere { center, radius, material }));
                 } else if choose_mat < 0.95 {
                     // Metal
-                    let albedo = utils::random_range_vec3(0.5, 1.0);
-                    let fuzz = utils::random_range(0.0, 0.5);
+                    let albedo = utils::det_random_range_vec3(0.5, 1.0);
+                    let fuzz = utils::det_random_range(0.0, 0.5);
                     let material = Arc::new(material::Metal { albedo, fuzz });
                     world.list.push(Arc::new(Sphere { center, radius, material }));
                 } else {

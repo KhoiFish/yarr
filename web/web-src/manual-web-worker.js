@@ -8,11 +8,39 @@ var workerPool = [];
 
 // --------------------------------------------------------------------------------------------------------------------
 
+// https://stackoverflow.com/questions/1349404/generate-random-string-characters-in-javascript
+function makeid(length) {
+    var result = '';
+    var characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+    var charactersLength = characters.length;
+    for ( var i = 0; i < length; i++ ) {
+        result += characters.charAt(Math.floor(Math.random() * charactersLength));
+    }
+    return result;
+}
+
+// https://stackoverflow.com/questions/521295/seeding-the-random-number-generator-in-javascript
+function xmur3(str) {
+    for(var i = 0, h = 1779033703 ^ str.length; i < str.length; i++)
+        h = Math.imul(h ^ str.charCodeAt(i), 3432918353),
+        h = h << 13 | h >>> 19;
+    return function() {
+        h = Math.imul(h ^ h >>> 16, 2246822507);
+        h = Math.imul(h ^ h >>> 13, 3266489909);
+        return (h ^= h >>> 16) >>> 0;
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 async function __init(workerId) {
     // Load our web assembly module
     wasmModule = await import('../../target/web/pkg/web.js');
     await wasmModule.default();
-    //await wasmModule.seed_rand(workerId);
+
+    // Seed random
+    const seedFunc = xmur3(makeid(32));
+    await wasmModule.seed_rand(seedFunc());
 }
 
 async function __initWorkerPool() {
@@ -40,15 +68,14 @@ async function __startWorkerPool(image_width, image_height, samples_per_pixel, m
 
     // Kick off the work for the worker threads
     var workerResults = []
-    for (var i = 0; i < 32; i++) {
-        workerResults.push(workerPool[i].workerRenderImage(image_width, image_height, samples_per_pixel, max_depth));
+    for (var workerId = 0; workerId < numWorkers; workerId++)  {
+        workerResults.push(workerPool[workerId].workerRenderImage(image_width, image_height, samples_per_pixel, max_depth));
     }
 
-    // Get final list of results
+    // Wait for results from all threads
     var resultsList = []
-    for (var i = 0; i < 32; i++) {
-        var result = await workerResults[i];
-        resultsList.push(result);
+    for (var workerId = 0; workerId < numWorkers; workerId++)  {
+        resultsList.push(await workerResults[workerId]);
     }
 
     // Convert to final form
@@ -58,8 +85,7 @@ async function __startWorkerPool(image_width, image_height, samples_per_pixel, m
     for (var i = 0; i < finalBufferSize; i++) {
         var sum = 0.0;
         for (var workerId = 0; workerId < numWorkers; workerId++) {
-            var workerResult = resultsList[workerId];
-            sum += workerResult[i];
+            sum += resultsList[workerId][i];
         }
         finalResults[i] = (sum * scale) * 256.0;
     }
