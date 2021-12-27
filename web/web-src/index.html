@@ -9,7 +9,7 @@
       <output id="numSamplesLabel">1</output> -->
       <div>
         <label id="numSamplesTitle">Num Samples</label>
-        <input type="range" min="1" max="1000" value="32" class="slider" list="numSamplesTickMarks" id="numSamplesSlider">
+        <input type="range" min="1" max="1000" value="64" class="slider" list="numSamplesTickMarks" id="numSamplesSlider">
         <datalist id="numSamplesTickMarks">
           <option value="1" label="1"></option>
           <option value="50" label="8"></option>
@@ -37,13 +37,16 @@
           <option value="128" label="100"></option>
         </datalist>
       </div>
-    <br>
-    <output id="numThreads"></output>
-    <br>
-    <input type="button" id="singleThreadBtn" value="Render with single-thread" disabled />
-    <input type="button" id="multiThreadBtn" value="Render with multi-threads" disabled />
-    <input type="button" id="manualWebWorkers" value="Render with standard web workers" disabled />
-    <output id="time"></output>
+    <div>
+      <output id="numThreads"></output>
+    </div>
+    <br />
+    <div>
+      <input type="button" id="singleThreadBtn" value="Render with single-thread" disabled />
+      <input type="button" id="multiThreadBtn" value="Render with multi-threads" disabled />
+      <input type="button" id="manualWebWorkers" value="Render with standard web workers" disabled />
+      <output id="time"></output>
+    </div>
     <br />
     <canvas id="canvas" width="640" height="360"></canvas>
     <script type="module" src="index.js"></script>
