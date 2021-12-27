@@ -1,4 +1,5 @@
 import * as Comlink from 'comlink';
+import * as ManualWorkerPool from './manual-worker-pool.js';
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -12,12 +13,15 @@ const timeOutput = document.getElementById('time');
 // --------------------------------------------------------------------------------------------------------------------
 
 (async function init() {
-  // Spin up a web worker to get our exports
-  let handlers = await Comlink.wrap(
+  // Get handlers to rust wasm api
+  let wasmHandlers = await Comlink.wrap(
     new Worker(new URL('./wasm-worker.js', import.meta.url), {
       type: 'module'
     })
   ).handlers;
+
+  // Spin up our manual web worker pool
+  await ManualWorkerPool.initWorkerPool();
 
   function setupRenderBtn(button, handler) {
     Object.assign(button, {
@@ -38,9 +42,9 @@ const timeOutput = document.getElementById('time');
     });
   }
 
-  setupRenderBtn(document.getElementById('singleThreadBtn'), handlers.singleThread);
-  setupRenderBtn(document.getElementById('manualWebWorkers'), handlers.manualWebWorkers);
-  if (await handlers.supportsThreads) {
-    setupRenderBtn(document.getElementById('multiThreadBtn'), handlers.multiThread);
+  setupRenderBtn(document.getElementById('singleThreadBtn'), wasmHandlers.singleThread);
+  if (await wasmHandlers.supportsThreads) {
+    setupRenderBtn(document.getElementById('multiThreadBtn'), wasmHandlers.multiThread);
   }
+  setupRenderBtn(document.getElementById('manualWebWorkers'), { renderImage: ManualWorkerPool.workerPoolRenderImage });
 })();

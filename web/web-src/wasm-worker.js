@@ -15,22 +15,10 @@ function wrapRenderImageFunc({ render_image }) {
   };
 }
 
-function wrapManualWebWorkersRenderImageFunc(handler) {
-  return async ({ width, height, numSamples, maxDepth }) => {
-    const start = performance.now();
-    var rawImageData = await handler.render_image(width, height, numSamples, maxDepth);
-    const time = performance.now() - start;
-    return {
-      rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
-      time
-    };
-  };
-}
-
 // --------------------------------------------------------------------------------------------------------------------
 
 async function initHandlers() {
-  let [singleThreadExports, multiThreadExports, manualWebWorkerExports] = await Promise.all(
+  let [singleThreadExports, multiThreadExports] = await Promise.all(
     [
       // Single-thread
       (async () => {
@@ -57,27 +45,11 @@ async function initHandlers() {
           renderImage: wrapRenderImageFunc(multiThreadImport)
         });
       })(),
-
-      // Manual Web workers
-      (async () => {
-        const manualWebWorkersImport = await Comlink.wrap(
-          new Worker(new URL('./manual-web-worker.js', import.meta.url), {
-            type: 'module'
-          })
-        );
-        await manualWebWorkersImport.init();
-        await manualWebWorkersImport.initWorkerPool();
-
-        return Comlink.proxy({
-          renderImage: wrapManualWebWorkersRenderImageFunc(manualWebWorkersImport)
-        });
-      })(),
   ]);
 
   return Comlink.proxy({
     singleThread: singleThreadExports,
     multiThread: multiThreadExports,
-    manualWebWorkers: manualWebWorkerExports,
     supportsThreads: !!multiThreadExports,
   });
 }
