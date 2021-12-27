@@ -2,9 +2,7 @@ import * as Comlink from 'comlink';
 
 // --------------------------------------------------------------------------------------------------------------------
 
-// TODO: navigator.hardwareConcurrency is undefined on iOS at the moment
-//const MAX_NUM_WORKERS = navigator.hardwareConcurrency;
-const MAX_NUM_WORKERS = 32;
+const MAX_NUM_WORKERS = navigator.hardwareConcurrency || 8;
 const workerPool = [];
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -94,4 +92,4 @@ async function workerPoolRenderImage({ width, height, numSamples, maxDepth }) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-export { initWorkerPool, workerPoolRenderImage };
+export { initWorkerPool, workerPoolRenderImage, MAX_NUM_WORKERS };

@@ -9,6 +9,7 @@ const canvas = document.getElementById('canvas');
 const { width, height } = canvas;
 const ctx = canvas.getContext('2d');
 const timeOutput = document.getElementById('time');
+const numThreadsOutput = document.getElementById('numThreads');
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -22,6 +23,9 @@ const timeOutput = document.getElementById('time');
 
   // Spin up our manual web worker pool
   await ManualWorkerPool.initWorkerPool();
+
+  // Set label to how many threads detected
+  numThreadsOutput.value = `Num threads: ${ManualWorkerPool.MAX_NUM_WORKERS}`;
 
   function setupRenderBtn(button, handler) {
     Object.assign(button, {
