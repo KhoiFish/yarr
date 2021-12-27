@@ -93,8 +93,6 @@ async function kickOffWorkerPoolRenderImage(imageWidth, imageHeight, samplesPerP
 
     return finalResults;
 }
-
-// --------------------------------------------------------------------------------------------------------------------
   
 async function workerPoolRenderImage({ width, height, numSamples, maxDepth }) {
     const start = performance.now();
@@ -108,4 +106,20 @@ async function workerPoolRenderImage({ width, height, numSamples, maxDepth }) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-export { initWorkerPool, workerPoolRenderImage, MAX_NUM_WORKERS };
+async function kickOffWorkerPoolRenderImageProgressive(progressiveCb, imageWidth, imageHeight, samplesPerPixel, maxDepth) {
+    
+}
+  
+async function workerPoolRenderImageProgressive({ progressiveCb, width, height, numSamples, maxDepth }) {
+    const start = performance.now();
+    var rawImageData = await kickOffWorkerPoolRenderImage(width, height, numSamples, maxDepth);
+    const time = performance.now() - start;
+    return {
+        rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
+        time
+    };
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+export { MAX_NUM_WORKERS, initWorkerPool, workerPoolRenderImage, workerPoolRenderImageProgressive };

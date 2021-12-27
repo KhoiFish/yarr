@@ -3,10 +3,11 @@ import * as Comlink from 'comlink';
 
 // --------------------------------------------------------------------------------------------------------------------
 
-function wrapRenderImageFunc({ render_image }) {
+function wrapRenderImageFunc(importedHandler) {
   return ({ width, height, numSamples, maxDepth }) => {
     const start = performance.now();
-    const rawImageData = render_image(width, height, numSamples, maxDepth);
+    const raytracer = importedHandler.create_webraytracer(width, height, numSamples, maxDepth);
+    const rawImageData = importedHandler.render_image(raytracer);
     const time = performance.now() - start;
     return {
       rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
@@ -38,7 +39,6 @@ async function initHandlers() {
         }
         const multiThreadImport = await import('../../target/web/pkg-parallel/web.js');
         await multiThreadImport.default();
-        await multiThreadImport.seed_rand(Date.now());
         await multiThreadImport.initThreadPool(navigator.hardwareConcurrency);
 
         return Comlink.proxy({

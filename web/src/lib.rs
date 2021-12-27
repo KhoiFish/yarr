@@ -36,7 +36,8 @@ pub fn wasm_alert(name: &str) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-struct WebRaytracer {
+#[wasm_bindgen]
+pub struct WebRaytracer {
     params: RaytracerParams,
     camera: camera::Camera,
     world: hittable::HittableList
@@ -92,20 +93,21 @@ impl WebRaytracer {
 // --------------------------------------------------------------------------------------------------------------------
 
 #[wasm_bindgen]
+pub fn create_webraytracer(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> WebRaytracer {
+    WebRaytracer::new(image_width, image_height, samples_per_pixel, max_depth)
+}
+
+#[wasm_bindgen]
 pub fn seed_rand(seed: u32) {
     owr_utils::seed_rand(seed)
 }
 
 #[wasm_bindgen]
-pub fn render_image(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> Clamped<Vec<u8>> {
-    let raytracer = WebRaytracer::new(image_width, image_height, samples_per_pixel, max_depth);
-    Clamped(
-        raytracer.render_image()
-    )
+pub fn render_image(raytracer: &WebRaytracer) -> Clamped<Vec<u8>> {
+    Clamped(raytracer.render_image())
 }
 
 #[wasm_bindgen]
-pub fn multi_sample_image(enable_average_sum: bool, image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> Vec<Float> {
-    let raytracer = WebRaytracer::new(image_width, image_height, samples_per_pixel, max_depth);
+pub fn multi_sample_image(raytracer: &WebRaytracer, enable_average_sum: bool) -> Vec<Float> {
     raytracer.multi_sample_image(enable_average_sum)
 }
