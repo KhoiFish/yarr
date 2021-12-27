@@ -3,8 +3,8 @@ import * as Comlink from 'comlink';
 // --------------------------------------------------------------------------------------------------------------------
 
 var wasmModule;
-var numWorkers = navigator.hardwareConcurrency;
-var workerPool = [];
+const MAX_NUM_WORKERS = navigator.hardwareConcurrency;
+const workerPool = [];
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -44,7 +44,7 @@ async function __init(workerId) {
 }
 
 async function __initWorkerPool() {
-    for (var i = 0; i < numWorkers; i++ ) {
+    for (var i = 0; i < MAX_NUM_WORKERS; i++ ) {
         let worker = await Comlink.wrap(
             new Worker(new URL('./manual-web-worker.js', import.meta.url), {
             type: 'module'
@@ -62,32 +62,48 @@ async function __workerRenderImage(image_width, image_height, samples_per_pixel,
 }
 
 async function __startWorkerPool(image_width, image_height, samples_per_pixel, max_depth) {
-    var numSamplesToProcess = [];
+    // Distribute the sampling across the worker threads
+    var numSamplesPerWorkerTable = [];
+    var numWorkers = 0;
+    {
+        var numSamplesToDo = samples_per_pixel;
+        var currentWorkerId = 0;
+        do {
+            if (numWorkers < MAX_NUM_WORKERS) {
+                numSamplesPerWorkerTable.push(0);
+                numWorkers++;
+                currentWorkerId = (numSamplesPerWorkerTable.length - 1);
+            } else {
+                currentWorkerId = (currentWorkerId + 1) % MAX_NUM_WORKERS;
+            }
 
-    samples_per_pixel = 1;
-
+            numSamplesPerWorkerTable[currentWorkerId]++;
+            numSamplesToDo--;
+        } while (numSamplesToDo > 0)
+    }
+    
     // Kick off the work for the worker threads
     var workerResults = []
-    for (var workerId = 0; workerId < numWorkers; workerId++)  {
-        workerResults.push(workerPool[workerId].workerRenderImage(image_width, image_height, samples_per_pixel, max_depth));
+    for (var workerId = 0; workerId < numSamplesPerWorkerTable.length; workerId++)  {
+        workerResults.push(workerPool[workerId].workerRenderImage(image_width, image_height, numSamplesPerWorkerTable[workerId], max_depth));
     }
 
     // Wait for results from all threads
     var resultsList = []
-    for (var workerId = 0; workerId < numWorkers; workerId++)  {
+    for (var workerId = 0; workerId < workerResults.length; workerId++)  {
         resultsList.push(await workerResults[workerId]);
     }
 
     // Convert to final form
     var finalBufferSize = image_width * image_height * 4;
     var finalResults = new Uint8ClampedArray(finalBufferSize);
-    var scale = 1.0 / 32.0;
+    var sumScale = 1.0 / samples_per_pixel;
     for (var i = 0; i < finalBufferSize; i++) {
         var sum = 0.0;
-        for (var workerId = 0; workerId < numWorkers; workerId++) {
-            sum += resultsList[workerId][i];
+        for (var resultIndex = 0; resultIndex < resultsList.length; resultIndex++) {
+            sum += resultsList[resultIndex][i];
         }
-        finalResults[i] = (sum * scale) * 256.0;
+        finalResults[i] = (sum * sumScale) * 256.0;
     }
 
     return finalResults;
