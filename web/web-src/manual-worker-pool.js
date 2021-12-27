@@ -35,7 +35,9 @@ function convertToU8Range(c) {
     return (c * 256);
 }
 
-async function startWorkerPool(imageWidth, imageHeight, samplesPerPixel, maxDepth) {
+// --------------------------------------------------------------------------------------------------------------------
+
+async function kickOffWorkerPoolRenderImage(imageWidth, imageHeight, samplesPerPixel, maxDepth) {
     // Distribute the sampling across the worker threads
     var numSamplesPerWorkerTable = [];
     var numWorkers = 0;
@@ -96,7 +98,7 @@ async function startWorkerPool(imageWidth, imageHeight, samplesPerPixel, maxDept
   
 async function workerPoolRenderImage({ width, height, numSamples, maxDepth }) {
     const start = performance.now();
-    var rawImageData = await startWorkerPool(width, height, numSamples, maxDepth);
+    var rawImageData = await kickOffWorkerPoolRenderImage(width, height, numSamples, maxDepth);
     const time = performance.now() - start;
     return {
         rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
