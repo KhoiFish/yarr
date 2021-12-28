@@ -1,6 +1,7 @@
 # YARR! - Native & Web-based Raytracer
-### It's pirate speak for: ___"Yet Another Rust Raytracer"___
 <img src="yarr_preview.png" alt="YARR - Yet Another Rust Raytracer" />
+
+### Pirate speak for ___"Yet Another Rust Raytracer"___
 
 Ahoy, me fellow mateys! This project serves as my own personal journey with learning Rust. It also led me to cross-compiling to WebAssembly.
 
@@ -68,12 +69,12 @@ npm --prefix ./web run build
 npm --prefix ./web run host
 ```
 
-
-## Credits & Credits
+## References
+#### Learn Rust
+I recently joined the _Rust Gang_ by reading [Programming Rust: Fast, Safe Systems Development](https://www.amazon.com/Programming-Rust-Fast-Systems-Development/dp/1492052590). It introduces as well as deep-dives the Rust language, from the perspective of a systems programmer. It's also surprisingly fun to read and has some light yet professional humor. If you're coming from another systems language such as C/C++, this is the book for you.
 
 #### Learn Raytracing
 If you're new to raytracing, I highly recommend you take a weekend (or two) to go through Peter Shirley's [RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) series of books. It's a great read and this project's raytracing core is based on it.
-
 
 #### WebAssembly & Multi-threading on the Web
 The following are great resources in learning how to setup Rust & WebAssembly for the web.
@@ -81,6 +82,12 @@ The following are great resources in learning how to setup Rust & WebAssembly fo
 * [WASM bindings with wasm-bindgend](https://rustwasm.github.io/docs/wasm-bindgen/introduction.html)
 * [Parallel demo with wasm-bindgen](https://github.com/rustwasm/wasm-bindgen/tree/main/examples/raytrace-parallel)
 * [Drop-in wasm parallelism with wasm-bindgen-rayon](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon)
+* [Manage web worker communication with Comlink](https://github.com/GoogleChromeLabs/comlink)
+
+## Special Thanks
+I'd like to thank the following people:
+* Peter Shirley, whose books really inspired me. As a kid, I always loved computer generated graphics, and his down-to-earth lessons made my childhood dream of writing a raytracer come true.
+* Diep Mai, for his friendship, and for introducing me to Rust. I finally got around to learning how to Rust!
 
 ## License
 This is free and open-source software distributed under the MIT License.
