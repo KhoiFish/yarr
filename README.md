@@ -10,7 +10,7 @@ I'm C/C++ programmer at heart, yet my heart grows ever so fonder for Rust. Rust 
 - Based on Peter Shirley's great "Raytracing in One Weekend" book series
 - Core implementation in Rust, with some JavaScript glue
 - Builds natively for Windows, MacOS, Linux & Dub-dub-dub (JavaScript & WebAssembly)
-- Multi-threaded via rayon crate, wasm-bind-rayon, and a (manually) managed web worker pool
+- Multi-threaded via rayon crate, wasm-bind-rayon, and as well as a (manually) managed web worker pool
 - Tested on iOS/Android via Chrome browser
 
 ## Get the source
@@ -71,18 +71,15 @@ npm --prefix ./web run host
 ## Credits & Credits
 
 #### Learn Raytracing
-If you're new to raytracing, I highly recommend you take a weekend or two to go through Peter Shirley's 'RayTracing in One Weekend' series of books.
+If you're new to raytracing, I highly recommend you take a weekend (or two) to go through Peter Shirley's [RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) series of books. It's a great read and this project's raytracing core is based on it.
 
-[RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
 
 #### WebAssembly & Multi-threading on the Web
 The following are great resources in learning how to setup Rust & WebAssembly for the web.
 
-[WASM bindings with wasm-bindgend](https://rustwasm.github.io/docs/wasm-bindgen/introduction.html)
-
-[Parallel demo with wasm-bindgen](https://github.com/rustwasm/wasm-bindgen/tree/main/examples/raytrace-parallel)
-
-[Drop-in wasm parallelism with wasm-bindgen-rayon](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon)
+* [WASM bindings with wasm-bindgend](https://rustwasm.github.io/docs/wasm-bindgen/introduction.html)
+* [Parallel demo with wasm-bindgen](https://github.com/rustwasm/wasm-bindgen/tree/main/examples/raytrace-parallel)
+* [Drop-in wasm parallelism with wasm-bindgen-rayon](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon)
 
 ## License
 This is free and open source software distributed under the MIT License.
