@@ -69,7 +69,9 @@ npm --prefix ./web run build
 npm --prefix ./web run host
 ```
 
-## Credits & Credits
+## References
+#### Learn Rust
+I recently joined the _Rust Gang_ by reading [Programming Rust: Fast, Safe Systems Development](https://www.amazon.com/Programming-Rust-Fast-Systems-Development/dp/1492052590). It introduces as well as deep-dives the Rust language, from the perspective of a systems programmer. It's also surprisingly fun to read and has some light yet professional humor. If you're coming from another systems language such as C/C++, this is the book for you.
 
 #### Learn Raytracing
 If you're new to raytracing, I highly recommend you take a weekend (or two) to go through Peter Shirley's [RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) series of books. It's a great read and this project's raytracing core is based on it.
