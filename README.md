@@ -30,6 +30,21 @@ https://www.rust-lang.org/tools/install
 #### Install npm
 https://nodejs.org/en/download/
 
+#### Install this version of nightly Rust
+This is required to build multi-thread support in the wasm module:
+
+For Windows
+```console
+rustup component add rust-src --toolchain nightly-2021-07-29-x86_64-pc-windows-msvc
+```console
+
+For MacOS
+```console
+rustup component add rust-src --toolchain nightly-2021-07-29-x86_64-apple-darwin
+```console
+
+For Linux, do something similar to the above. Pay attention to an error in your log that will suggest that right toolchain to rustup.
+
 #### Install wasm-bindgen-cli to build wasm bindings:
 ```console
 cargo install -f wasm-bindgen-cli
