@@ -1,11 +1,11 @@
-# YARR! - Native & Web-based Raytracer
+# YARR - Native & Web-based Raytracer
 <img src="yarr_preview.png" alt="YARR - Yet Another Rust Raytracer" />
 
 ### Pirate speak for ___"Yet Another Rust Raytracer"___
 
 Ahoy, me fellow mateys! This project serves as my own personal journey with learning Rust. It also led me to cross-compiling to WebAssembly.
 
-Building a raytracer is a great way to learn a modern language like Rust, where you can hone your skills in software design and performance-minded implementation. Rust is also well suited for systems programming, where close-to-the-metal control, performance, and data safety are critical to the craft.
+Building a raytracer is a great way to learn a modern language like Rust -- building a raytracer can hone your skills in software design and performance-minded implementation. Rust is also well suited for systems programming, where close-to-the-metal control, performance, and data safety are crucial to the craft.
 
 I'm a C/C++ programmer at heart, yet my heart grows ever so fonder for Rust. Rust definitely gives C++ a run for its money.
 
@@ -43,7 +43,7 @@ For MacOS
 rustup component add rust-src --toolchain nightly-2021-07-29-x86_64-apple-darwin
 ```
 
-For Linux, do something similar to the above. If you try to build without switching to this version of nightly rust, it will error. Pay attention to an error in your log that will suggest that right toolchain to rustup.
+For Linux, do something similar to the above (pay attention to an error in your log if you attempt to build, it should suggest that right toolchain to do rustup with).
 
 #### Install wasm-bindgen-cli to build wasm bindings:
 ```console
@@ -59,32 +59,32 @@ npm install
 ## Building
 You can use the scripts provided in this repo to build and host a local web server, or use these commands directly:
 
-#### Build natively on your machine:
+#### Build a native console app
 ```console
 cargo build --release
 ```
 
-#### Test natively on your machine. This will output a ppm image file (use GIMP to view):
+#### Testing native console app (output is a .ppm file, use GIMP to view)
 ```console
 cargo run --release > output.ppm
 ```
 
-#### Build web app:
+#### Building the web app
 ```console
 npm --prefix ./web run build
 ```
 
-#### Host and try out WebAssembly locally:
+#### Hosting local web server
 ```console
 npm --prefix ./web run host
 ```
 
 ## References
 #### Learn Rust
-I recently joined the _Rust Gang_ by reading [Programming Rust: Fast, Safe Systems Development](https://www.amazon.com/Programming-Rust-Fast-Systems-Development/dp/1492052590). It introduces as well as deep-dives the Rust language, from the perspective of a systems programmer. It's also surprisingly fun to read and has some light yet professional humor. If you're coming from another systems language such as C/C++, this is the book for you.
+I recently joined the _Rust Gang_ by reading [Programming Rust: Fast, Safe Systems Development](https://www.amazon.com/Programming-Rust-Fast-Systems-Development/dp/1492052590). It introduces and deep-dives the Rust language from the perspective of systems development. It's also surprisingly fun to read with light yet professional humor. If you are coming from another systems language such as C/C++, this is the book for you.
 
 #### Learn Raytracing
-If you're new to raytracing, I highly recommend you take a weekend (or two) to go through Peter Shirley's [RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) series of books. It's a great read and this project's raytracing core is based on it.
+If you're new to raytracing, I highly recommend you take a weekend (or two!) to go through Peter Shirley's [RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) series of books. It's a great read and this project's raytracing core is based on it.
 
 #### WebAssembly & Multi-threading on the Web
 The following are great resources in learning how to setup Rust & WebAssembly for the web.
@@ -96,8 +96,8 @@ The following are great resources in learning how to setup Rust & WebAssembly fo
 
 ## Special Thanks
 I'd like to thank the following people:
-* Peter Shirley, whose books really inspired me. As a kid, I always loved computer generated graphics, and his down-to-earth lessons made my childhood dream of writing a raytracer come true.
-* Diep Mai, for his friendship, and for introducing me to Rust. I finally got around to learning how to Rust!
+* Peter Shirley, whose books really inspired me. As a kid, I always loved computer generated graphics, and his down-to-earth lessons made my childhood dreams of writing my own raytracer come true.
+* Diep Mai, for his friendship, and for introducing me to Rust. I finally got around to learning how-to-rust!
 
 ## License
-This is free and open-source software distributed under the MIT License.
+This is free and open-source software distributed under the MIT License. Feel free to use and go get 'em tiger.
