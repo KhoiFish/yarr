@@ -1,11 +1,12 @@
 # YARR! - Native & Web-based Raytracer
 ### It's pirate speak for: ___"Yet Another Rust Raytracer"___
+<img src="yarr_preview.png" alt="YARR - Yet Another Rust Raytracer" />
 
 Ahoy, me fellow mateys! This project serves as my own personal journey with learning Rust. It also led me to cross-compiling to WebAssembly.
 
-Building a raytracer is a great way to learn a modern language like Rust, where you hone your skills in software design and performance-minded implementation. Rust is also well suited for systems programming, where close-to-the-metal control, performance and data safety are critical to the craft.
+Building a raytracer is a great way to learn a modern language like Rust, where you can hone your skills in software design and performance-minded implementation. Rust is also well suited for systems programming, where close-to-the-metal control, performance, and data safety are critical to the craft.
 
-I'm C/C++ programmer at heart, yet my heart grows ever so fonder for Rust. Rust definitely gives C++ a run for its money.
+I'm a C/C++ programmer at heart, yet my heart grows ever so fonder for Rust. Rust definitely gives C++ a run for its money.
 
 - Based on Peter Shirley's great "Raytracing in One Weekend" book series
 - Core implementation in Rust, with some JavaScript glue
@@ -18,7 +19,7 @@ I'm C/C++ programmer at heart, yet my heart grows ever so fonder for Rust. Rust 
 git clone https://github.com/KhoiFish/yarr.git
 ```
 
-## Software pre-requsuites
+## Software pre-requisites
 
 To build this project, you'll need to install the following software. *_Note: the following commands are assumed to be from the root directory of the project._*
 
@@ -82,4 +83,4 @@ The following are great resources in learning how to setup Rust & WebAssembly fo
 * [Drop-in wasm parallelism with wasm-bindgen-rayon](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon)
 
 ## License
-This is free and open source software distributed under the MIT License.
+This is free and open-source software distributed under the MIT License.
