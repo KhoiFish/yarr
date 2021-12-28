@@ -30,11 +30,6 @@ https://www.rust-lang.org/tools/install
 #### Install npm
 https://nodejs.org/en/download/
 
-#### Install this version of nightly Rust (enables multi-thread support for WebAssembly)
-```console
-rustup component add rust-src --toolchain nightly-2021-07-29-x86_64-pc-windows-msvc
-```
-
 #### Install wasm-bindgen-cli to build wasm bindings:
 ```console
 cargo install -f wasm-bindgen-cli
