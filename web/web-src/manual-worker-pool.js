@@ -114,25 +114,25 @@ async function workerPoolRenderImage({ width, height, numSamples, maxDepth }) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function kickOffWorkerPoolRenderImageProgressive(userCb, imageWidth, imageHeight, samplesPerPixel, maxDepth) {
-    // Allocate final buffer upfront
-    var finalBufferSize = imageWidth * imageHeight * 4;
-    var finalResults = new Uint8ClampedArray(finalBufferSize);
+async function kickOffWorkerPoolRenderImageProgressive(previewCb, imageWidth, imageHeight, samplesPerPixel, maxDepth) {
+    // // Allocate final buffer upfront
+    // var finalBufferSize = imageWidth * imageHeight * 4;
+    // var finalResults = new Uint8ClampedArray(finalBufferSize);
 
-    // Define our own callback
-    var ourCb = function (x, y, colorU32) {
-        // Write to our final results buffer
-        // Note we intentionally skip alpha (i = 4)
-        var offset = ((y * imageWidth) + x) * 4;
-        for (var i = 0; i < 3; i++) {
-            // Shift and mask off the channel value
-            finalResults[offset + i] = (colorU32 >> (8 * (3 - i))) & 0xff;
-        }
-        finalResults[offset + 3] = 255;
+    // // Define our own callback
+    // var ourCb = function (x, y, colorU32) {
+    //     // Write to our final results buffer
+    //     // Note we intentionally skip alpha (i = 4)
+    //     var offset = ((y * imageWidth) + x) * 4;
+    //     for (var i = 0; i < 3; i++) {
+    //         // Shift and mask off the channel value
+    //         finalResults[offset + i] = (colorU32 >> (8 * (3 - i))) & 0xff;
+    //     }
+    //     finalResults[offset + 3] = 255;
 
-        // Call user's callback
-        userCb(x, y, colorU32);
-    }
+    //     // Call user's callback
+    //     userCb(x, y, colorU32);
+    // }
 
     // Divide into regions
     const maxRegionWidth = Math.floor(imageWidth / MAX_NUM_WORKERS);
@@ -141,7 +141,7 @@ async function kickOffWorkerPoolRenderImageProgressive(userCb, imageWidth, image
     for (var x = 0; x < imageWidth; x += maxRegionWidth) {
         var regionWidth = Math.min(maxRegionWidth, (imageWidth - x));
         var regionHeight = imageHeight;
-        workersList.push(workerPool[numWorkers++].workerRenderImageProgressive(Comlink.proxy(ourCb), imageWidth, imageHeight, samplesPerPixel, maxDepth, x, 0, regionWidth, regionHeight));
+        workersList.push(workerPool[numWorkers++].workerRenderImageProgressive(Comlink.proxy(previewCb), imageWidth, imageHeight, samplesPerPixel, maxDepth, x, 0, regionWidth, regionHeight));
     }
 
     // Wait for everything to come back
@@ -149,16 +149,15 @@ async function kickOffWorkerPoolRenderImageProgressive(userCb, imageWidth, image
         await workersList[i];
     }
 
-    // Done
-    return finalResults;
+    // // Done
+    // return finalResults;
 }
   
-async function workerPoolRenderImageProgressive({ userCb, width, height, numSamples, maxDepth }) {
+async function workerPoolRenderImageProgressive({ previewCb, width, height, numSamples, maxDepth }) {
     const start = performance.now();
-    var rawImageData = await kickOffWorkerPoolRenderImageProgressive(userCb, width, height, numSamples, maxDepth);
+    await kickOffWorkerPoolRenderImageProgressive(previewCb, width, height, numSamples, maxDepth);
     const time = performance.now() - start;
     return {
-        rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
         time
     };
 }
