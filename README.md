@@ -1,6 +1,7 @@
 # YARR! - Native & Web-based Raytracer
-### It's pirate speak for: ___"Yet Another Rust Raytracer"___
 <img src="yarr_preview.png" alt="YARR - Yet Another Rust Raytracer" />
+
+### Pirate speak for ___"Yet Another Rust Raytracer"___
 
 Ahoy, me fellow mateys! This project serves as my own personal journey with learning Rust. It also led me to cross-compiling to WebAssembly.
 
@@ -81,6 +82,7 @@ The following are great resources in learning how to setup Rust & WebAssembly fo
 * [WASM bindings with wasm-bindgend](https://rustwasm.github.io/docs/wasm-bindgen/introduction.html)
 * [Parallel demo with wasm-bindgen](https://github.com/rustwasm/wasm-bindgen/tree/main/examples/raytrace-parallel)
 * [Drop-in wasm parallelism with wasm-bindgen-rayon](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon)
+* [Manage web worker communication with Comlink](https://github.com/GoogleChromeLabs/comlink)
 
 ## License
 This is free and open-source software distributed under the MIT License.
