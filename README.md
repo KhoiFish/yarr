@@ -14,17 +14,17 @@ Rust is well suited for systems programming, where close-to-the-metal control, p
 I'm a C/C++ programmer at heart, yet my heart grows ever so fonder for Rust. **Rust gives C++ a run for its money.**
 
 - Based on Peter Shirley's great "Raytracing in One Weekend" book series
-- Core implementation in Rust, with some JavaScript glue
+- Core implementation in Rust, with some JavaScript glue for the web target
 - Builds natively for Windows, MacOS, Linux & dub-dub-dub (JavaScript & WebAssembly)
 - Multi-threaded via rayon crate, wasm-bind-rayon, and as well as a manually managed web worker pool
 - Tested on iOS/Android via Chrome browser
 
-## Get the source
+## Get the Source
 ```console
 git clone https://github.com/KhoiFish/yarr.git
 ```
 
-## Software pre-requisites
+## Software Prerequisites
 
 To build this project, you'll need to install the following software. 
 _Note: the following commands are assumed to be from the root directory of the project._
@@ -35,7 +35,7 @@ https://www.rust-lang.org/tools/install
 ### Install npm
 https://nodejs.org/en/download/
 
-### Install Nightly Rust
+### Install nightly rust
 This is required to build multi-thread support in the wasm module. At some time in the future this will be included in a stable release of rust.
 
 #### Windows
@@ -64,7 +64,7 @@ cd web
 npm install
 ```
 
-## Building
+## Build It
 You can use the scripts provided in this repo to build and host a local web server, or use these commands directly:
 
 ### Build a native console app
@@ -92,13 +92,13 @@ npm --prefix ./web run host
 ```
 
 ## References
-### Learning Rust
+### Learning rust
 I recently joined the _Rust Gang_ by reading [Programming Rust: Fast, Safe Systems Development](https://www.amazon.com/Programming-Rust-Fast-Systems-Development/dp/1492052590). It introduces and deep-dives the Rust language from the perspective of systems development. It's also surprisingly fun to read with light and professional humor. If you are coming from another systems language such as C/C++, this is the book for you.
 
-### Learning Raytracing
+### Learning raytracing
 If you're new to raytracing, I highly recommend you take a weekend (or two!) and go through Peter Shirley's [RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) series of books. It's a great read and this project's raytracing core is based on it.
 
-### WebAssembly & Multi-threading on the Web
+### WebAssembly & multi-threading on the web
 The following are great resources in learning how to setup Rust & WebAssembly for the web.
 
 * [Create wasm bindings with wasm-bindgen](https://rustwasm.github.io/docs/wasm-bindgen/introduction.html)
