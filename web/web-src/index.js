@@ -22,7 +22,8 @@ function updateTimeLabel(timeInMs) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-function setupRenderBtn(button, handler) {
+function setupRenderBtn(buttonId, handler) {
+    var button = document.getElementById(buttonId);
     Object.assign(button, {
         async onclick() {
             setEnableAvaialbleButtons(false);
@@ -57,7 +58,8 @@ function previewDraw() {
     ctx.putImageData(previewImgData, 0, 0);
 }
 
-function setupPreviewRenderBtn(button) {
+function setupPreviewRenderBtn(buttonId) {
+    var button = document.getElementById(buttonId);
     Object.assign(button, {
         async onclick() {            
             // Kick off preview drawing
@@ -114,10 +116,10 @@ async function init() {
     buttonAvailableMap.set('manualWebWorkersPreview', true);
 
     // Setup buttons, they are disabled by default
-    setupRenderBtn(document.getElementById('singleThreadBtn'), wasmHandlers.singleThread);
-    setupRenderBtn(document.getElementById('multiThreadBtn'), wasmHandlers.multiThread);
-    setupRenderBtn(document.getElementById('manualWebWorkers'), { renderImage: ManualWorkerPool.workerPoolRenderImage });
-    setupPreviewRenderBtn(document.getElementById('manualWebWorkersPreview'));
+    setupRenderBtn('singleThreadBtn', wasmHandlers.singleThread);
+    setupRenderBtn('multiThreadBtn', wasmHandlers.multiThread);
+    setupRenderBtn('manualWebWorkers', { renderImage: ManualWorkerPool.workerPoolRenderImage });
+    setupPreviewRenderBtn('manualWebWorkersPreview');
 
     // Now enable buttons if they are available
     setEnableAvaialbleButtons(true);
