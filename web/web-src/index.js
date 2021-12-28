@@ -10,6 +10,7 @@ const { width, height } = canvas;
 const ctx = canvas.getContext('2d');
 const timeOutput = document.getElementById('time');
 const numThreadsOutput = document.getElementById('numThreads');
+const buttonAvailableMap = new Map();
 var previewImgData;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -24,6 +25,7 @@ function updateTimeLabel(timeInMs) {
 function setupRenderBtn(button, handler) {
     Object.assign(button, {
         async onclick() {
+            setEnableAvaialbleButtons(false);
             const numSamples = parseInt(numSamplesSlider.value);
             const maxDepth = parseInt(maxDepthSlider.value);
             let { rawImageData, time } = await handler.renderImage({
@@ -34,8 +36,8 @@ function setupRenderBtn(button, handler) {
             });
             updateTimeLabel(time);
             ctx.putImageData(new ImageData(rawImageData, width, height), 0, 0);
-        },
-        disabled: false
+            setEnableAvaialbleButtons(true);
+        }
     });
 }
 
@@ -57,8 +59,9 @@ function previewDraw() {
 
 function setupPreviewRenderBtn(button) {
     Object.assign(button, {
-        async onclick() {
+        async onclick() {            
             // Kick off preview drawing
+            setEnableAvaialbleButtons(false);
             previewImgData = new ImageData(width, height);
             const drawInteral = setInterval(previewDraw, 250);
 
@@ -71,9 +74,18 @@ function setupPreviewRenderBtn(button) {
             updateTimeLabel(time);
             clearInterval(drawInteral);
             ctx.putImageData(previewImgData, 0, 0);
-        },
-        disabled: false
+            setEnableAvaialbleButtons(true);
+        }
     });
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+function setEnableAvaialbleButtons(enable) {
+    for (let [buttonId, isAvailable] of buttonAvailableMap) {
+        var buttonEnabled = isAvailable && enable;
+        document.getElementById(buttonId).disabled = !buttonEnabled;
+    }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -92,15 +104,23 @@ async function init() {
     // Set label to how many threads detected
     numThreadsOutput.value = `Num threads: ${ManualWorkerPool.MAX_NUM_WORKERS}`;
 
-    // Setup buttons
+    // Are threads supported ?
+    const threadsSupported = (await wasmHandlers.supportsThreads) ? true : false;
+
+    // Map which buttons are available
+    buttonAvailableMap.set('singleThreadBtn', true);
+    buttonAvailableMap.set('multiThreadBtn', threadsSupported);
+    buttonAvailableMap.set('manualWebWorkers', true);
+    buttonAvailableMap.set('manualWebWorkersPreview', true);
+
+    // Setup buttons, they are disabled by default
     setupRenderBtn(document.getElementById('singleThreadBtn'), wasmHandlers.singleThread);
+    setupRenderBtn(document.getElementById('multiThreadBtn'), wasmHandlers.multiThread);
     setupRenderBtn(document.getElementById('manualWebWorkers'), { renderImage: ManualWorkerPool.workerPoolRenderImage });
     setupPreviewRenderBtn(document.getElementById('manualWebWorkersPreview'));
 
-    // Setup multi-threaded button if avaialble
-    if (await wasmHandlers.supportsThreads) {
-        setupRenderBtn(document.getElementById('multiThreadBtn'), wasmHandlers.multiThread);
-    }
+    // Now enable buttons if they are available
+    setEnableAvaialbleButtons(true);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
