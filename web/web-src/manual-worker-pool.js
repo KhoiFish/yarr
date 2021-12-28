@@ -27,6 +27,14 @@ function assert(condition, message) {
     }
 }
 
+var rgbToHex = function (rgba) { 
+    var hex = Number(rgba).toString(16);
+    if (hex.length < 2) {
+        hex = "0" + hex;
+    }
+    return hex;
+};
+
 function gammaCorrect(c) {
     return Math.max(0.0, Math.min(Math.sqrt(c), 0.999));
 }
@@ -112,17 +120,18 @@ async function kickOffWorkerPoolRenderImageProgressive(userCb, imageWidth, image
     var finalResults = new Uint8ClampedArray(finalBufferSize);
 
     // Define our own callback
-    var ourCb = function (sample, x, y) {
+    var ourCb = function (x, y, colorU32) {
         // Write to our final results buffer
         // Note we intentionally skip alpha (i = 4)
         var offset = ((y * imageWidth) + x) * 4;
         for (var i = 0; i < 3; i++) {
-            finalResults[offset + i] = convertToU8Range(gammaCorrect(sample[i]));
+            // Shift and mask off the channel value
+            finalResults[offset + i] = (colorU32 >> (8 * (3 - i))) & 0xff;
         }
         finalResults[offset + 3] = 255;
 
         // Call user's callback
-        userCb(sample, x, y);
+        userCb(x, y, colorU32);
     }
 
     // Divide into regions

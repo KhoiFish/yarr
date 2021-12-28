@@ -52,8 +52,8 @@ async function workerRenderImageProgressive(progressiveCb, imageWidth, imageHeig
     var raytracer = wasmModule.create_webraytracer(imageWidth, imageHeight, samplesPerPixel, maxDepth);
     for(var y = regionY; y < (regionY + regionHeight); y++) {
         for(var x = regionX; x < (regionX + regionWidth); x++) {
-            var sample = await wasmModule.multi_sample_point(raytracer, true, x, (imageHeight-y));
-            await progressiveCb(sample, x, y);
+            var colorU32 = await wasmModule.multi_sample_point(raytracer, x, (imageHeight-y));
+            await progressiveCb(x, y, colorU32);
         }
     }
 }

@@ -14,11 +14,11 @@ pub fn convert_to_u8_range(c: Float) -> u8 {
     (c * 256.0) as u8
 }
 
-pub fn convert_to_u32_color(c: &Vec3<Float>) -> u32 {
-    let r = convert_to_u8_range(c.x()) as u32;
-    let g = convert_to_u8_range(c.y()) as u32;
-    let b = convert_to_u8_range(c.z()) as u32;
-    let a = convert_to_u8_range(1.0)as u32;
+pub fn vec3_to_u32(c: &Vec3<Float>) -> u32 {
+    let r = convert_to_u8_range(gamma_correct(c.x())) as u32;
+    let g = convert_to_u8_range(gamma_correct(c.y())) as u32;
+    let b = convert_to_u8_range(gamma_correct(c.z())) as u32;
+    let a = convert_to_u8_range(1.0) as u32;
 
     r.shl(24) | g.shl(16) | b.shl(8) | a
 }
