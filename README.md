@@ -80,10 +80,10 @@ npm --prefix ./web run host
 ```
 
 ## References
-#### Learn Rust
+#### Learning Rust
 I recently joined the _Rust Gang_ by reading [Programming Rust: Fast, Safe Systems Development](https://www.amazon.com/Programming-Rust-Fast-Systems-Development/dp/1492052590). It introduces and deep-dives the Rust language from the perspective of systems development. It's also surprisingly fun to read with light yet professional humor. If you are coming from another systems language such as C/C++, this is the book for you.
 
-#### Learn Raytracing
+#### Learning Raytracing
 If you're new to raytracing, I highly recommend you take a weekend (or two!) to go through Peter Shirley's [RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) series of books. It's a great read and this project's raytracing core is based on it.
 
 #### WebAssembly & Multi-threading on the Web
