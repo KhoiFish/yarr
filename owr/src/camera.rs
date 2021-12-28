@@ -14,11 +14,14 @@ pub struct Camera {
     u: Vec3<Float>,
     v: Vec3<Float>,
     w: Vec3<Float>,
-    lens_radius: Float
+    lens_radius: Float,
+    time0: Float,
+    time1: Float
 }
 
 impl Camera {
-    pub fn new(look_from: &Vec3<Float>, look_at: &Vec3<Float>, up: &Vec3<Float>, fov: Float, aspect_ratio: Float, aperture: Float, focus_dist: Float) -> Self {
+    pub fn new(look_from: &Vec3<Float>, look_at: &Vec3<Float>, up: &Vec3<Float>, fov: Float, 
+            aspect_ratio: Float, aperture: Float, focus_dist: Float, time0: Float, time1: Float) -> Self {
         let theta = fov.to_radians();
         let h = (theta/2.0).tan();
         let viewport_height = 2.0 * h;
@@ -42,7 +45,9 @@ impl Camera {
             u,
             v,
             w,
-            lens_radius
+            lens_radius,
+            time0,
+            time1
         }
     }
 
@@ -52,7 +57,8 @@ impl Camera {
 
         Ray::<Float> { 
             orig: self.origin + offset,
-            dir: self.lower_left_corner + self.horizontal*s + self.vertical*t - self.origin - offset
+            dir: self.lower_left_corner + self.horizontal*s + self.vertical*t - self.origin - offset,
+            time: utils::random_range(self.time0, self.time1)
         }
     }
 }

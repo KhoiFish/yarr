@@ -4,7 +4,7 @@ use std::sync::Arc;
 use crate::{log_print};
 use crate::vec3::Vec3;
 use crate::hittable::{HittableList};
-use crate::sphere::Sphere;
+use crate::sphere::{Sphere, MovingSphere};
 use crate::utils;
 use crate::sampling::{render_image};
 use crate::material;
@@ -44,7 +44,9 @@ pub fn example_camera(aspect_ratio: Float) -> camera::Camera {
             45.0,
             aspect_ratio,
             aperture,
-            focus_dist
+            focus_dist,
+            0.0,
+            1.0
         );
     }
 
@@ -71,7 +73,8 @@ pub fn first_weekend_scene() -> HittableList {
                     // Diffuse
                     let albedo = utils::det_random_vec3() * utils::det_random_vec3();
                     let material = Arc::new(material::Lambertian { albedo });
-                    world.list.push(Arc::new(Sphere { center, radius, material }));
+                    let center2 = center +  Vec3::new(0.0, utils::det_random_range(0.0,0.5), 0.0);
+                    world.list.push(Arc::new(MovingSphere { center0: center, center1: center2, time0: 0.0, time1: 1.0, radius, material }));
                 } else if choose_mat < 0.95 {
                     // Metal
                     let albedo = utils::det_random_range_vec3(0.5, 1.0);

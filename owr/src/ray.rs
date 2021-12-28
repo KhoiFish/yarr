@@ -4,8 +4,9 @@ use std::ops::{Add, Mul};
 // --------------------------------------------------------------------------------------------------------------------
 
 pub struct Ray<T> {
-    pub orig : Vec3<T>,
-    pub dir : Vec3<T>
+    pub orig: Vec3<T>,
+    pub dir: Vec3<T>,
+    pub time: T
 }
 
 impl<T> Ray<T> {
