@@ -41,7 +41,7 @@ pub fn example_camera(aspect_ratio: Float) -> camera::Camera {
             &look_from,
             &look_at,
             &up,
-            90.0,
+            45.0,
             aspect_ratio,
             aperture,
             focus_dist
