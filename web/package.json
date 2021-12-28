@@ -4,7 +4,7 @@
     "build:wasm-st": "wasm-pack build --target web --out-dir ../target/web/pkg",
     "build:wasm-mt": "cross-env RUSTFLAGS=\"-C target-feature=+atomics,+bulk-memory,+mutable-globals\" rustup run nightly-2021-07-29 wasm-pack build --target web --out-dir ../target/web/pkg-parallel -- --features parallel -Z build-std=panic_abort,std",
     "build:wasm": "run-p build:wasm-st build:wasm-mt",
-    "build": "npm run build:wasm && webpack build ./web-src/index.js --mode production -o ../target/web/dist --output-filename index.js && copy .\\web-src\\index.html ..\\target\\web\\dist\\",
+    "build": "npm run build:wasm && webpack build ./web-src/index.js --mode production -o ../target/web/dist --output-filename index.js && ncp ./web-src/index.html ../target/web/dist/index.html",
     "host": "serve"
   },
   "devDependencies": {
@@ -16,6 +16,7 @@
   },
   "dependencies": {
     "comlink": "^4.3.1",
+    "ncp": "^2.0.0",
     "serve": "^13.0.2",
     "wasm-feature-detect": "^1.2.10"
   }
