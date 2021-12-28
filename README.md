@@ -1,7 +1,7 @@
 # YARR! - Native & Web-based Raytracer
-### It's pirate speak for ___"Yet Another Rust Raytracer"___
+### It's pirate speak for: ___"Yet Another Rust Raytracer"___
 
-Aye aye, me fellow mateys! This project serves as my own personal journey with learning Rust. It also led me to cross-compiling to WebAssembly.
+Ahoy, me fellow mateys! This project serves as my own personal journey with learning Rust. It also led me to cross-compiling to WebAssembly.
 
 Building a raytracer is a great way to learn a modern language like Rust, where you hone your skills in software design and performance-minded implementation. Rust is also well suited for systems programming, where close-to-the-metal control, performance and data safety are critical to the craft.
 
@@ -71,15 +71,18 @@ npm --prefix ./web run host
 ## Credits & Credits
 
 #### Learn Raytracing
-If you're new to raytracing, I highly recommend you take a weekend or two to go through Peter Shirley's 'RayTracing in One Weekend' series of books. It's well worth your time, and the raytracing core of this project is adapted and based on it.
-https://raytracing.github.io/books/RayTracingInOneWeekend.html
+If you're new to raytracing, I highly recommend you take a weekend or two to go through Peter Shirley's 'RayTracing in One Weekend' series of books.
+
+[RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html)
 
 #### WebAssembly & Multi-threading on the Web
 The following are great resources in learning how to setup Rust & WebAssembly for the web.
 
-https://rustwasm.github.io/docs/wasm-bindgen/introduction.html
-https://github.com/rustwasm/wasm-bindgen/tree/main/examples/raytrace-parallel
-https://github.com/GoogleChromeLabs/wasm-bindgen-rayon
+[WASM bindings with wasm-bindgend](https://rustwasm.github.io/docs/wasm-bindgen/introduction.html)
+
+[Parallel demo with wasm-bindgen](https://github.com/rustwasm/wasm-bindgen/tree/main/examples/raytrace-parallel)
+
+[Drop-in wasm parallelism with wasm-bindgen-rayon](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon)
 
 ## License
 This is free and open source software distributed under the MIT License.
