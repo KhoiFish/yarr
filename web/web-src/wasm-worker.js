@@ -3,8 +3,7 @@ import * as Comlink from 'comlink';
 
 // --------------------------------------------------------------------------------------------------------------------
 
-function wrapRenderImageFunc(importedHandler)
-{
+function wrapRenderImageFunc(importedHandler) {
     return ({ width, height, numSamples, maxDepth }) =>
     {
         const start = performance.now();
@@ -20,8 +19,7 @@ function wrapRenderImageFunc(importedHandler)
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function initHandlers()
-{
+async function initHandlers() {
     let [singleThreadExports, multiThreadExports] = await Promise.all(
         [
             // Single-thread

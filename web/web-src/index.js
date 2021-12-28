@@ -10,15 +10,20 @@ const { width, height } = canvas;
 const ctx = canvas.getContext('2d');
 const timeOutput = document.getElementById('time');
 const numThreadsOutput = document.getElementById('numThreads');
-const previewImgData = new ImageData(width, height);
+var previewImgData;
 
 // --------------------------------------------------------------------------------------------------------------------
 
-function setupRenderBtn(button, handler)
-{
+function updateTimeLabel(timeInMs) {
+    var timeInSec = timeInMs / 1000;
+    timeOutput.value = `${timeInSec.toFixed(2)} sec(s)`;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+function setupRenderBtn(button, handler) {
     Object.assign(button, {
-        async onclick()
-        {
+        async onclick() {
             const numSamples = parseInt(numSamplesSlider.value);
             const maxDepth = parseInt(maxDepthSlider.value);
             let { rawImageData, time } = await handler.renderImage({
@@ -27,9 +32,8 @@ function setupRenderBtn(button, handler)
                 numSamples,
                 maxDepth
             });
-            timeOutput.value = `${time.toFixed(2)} ms`;
-            const imgData = new ImageData(rawImageData, width, height);
-            ctx.putImageData(imgData, 0, 0);
+            updateTimeLabel(time);
+            ctx.putImageData(new ImageData(rawImageData, width, height), 0, 0);
         },
         disabled: false
     });
@@ -37,32 +41,36 @@ function setupRenderBtn(button, handler)
 
 // --------------------------------------------------------------------------------------------------------------------
 
-function previewCb(x, y, colorU32)
-{
+function previewCb(x, y, colorU32) {
     // Note we intentionally skip alpha (i = 4)
     var offset = ((y * width) + x) * 4;
-    for (var i = 0; i < 3; i++)
-    {
+    for (var i = 0; i < 3; i++) {
         // Shift and mask off the channel value
         previewImgData.data[offset + i] = (colorU32 >> (8 * (3 - i))) & 0xff;
     }
     previewImgData.data[offset + 3] = 255;
+}
 
-    // Update canvas
+function previewDraw() {
     ctx.putImageData(previewImgData, 0, 0);
 }
 
-// --------------------------------------------------------------------------------------------------------------------
-
-function setupPreviewRenderBtn(button)
-{
+function setupPreviewRenderBtn(button) {
     Object.assign(button, {
-        async onclick()
-        {
+        async onclick() {
+            // Kick off preview drawing
+            previewImgData = new ImageData(width, height);
+            const drawInteral = setInterval(previewDraw, 250);
+
+            // Kick off the progressive raytracing
             const numSamples = parseInt(numSamplesSlider.value);
             const maxDepth = parseInt(maxDepthSlider.value);
             let { time } = await ManualWorkerPool.workerPoolRenderImageProgressive({ previewCb, width, height, numSamples, maxDepth });
-            timeOutput.value = `${time.toFixed(2)} ms`;
+
+            // Done rendering
+            updateTimeLabel(time);
+            clearInterval(drawInteral);
+            ctx.putImageData(previewImgData, 0, 0);
         },
         disabled: false
     });
@@ -70,8 +78,7 @@ function setupPreviewRenderBtn(button)
 
 // --------------------------------------------------------------------------------------------------------------------
 
-(async function init()
-{
+async function init() {
     // Get handlers to rust wasm api
     let wasmHandlers = await Comlink.wrap(
         new Worker(new URL('./wasm-worker.js', import.meta.url), {
@@ -91,8 +98,12 @@ function setupPreviewRenderBtn(button)
     setupPreviewRenderBtn(document.getElementById('manualWebWorkersPreview'));
 
     // Setup multi-threaded button if avaialble
-    if (await wasmHandlers.supportsThreads)
-    {
+    if (await wasmHandlers.supportsThreads) {
         setupRenderBtn(document.getElementById('multiThreadBtn'), wasmHandlers.multiThread);
     }
-})();
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Main entry
+
+init();
