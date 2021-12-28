@@ -69,12 +69,10 @@ npm --prefix ./web run build
 npm --prefix ./web run host
 ```
 
-
 ## Credits & Credits
 
 #### Learn Raytracing
 If you're new to raytracing, I highly recommend you take a weekend (or two) to go through Peter Shirley's [RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) series of books. It's a great read and this project's raytracing core is based on it.
-
 
 #### WebAssembly & Multi-threading on the Web
 The following are great resources in learning how to setup Rust & WebAssembly for the web.
@@ -83,6 +81,11 @@ The following are great resources in learning how to setup Rust & WebAssembly fo
 * [Parallel demo with wasm-bindgen](https://github.com/rustwasm/wasm-bindgen/tree/main/examples/raytrace-parallel)
 * [Drop-in wasm parallelism with wasm-bindgen-rayon](https://github.com/GoogleChromeLabs/wasm-bindgen-rayon)
 * [Manage web worker communication with Comlink](https://github.com/GoogleChromeLabs/comlink)
+
+## Special Thanks
+I'd like to thank the following people:
+* Peter Shirley, whose books really inspired me. As a kid, I always loved computer generated graphics, and his down-to-earth lessons made my childhood dream of writing a raytracer come true.
+* Diep Mai, for his friendship, and for introducing me to Rust. I finally got around to learning how to Rust!
 
 ## License
 This is free and open-source software distributed under the MIT License.
