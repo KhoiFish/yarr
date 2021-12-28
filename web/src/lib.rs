@@ -1,3 +1,5 @@
+#![cfg(target_family = "wasm")]
+
 use owr::examples::*;
 use owr::types::*;
 use owr::camera;
