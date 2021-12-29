@@ -7,12 +7,12 @@ Ahoy, me fellow mateys!
 
 YARR is the result of my personal journey with learning Rust. It also led me to cross-compiling to WebAssembly along the way. 
 
-Rust is well suited for systems programming, where close-to-the-metal control, performance, and data safety are crucial to the craft. Building a raytracer is a great way to learn a modern language like Rust; building a raytracer can hone your skills in software design, multi-threading/parallelism, and performance-minded implementation. 
+Rust is well suited for systems programming, where close-to-the-metal control, performance, and data safety are crucial to the craft. Building a raytracer is a great way to learn a modern language like Rust; writing a raytracer using Rust can hone skills in software design, multi-threading/parallelism, and performance-minded implementation. 
 
 I'm a C/C++ programmer at heart, yet my heart grows ever so fonder for Rust. **Rust gives C++ a run for its money.**
 
 - Based on Peter Shirley's great "Raytracing in One Weekend" book series
-- Core implementation in Rust, with some JavaScript glue for the web target
+- Core implementation in Rust, with some JavaScript glue for the web
 - Builds natively for Windows, MacOS, Linux & dub-dub-dub (JavaScript & WebAssembly)
 - Multi-threaded via rayon crate, wasm-bind-rayon, and as well as a manually managed web worker pool
 - Tested on iOS/Android via Chrome browser
@@ -34,7 +34,7 @@ https://www.rust-lang.org/tools/install
 https://nodejs.org/en/download/
 
 ### Install nightly rust
-This is required to build multi-thread support in the wasm module. At some time in the future this will be included in a stable release of rust.
+Although this project includes a manually managed web worker pool implementation, the other mulit-threaded solution uses wasm-bindgen-rayon, which requires a build of the rust toolchain with atomics and shared memory enabled. Hopefully these features will be built as part of the standard stable release of Rust in the future.
 
 #### Install toolchain
 ```console
