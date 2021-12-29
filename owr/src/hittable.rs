@@ -1,8 +1,9 @@
 use crate::ray::Ray;
 use crate::vec3::Vec3;
 use crate::material::{Material};
+use crate::aabb::Aabb;
 use std::sync::Arc;
-use crate::types::*;
+use crate::{types::*, log_print};
 
 // --------------------------------------------------------------------------------------------------------------------
 // Hit record
@@ -40,6 +41,7 @@ impl HitRecord {
 
 pub trait Hittable {
     fn hit(&self, r: &Ray<Float>, t_min: Float, t_max: Float) -> Option<HitRecord>; 
+    fn bounding_box(&self, time0: Float, time1: Float) -> Option<Aabb>;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -67,7 +69,38 @@ impl Hittable for HittableList {
 
         return_option
     }
+
+    fn bounding_box(&self, time0: Float, time1: Float) -> Option<Aabb> {
+        if self.list.is_empty() {
+            return Option::None;
+        }
+
+        let mut ret_option = Option::None;
+        for element in &self.list {
+            match element.bounding_box(time0, time1) {
+                // Match against previous box finds
+                Some(new_box) => {
+                    match ret_option {
+                        // We already found a box, now build a surrounding box
+                        Some(saved_box) => { ret_option = Some(Aabb::surrounding_box(&new_box, &saved_box)) }
+
+                        // First one found
+                        _ => { ret_option = Some(new_box) }
+                    }
+                }
+
+                // If there are any elements without a bounding box, bail
+                _ => { 
+                    log_print!("Found an object without a bounding box, this is weird.");
+                    return Option::None; 
+                }
+            }
+        }
+
+        return ret_option;
+    }
 }
 
+// Pull in these traits so we can enable multi-threading
 unsafe impl Sync for HittableList {}
 unsafe impl Send for HittableList {}

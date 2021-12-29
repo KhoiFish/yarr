@@ -2,6 +2,7 @@ use crate::vec3::*;
 use crate::ray::{Ray};
 use crate::hittable::{Hittable, HitRecord};
 use crate::material::{Material};
+use crate::aabb::Aabb;
 use std::sync::Arc;
 use crate::types::*;
 
@@ -41,6 +42,13 @@ impl Hittable for Sphere {
         let n = (p - self.center) * (1.0/self.radius);
         
         Some(HitRecord::new(&r, &p, &n, t, self.material.clone()))
+    }
+
+    fn bounding_box(&self, _time0: Float, _time1: Float) -> Option<Aabb> {
+        Some(Aabb {
+            min: self.center - Vec3::new(self.radius, self.radius, self.radius),
+            max: self.center + Vec3::new(self.radius, self.radius, self.radius)
+        })
     }
 }
 
@@ -89,5 +97,19 @@ impl Hittable for MovingSphere {
         let n = (p - self.center(r.time)) * (1.0/self.radius);
         
         Some(HitRecord::new(&r, &p, &n, t, self.material.clone()))
+    }
+
+    fn bounding_box(&self, time0: Float, time1: Float) -> Option<Aabb> {
+        let box0 = Aabb {
+            min: self.center(time0) - Vec3::new(self.radius, self.radius, self.radius),
+            max: self.center(time0) + Vec3::new(self.radius, self.radius, self.radius)
+        };
+
+        let box1 = Aabb {
+            min: self.center(time1) - Vec3::new(self.radius, self.radius, self.radius),
+            max: self.center(time1) + Vec3::new(self.radius, self.radius, self.radius)
+        };
+
+        Some(Aabb::surrounding_box(&box0, &box1))
     }
 }
