@@ -7,14 +7,12 @@ Ahoy, me fellow mateys!
 
 YARR is the result of my personal journey with learning Rust. It also led me to cross-compiling to WebAssembly along the way. 
 
-I'm very new to Rust, so feel free to drop me a suggestion or criticism, I promise to embrace them. How else do we get better at anything otherwise?!
-
-Rust is well suited for systems programming, where close-to-the-metal control, performance, and data safety are crucial to the craft. Building a raytracer is a great way to learn a modern language like Rust; building a raytracer can hone your skills in software design, multi-threading/parallelism, and performance-minded implementation. 
+Rust is well suited for systems programming, where close-to-the-metal control, performance, and data safety are crucial to the craft. Building a raytracer is a great way to learn a modern language like Rust; writing a raytracer using Rust can hone skills in software design, multi-threading/parallelism, and performance-minded implementation. 
 
 I'm a C/C++ programmer at heart, yet my heart grows ever so fonder for Rust. **Rust gives C++ a run for its money.**
 
 - Based on Peter Shirley's great "Raytracing in One Weekend" book series
-- Core implementation in Rust, with some JavaScript glue for the web target
+- Core implementation in Rust, with some JavaScript glue for the web
 - Builds natively for Windows, MacOS, Linux & dub-dub-dub (JavaScript & WebAssembly)
 - Multi-threaded via rayon crate, wasm-bind-rayon, and as well as a manually managed web worker pool
 - Tested on iOS/Android via Chrome browser
@@ -36,25 +34,16 @@ https://www.rust-lang.org/tools/install
 https://nodejs.org/en/download/
 
 ### Install nightly rust
-This is required to build multi-thread support in the wasm module. At some time in the future this will be included in a stable release of rust.
+Although this project includes a manually managed web worker pool implementation, the other mulit-threaded solution uses wasm-bindgen-rayon, which requires a build of the rust toolchain with atomics and shared memory enabled. Hopefully these features will be built as part of the standard stable release of Rust in the future.
 
-#### Windows
+#### Install toolchain
 ```console
-rustup component add rust-src --toolchain nightly-2021-07-29-x86_64-pc-windows-msvc
+cargo install
 ```
 
-#### MacOS
+#### Add toolchain sources
 ```console
-rustup component add rust-src --toolchain nightly-2021-07-29-x86_64-apple-darwin
-```
-
-#### Linux
-Do something similar to the above platforms. Pay attention to an error in your log if you attempt to build, cargo should suggest the right toolchain to do rustup with.
-
-### Install wasm-bindgen-cli
-This is needed to build wasm bindings.
-```console
-cargo install -f wasm-bindgen-cli
+rustup component add rust-src --toolchain nightly-2021-07-29
 ```
 
 ### Install npm packages
@@ -64,7 +53,7 @@ cd web
 npm install
 ```
 
-## Build It
+## How to Build
 You can use the scripts provided in this repo to build and host a local web server, or use these commands directly:
 
 ### Build a native console app
@@ -85,7 +74,7 @@ This uses npm to kick off build and package it.
 npm --prefix ./web run build
 ```
 
-### Hosting local web server
+### Hosting a local web server
 Run this to try the WebAssembly app. The node-js serve app is configured to serve cross-origin headers, needed to run the multi-threaded implementation using wasm-bind-rayon.
 ```console
 npm --prefix ./web run host
@@ -112,4 +101,4 @@ I'd like to thank the following people:
 * Diep Mai, for his friendship, and for introducing me to Rust. I finally got around to learning how-to-rust!
 
 ## License
-This is free and open-source software distributed under the MIT License. Feel free to use and go get 'em tiger.
+This is free and open-source software distributed under the MIT License. Feel free to use this, and go get 'em tiger.
