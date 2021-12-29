@@ -66,7 +66,7 @@ impl WebRaytracer {
     }
 
     pub fn multi_sample_point(&self, x: u32, y: u32) -> u32 {
-        let sample = owr::color::vec3_to_u32(&owr::sampling::multi_sample(true, x, y, &self.params, &self.camera, &self.world));
+        let sample = owr::color::vec3_to_u32(&owr::sampling::multi_sample(true, x, y, &self.params, &self.camera, &self.world), 1.0);
         sample
     }
 
