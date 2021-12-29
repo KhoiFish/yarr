@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use vecmath;
-use std::ops::{Add, Sub, Mul, Div};
+use std::ops::{Add, Sub, Mul, Div, Index};
 use crate::types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -102,5 +102,13 @@ impl<T> Mul<T> for Vec3<T> where T: Copy + Mul<T, Output = T> {
         Self {
             data: vecmath::vec3_scale(self.data, t)
         }
+    }
+}
+
+impl<T> Index<usize> for  Vec3<T> where T: Copy {
+    type Output = T;
+
+    fn index(&self, i: usize) -> &Self::Output {
+        &self.data[i]
     }
 }
