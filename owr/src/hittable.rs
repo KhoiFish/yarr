@@ -12,15 +12,17 @@ pub struct HitRecord {
     pub point: Vec3<Float>,
     pub normal: Vec3<Float>,
     pub t: Float,
+    pub u: Float,
+    pub v: Float,
     pub front_facing: bool,
     pub material: Arc<dyn Material>
 }
 
 impl HitRecord {
-    pub fn new(ray: &Ray<Float>, point: &Vec3<Float>, normal: &Vec3<Float>, t: Float, material: Arc<dyn Material>) -> HitRecord {
-        let front_face = ray.dir.dot(&normal) < 0.0;
+    pub fn new(ray: &Ray<Float>, point: &Vec3<Float>, normal: &Vec3<Float>, t: Float, u: Float, v: Float, material: Arc<dyn Material>) -> HitRecord {
+        let front_facing = ray.dir.dot(&normal) < 0.0;
         let new_normal;
-        if front_face {
+        if front_facing {
             new_normal = *normal;
         } else {
             new_normal = normal.reverse_dir();
@@ -29,9 +31,11 @@ impl HitRecord {
         Self {
             point: *point,
             normal: new_normal,
-            t: t,
-            front_facing: front_face, 
-            material: material
+            t,
+            u,
+            v,
+            front_facing, 
+            material
         }
     }
 }

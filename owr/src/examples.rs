@@ -10,6 +10,7 @@ use crate::sampling::{render_image};
 use crate::material;
 use crate::types::*;
 use crate::camera;
+use crate::texture;
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -59,7 +60,8 @@ pub fn first_weekend_scene() -> HittableList {
     let mut world = HittableList::default();
 
     // Ground
-    let ground_material = Arc::new(material::Lambertian { albedo: Vec3::new(0.5, 0.5, 0.5) });
+    let checker =  Arc::new(texture::Checker::new_from_colors(&Vec3::new(0.2, 0.3, 0.1), &Vec3::new(0.9, 0.9, 0.9)));
+    let ground_material = Arc::new(material::Lambertian { albedo: checker.clone() });
     world.list.push(Arc::new(Sphere { center: Vec3::new(0.0, -1000.0, 0.0), radius: 1000.0, material: ground_material }));
 
     for a in -11..11 {
@@ -71,7 +73,7 @@ pub fn first_weekend_scene() -> HittableList {
             if (center - Vec3::new(4.0, 0.2, 0.0)).length() > 0.9 {
                 if choose_mat < 0.8 {
                     // Diffuse
-                    let albedo = utils::det_random_vec3() * utils::det_random_vec3();
+                    let albedo = Arc::new(texture::SolidColor::new(&(utils::det_random_vec3() * utils::det_random_vec3())));
                     let material = Arc::new(material::Lambertian { albedo });
                     let center2 = center +  Vec3::new(0.0, utils::det_random_range(0.0,0.5), 0.0);
                     world.list.push(Arc::new(MovingSphere { center0: center, center1: center2, time0: 0.0, time1: 1.0, radius, material }));
@@ -96,7 +98,7 @@ pub fn first_weekend_scene() -> HittableList {
     }
 
     {
-        let material2 = Arc::new(material::Lambertian { albedo: Vec3::new(0.4, 0.2, 0.1)});
+        let material2 = Arc::new(material::Lambertian { albedo: Arc::new(texture::SolidColor::new(&Vec3::new(0.4, 0.2, 0.1)))});
         world.list.push(Arc::new(Sphere { center: Vec3::new(-4.0, 1.0, 0.0), radius: 1.0, material: material2 }));
     }
 

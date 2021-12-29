@@ -1,10 +1,12 @@
+use crate::types::*;
 use crate::vec3::*;
 use crate::ray::{Ray};
 use crate::hittable::{Hittable, HitRecord};
 use crate::material::{Material};
 use crate::aabb::Aabb;
+use crate::utils;
+
 use std::sync::Arc;
-use crate::types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -40,8 +42,16 @@ impl Hittable for Sphere {
         let t = root;
         let p = r.at(t);
         let n = (p - self.center) * (1.0/self.radius);
+        let uv = utils::get_sphere_uv(&n);
         
-        Some(HitRecord::new(&r, &p, &n, t, self.material.clone()))
+        Some(HitRecord::new(
+            &r, 
+            &p, 
+            &n, 
+            t,
+            uv.0,
+            uv.1,
+            self.material.clone()))
     }
 
     fn bounding_box(&self, _time0: Float, _time1: Float) -> Option<Aabb> {
@@ -95,8 +105,16 @@ impl Hittable for MovingSphere {
         let t = root;
         let p = r.at(t);
         let n = (p - self.center(r.time)) * (1.0/self.radius);
+        let uv = utils::get_sphere_uv(&n);
         
-        Some(HitRecord::new(&r, &p, &n, t, self.material.clone()))
+        Some(HitRecord::new(
+            &r, 
+            &p, 
+            &n, 
+            t,
+            uv.0,
+            uv.1,
+            self.material.clone()))
     }
 
     fn bounding_box(&self, time0: Float, time1: Float) -> Option<Aabb> {

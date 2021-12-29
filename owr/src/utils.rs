@@ -159,3 +159,13 @@ pub fn refract(uv: &Vec3<Float>, n: &Vec3<Float>, etai_over_etat: Float) -> Vec3
 
     r_out_perp + r_out_parallel
 }
+
+pub fn get_sphere_uv(p: &Vec3<Float>) -> (Float, Float) {
+    let pi = std::f32::consts::PI as Float;
+    let theta = Float::acos(-p.y());
+    let phi = Float::atan2(-p.z(), p.x()) + pi;
+    let u = phi / (2.0*pi);
+    let v = theta / pi;
+
+    (u, v)
+}

@@ -14,6 +14,15 @@ pub fn convert_to_u8_range(c: Float) -> u8 {
     (c * 256.0) as u8
 }
 
+pub fn color_to_vec3(color: &Color) -> Vec3<Float> {
+    let scale = 1.0 / 255.0;
+    Vec3::new(
+        (color[0] as Float) * scale,
+        (color[1] as Float) * scale,
+        (color[2] as Float) * scale
+    )
+}
+
 pub fn vec3_to_color(color: &Vec3<Float>, alpha: Float) -> Color {
     [
         convert_to_u8_range(gamma_correct(color[0])),
@@ -25,14 +34,11 @@ pub fn vec3_to_color(color: &Vec3<Float>, alpha: Float) -> Color {
 
 pub fn vec3_to_u32(color: &Vec3<Float>, alpha: Float) -> u32 {
     let color_array = vec3_to_color(&color, alpha);
-
-    #[allow(unused_parens)]
-    ( 
-        (color_array[0] as u32).shl(24) | 
-        (color_array[1] as u32).shl(16) | 
-        (color_array[2] as u32).shl(8) | 
-        (color_array[3] as u32) 
-    )
+     
+    (color_array[0] as u32).shl(24) | 
+    (color_array[1] as u32).shl(16) | 
+    (color_array[2] as u32).shl(8) | 
+    (color_array[3] as u32) 
 }
 
 pub fn print_color(color: &Color) {

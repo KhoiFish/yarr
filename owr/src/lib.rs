@@ -11,3 +11,4 @@ pub mod types;
 pub mod sampling;
 pub mod aabb;
 pub mod bvh;
+pub mod texture;

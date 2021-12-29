@@ -2,7 +2,10 @@ use crate::ray::{Ray};
 use crate::hittable::{HitRecord};
 use crate::types::*;
 use crate::utils;
+use crate::texture::*;
 use crate::vec3::Vec3;
+
+use std::sync::Arc;
 
 // --------------------------------------------------------------------------------------------------------------------
 // Scatter result
@@ -23,7 +26,7 @@ pub trait Material {
 // Lambert
 
 pub struct Lambertian {
-    pub albedo: Vec3<Float>
+    pub albedo: Arc<dyn Texture>
 }
 
 impl Material for Lambertian {
@@ -35,7 +38,7 @@ impl Material for Lambertian {
 
         Some(ScatterResult {
             scattered: Ray { orig: hit.point, dir: scatter_direction, time: r_in.time },
-            attenuation: self.albedo
+            attenuation: *self.albedo.value(hit.u, hit.v, &hit.point)
         })
     }
 }
