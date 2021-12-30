@@ -3,9 +3,6 @@ use owr::examples::*;
 // --------------------------------------------------------------------------------------------------------------------
 
 pub fn main() {
-    let params = example_params(); 
-    let camera = example_camera(params.aspect_ratio);
-    let world = first_weekend_scene();
-
-    run_and_print_ppm(&params, &camera, &world);
+    let example_scene = first_weekend_example(576, 1024, 32, 50);
+    run_and_print_ppm(&example_scene.0, &example_scene.1, &example_scene.2);
 }
