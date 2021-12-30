@@ -5,7 +5,9 @@ use crate::types::*;
 use crate::color;
 use crate::camera;
 use crate::utils;
+
 use rayon::prelude::*;
+extern crate image;
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -92,7 +94,7 @@ pub fn multi_sample_image(enable_average_sum: bool, enable_parallel: bool, param
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn render_image(enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec::<u8> {
+pub fn render_image(enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Option<image::RgbaImage> {
     // How many pixels?
     let num_pixels = (params.image_width * params.image_height) as usize;
 
@@ -105,15 +107,18 @@ pub fn render_image(enable_parallel: bool, params: &RaytracerParams, camera: &ca
     }
 
     // Iterate and collect results
+    let results;
     if enable_parallel {
-        return grid.par_iter()
+        results = grid.par_iter()
             .flat_map(|&point| -> Color {
                 color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
             }).collect();
     } else {
-        return grid.iter()
+        results = grid.iter()
             .flat_map(|&point| -> Color {
                 color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
             }).collect();
     }
+
+    image::RgbaImage::from_raw(params.image_width, params.image_height, results)
 }

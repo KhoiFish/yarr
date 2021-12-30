@@ -1,7 +1,6 @@
 #![cfg(target_family = "wasm")]
 
 use owr::examples::*;
-use owr::examples::first_weekend_example;
 use owr::types::*;
 use owr::camera;
 use owr::hittable;
@@ -41,18 +40,18 @@ pub fn wasm_alert(name: &str) {
 
 #[wasm_bindgen]
 pub struct WebRaytracer {
-    world: hittable::HittableList,
     params: RaytracerParams,
     camera: camera::Camera,
+    world: hittable::HittableList,
 }
 
 impl WebRaytracer {
     pub fn new(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> Self {
         let example_scene = first_weekend_example(image_width, image_height, samples_per_pixel, max_depth);
         Self {
-            world: example_scene.0,
-            params: example_scene.1,
-            camera: example_scene.2
+            params: example_scene.0,
+            camera: example_scene.1,
+            world: example_scene.2,
         }
     }
 
@@ -66,7 +65,7 @@ impl WebRaytracer {
 
     #[cfg(not(feature = "parallel"))]
     pub fn render_image(&self) -> Vec<u8> {
-         owr::sampling::render_image(false, &self.params, &self.camera, &self.world)
+         owr::sampling::render_image(false, &self.params, &self.camera, &self.world).unwrap().into_raw()
     }
 
     #[cfg(not(feature = "parallel"))]
@@ -79,7 +78,7 @@ impl WebRaytracer {
 
     #[cfg(feature = "parallel")]
     pub fn render_image(&self) -> Vec<u8> {
-         owr::sampling::render_image(true, &self.params, &self.camera, &self.world)
+         owr::sampling::render_image(true, &self.params, &self.camera, &self.world).unwrap().into_raw()
     }
 
     #[cfg(feature = "parallel")]

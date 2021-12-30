@@ -44,3 +44,4 @@ pub fn vec3_to_u32(color: &Vec3<Float>, alpha: Float) -> u32 {
 pub fn print_color(color: &Color) {
     log_print!("{} {} {}\n", color[0], color[1], color[2]);
 }
+

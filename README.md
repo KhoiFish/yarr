@@ -63,9 +63,9 @@ cargo build --release
 ```
 
 ### Testing the native console app 
-This outputs is a .ppm file to the current directory. Use [Gimp](https://www.gimp.org/) to view.
+This outputs a file, output.png to the current directory.
 ```console
-cargo run --release > output.ppm
+cargo run --release
 ```
 
 ### Building the web app

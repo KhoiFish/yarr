@@ -14,7 +14,7 @@ use crate::texture;
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn first_weekend_example(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> (HittableList, RaytracerParams, camera::Camera) {
+pub fn first_weekend_example(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> (RaytracerParams, camera::Camera, HittableList) {
 
     fn example_params(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> RaytracerParams {
         RaytracerParams {
@@ -107,7 +107,7 @@ pub fn first_weekend_example(image_width: u32, image_height: u32, samples_per_pi
 
     // Return
     let params = example_params(image_width, image_height, samples_per_pixel, max_depth);
-    (example_scene(), params, example_camera(params.aspect_ratio))
+    (params, example_camera(params.aspect_ratio), example_scene())
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -115,7 +115,7 @@ pub fn first_weekend_example(image_width: u32, image_height: u32, samples_per_pi
 pub fn run_and_print_ppm(world: &HittableList, params: &RaytracerParams, camera: &camera::Camera) {
     log_print!("P3\n{0} {1}\n255\n", params.image_width, params.image_height);
 
-    let results = render_image(true, &params, &camera, &world);
+    let results = render_image(true, &params, &camera, &world).unwrap().into_raw();
     let mut count = 0;
     for &color in &results {
         count = count + 1;
