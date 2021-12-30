@@ -20,7 +20,7 @@ pub fn main() {
 
     // Build bvh?
     let build_bvh = if args.len() > 2 { args[2].parse().unwrap() } else { false };
-    log_print!("Building bvh? {}\n", build_bvh);
+    log_print!("Build bvh: {}\n", build_bvh);
 
     // Build bvh if set
     let hittables = match build_bvh {
@@ -29,7 +29,7 @@ pub fn main() {
     };
 
     // Render and write out image
-    log_print!("Rendering scene {}\n", scene_num);
+    log_print!("Rendering scene {}...\n", scene_num);
     let final_image = render_image(true, &example_scene.0, &example_scene.1, &hittables);
     final_image.unwrap().save("output.png").unwrap();
     log_print!("Done.\n");
