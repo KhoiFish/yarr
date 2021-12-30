@@ -82,6 +82,6 @@ impl Noise {
 
 impl Texture for Noise {
     fn value(&self, _u: Float, _v: Float, p: &Vec3<Float>) -> Vec3<Float> {
-        Vec3::new(1.0, 1.0, 1.0) * self.perlin.smooth_noise(&(*p * self.scale))
+        Vec3::new(1.0, 1.0, 1.0) * 0.5 * (1.0 + self.perlin.smoother_noise(&(*p * self.scale)))
     }
 }
