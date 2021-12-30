@@ -18,7 +18,7 @@ pub struct ScatterResult {
 // --------------------------------------------------------------------------------------------------------------------
 // Material trait
 
-pub trait Material {
+pub trait Material: Sync + Send {
     fn scatter(&self, r_in : &Ray<Float>, hit: &HitRecord) -> Option<ScatterResult>;
 }
 
@@ -43,6 +43,9 @@ impl Material for Lambertian {
     }
 }
 
+unsafe impl Sync for Lambertian {}
+unsafe impl Send for Lambertian {}
+
 // --------------------------------------------------------------------------------------------------------------------
 // Metal
 
@@ -65,6 +68,9 @@ impl Material for Metal {
         return_option
     }
 }
+
+unsafe impl Sync for Metal {}
+unsafe impl Send for Metal {}
 
 // --------------------------------------------------------------------------------------------------------------------
 // Dielectric
@@ -104,3 +110,6 @@ impl Material for Dielectric {
         })
     }
 }
+
+unsafe impl Sync for Dielectric {}
+unsafe impl Send for Dielectric {}

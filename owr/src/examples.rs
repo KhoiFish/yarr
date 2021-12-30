@@ -3,7 +3,7 @@ use std::io::Write;
 use std::sync::Arc;
 use crate::{log_print};
 use crate::vec3::Vec3;
-use crate::hittable::{HittableList};
+use crate::hittable::{Hittable, HittableList};
 use crate::sphere::{Sphere, MovingSphere};
 use crate::utils;
 use crate::sampling::{render_image};
@@ -14,10 +14,10 @@ use crate::texture;
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn run_and_print_ppm(world: &HittableList, params: &RaytracerParams, camera: &camera::Camera) {
+pub fn run_and_print_ppm(params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) {
     log_print!("P3\n{0} {1}\n255\n", params.image_width, params.image_height);
 
-    let results = render_image(true, &params, &camera, &world).unwrap().into_raw();
+    let results = render_image(true, &params, &camera, world).unwrap().into_raw();
     let mut count = 0;
     for &color in &results {
         count = count + 1;

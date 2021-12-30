@@ -6,8 +6,10 @@ use owr::camera;
 use owr::hittable;
 use owr::utils as owr_utils;
 use owr::log_print;
+use owr::bvh;
 
 use wasm_bindgen::{prelude::*, Clamped};
+use std::sync::Arc;
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -42,7 +44,7 @@ pub fn wasm_alert(name: &str) {
 pub struct WebRaytracer {
     params: RaytracerParams,
     camera: camera::Camera,
-    world: hittable::HittableList,
+    world: Arc<dyn hittable::Hittable>,
 }
 
 impl WebRaytracer {
@@ -51,7 +53,10 @@ impl WebRaytracer {
         Self {
             params: example_scene.0,
             camera: example_scene.1,
-            world: example_scene.2,
+            world: Arc::new(example_scene.2)
+            
+            // TODO: figure out why bvh is much slower...
+            //world: bvh::BvhNode::build_bvh(&example_scene.2, 0.0, 0.0)
         }
     }
 

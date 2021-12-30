@@ -1,4 +1,4 @@
-use crate::hittable::{Hittable, HittableList};
+use crate::hittable::{Hittable};
 use crate::ray::{Ray};
 use crate::vec3::Vec3;
 use crate::types::*;
@@ -7,11 +7,12 @@ use crate::camera;
 use crate::utils;
 
 use rayon::prelude::*;
+use std::sync::Arc;
 extern crate image;
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn shoot_ray(r : &Ray<Float>, world: &HittableList, depth: u32) -> Vec3<Float> {
+pub fn shoot_ray(r : &Ray<Float>, world: &Arc<dyn Hittable>, depth: u32) -> Vec3<Float> {
     if depth <= 0 {
         return Vec3::<Float>::default();
     }
@@ -38,7 +39,7 @@ pub fn shoot_ray(r : &Ray<Float>, world: &HittableList, depth: u32) -> Vec3<Floa
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec3<Float> {
+pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec3<Float> {
     let u = ((image_x as Float) + utils::random_range(0.0, 1.0)) / ((params.image_width - 1) as Float);
     let v = ((image_y as Float) + utils::random_range(0.0, 1.0)) / ((params.image_height - 1) as Float);
     let r = camera.get_ray(u, v);
@@ -48,7 +49,7 @@ pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: 
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn multi_sample(enable_average_sum: bool, image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec3<Float> {
+pub fn multi_sample(enable_average_sum: bool, image_x: u32, image_y: u32, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec3<Float> {
     let mut sample_sum = Vec3::default();
     for _s in 0..params.samples_per_pixel {
         sample_sum = sample_sum + one_sample(image_x, image_y, &params, &camera, &world);
@@ -64,7 +65,7 @@ pub fn multi_sample(enable_average_sum: bool, image_x: u32, image_y: u32, params
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn multi_sample_image(enable_average_sum: bool, enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Vec::<Float> {
+pub fn multi_sample_image(enable_average_sum: bool, enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec::<Float> {
     // How many pixels?
     let num_pixels = (params.image_width * params.image_height) as usize;
 
@@ -94,7 +95,7 @@ pub fn multi_sample_image(enable_average_sum: bool, enable_parallel: bool, param
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn render_image(enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &HittableList) -> Option<image::RgbaImage> {
+pub fn render_image(enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Option<image::RgbaImage> {
     // How many pixels?
     let num_pixels = (params.image_width * params.image_height) as usize;
 
