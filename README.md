@@ -1,5 +1,5 @@
 # YARR - a Native & Web-based Raytracer
-<img src="yarr_preview.png" alt="YARR - Yet Another Rust Raytracer" />
+<img src="preview.png" alt="YARR - Yet Another Rust Raytracer" />
 
 ### Pirate speak for ___"Yet Another Rust Raytracer"___
 
