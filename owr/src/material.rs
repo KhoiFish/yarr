@@ -38,7 +38,7 @@ impl Material for Lambertian {
 
         Some(ScatterResult {
             scattered: Ray { orig: hit.point, dir: scatter_direction, time: r_in.time },
-            attenuation: *self.albedo.value(hit.u, hit.v, &hit.point)
+            attenuation: self.albedo.value(hit.u, hit.v, &hit.point)
         })
     }
 }

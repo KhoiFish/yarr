@@ -15,6 +15,7 @@ pub fn main() {
     let example_scene = match scene_num {
         0 => { first_weekend_example(576, 1024, 32, 50) }
         1 => { second_weekend_example_4dot4(576, 1024, 32, 50) }
+        2 => { second_weekend_example_5dot1(576, 1024, 32, 50) }
         _ => { first_weekend_example(576, 1024, 32, 50) }
     };
 
