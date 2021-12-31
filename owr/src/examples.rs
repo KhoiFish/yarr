@@ -433,3 +433,20 @@ pub fn second_weekend_example_7dot6(image_width: u32, image_height: u32, samples
     let params = example_params(image_width, image_height, samples_per_pixel, max_depth);
     (params, example_camera(params.aspect_ratio), example_scene())
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+
+pub fn second_weekend_example_8dot0(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> (RaytracerParams, camera::Camera, HittableList)  {
+    let mut ret = second_weekend_example_7dot6(image_width, image_height, samples_per_pixel, max_depth);
+
+    let white_material = 
+        Arc::new(material::Lambertian::new(
+        Arc::new(texture::SolidColor::new(&Vec3::new(0.73, 0.73, 0.73)))));
+
+    ret.2.list.push(
+        Arc::new(hittable::Box::new(&Vec3::new(130.0, 0.0, 65.0), &Vec3::new(295.0, 165.0, 230.0), white_material.clone())));
+    ret.2.list.push(
+        Arc::new(hittable::Box::new(&Vec3::new(265.0, 0.0, 295.0), &Vec3::new(430.0, 330.0, 460.0), white_material.clone())));
+
+    ret
+}

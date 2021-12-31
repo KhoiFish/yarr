@@ -273,3 +273,55 @@ impl Hittable for YZRect {
 
 unsafe impl Sync for YZRect {}
 unsafe impl Send for YZRect {}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Box
+
+pub struct Box {
+    min: Vec3<Float>,
+    max: Vec3<Float>,
+    sides: HittableList,
+}
+
+impl Box {
+    pub fn new(p0: &Vec3::<Float>, p1: &Vec3::<Float>, material: Arc<dyn Material>) -> Self {
+        let mut sides = HittableList::default();
+
+        sides.list.push(Arc::new(
+            XYRect::new(p0.x(), p1.x(), p0.y(), p1.y(), p1.z(), material.clone())));
+        sides.list.push(Arc::new(
+            XYRect::new(p0.x(), p1.x(), p0.y(), p1.y(), p0.z(), material.clone())));
+
+        sides.list.push(Arc::new(
+            XZRect::new(p0.x(), p1.x(), p0.z(), p1.z(), p1.y(), material.clone())));
+        sides.list.push(Arc::new(
+            XZRect::new(p0.x(), p1.x(), p0.z(), p1.z(), p0.y(), material.clone())));
+
+        sides.list.push(Arc::new(
+            YZRect::new(p0.y(), p1.y(), p0.z(), p1.z(), p1.x(), material.clone())));
+        sides.list.push(Arc::new(
+            YZRect::new(p0.y(), p1.y(), p0.z(), p1.z(), p0.x(), material.clone())));
+        
+        Self {
+            min: *p0,
+            max: *p1,
+            sides
+        }
+    }
+}
+
+impl Hittable for Box {
+    fn hit(&self, r: &Ray<Float>, t_min: Float, t_max: Float) -> Option<HitRecord> {
+        self.sides.hit(&r, t_min, t_max)
+    }
+
+    fn bounding_box(&self, _time0: Float, _time1: Float) -> Option<Aabb> {
+        Some(Aabb {
+            min: self.min,
+            max: self.max
+        })
+    }
+}
+
+unsafe impl Sync for Box {}
+unsafe impl Send for Box {}
