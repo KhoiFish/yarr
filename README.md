@@ -53,6 +53,10 @@ cd web
 npm install
 ```
 
+#### If you're on Windows
+For some reason, on windows environments wasm-pack can't be found (even though it's included in the npm package). Install wasm-pack manually here if you run into build problems:
+[Windows wasm-pack installer](https://rustwasm.github.io/wasm-pack/installer/)
+
 ## How to Build
 You can use the scripts provided in this repo to build and host a local web server, or use these commands directly:
 
