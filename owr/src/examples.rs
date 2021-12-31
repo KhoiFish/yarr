@@ -354,3 +354,82 @@ pub fn second_weekend_example_7dot4(image_width: u32, image_height: u32, samples
     let params = example_params(image_width, image_height, samples_per_pixel, max_depth);
     (params, example_camera(params.aspect_ratio), example_scene())
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+
+pub fn second_weekend_example_7dot6(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> (RaytracerParams, camera::Camera, HittableList)  {
+    fn example_params(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> RaytracerParams {
+        RaytracerParams {
+            aspect_ratio: (image_width as Float) / (image_height as Float),
+            image_width,
+            image_height,
+            samples_per_pixel,
+            max_depth,
+        }
+    }
+
+    pub fn example_camera(aspect_ratio: Float) -> camera::Camera {
+        let camera;
+        {
+            let look_from = Vec3::new(278.0, 278.0, -1250.0);
+            let look_at = Vec3::new(278.0, 278.0, 0.0);
+            let up = Vec3::new(0.0, 1.0, 0.0);
+            let focus_dist = 10.0;
+            let aperture = 0.0;
+    
+            camera = camera::Camera::new(
+                &look_from,
+                &look_at,
+                &up,
+                45.0,
+                aspect_ratio,
+                aperture,
+                focus_dist,
+                0.0,
+                1.0,
+                Vec3::default()
+            );
+        }
+    
+        camera
+    }
+    
+    fn example_scene() -> HittableList {
+        let mut world = HittableList::default();
+
+        let red_material = 
+            Arc::new(material::Lambertian::new(
+                Arc::new(texture::SolidColor::new(&Vec3::new(0.65, 0.05, 0.05)))));
+
+        let white_material = 
+            Arc::new(material::Lambertian::new(
+                Arc::new(texture::SolidColor::new(&Vec3::new(0.73, 0.73, 0.73)))));
+
+        let green_material = 
+            Arc::new(material::Lambertian::new(
+                Arc::new(texture::SolidColor::new(&Vec3::new(0.12, 0.45, 0.15)))));
+
+        let diff_light_material = 
+            Arc::new(material::DiffuseLight::new(
+           Arc::new(texture::SolidColor::new(&Vec3::new(4.0, 4.0, 4.0)))));
+
+        world.list.push(Arc::new(
+            hittable::YZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, green_material.clone())));
+        world.list.push(Arc::new(
+            hittable::YZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, red_material.clone())));
+        world.list.push(Arc::new(
+            hittable::XZRect::new(213.0, 343.0, 227.0, 332.0, 554.0, diff_light_material.clone())));
+        world.list.push(Arc::new(
+            hittable::XZRect::new(0.0, 555.0, 0.0, 555.0, 0.0, white_material.clone())));
+        world.list.push(Arc::new(
+            hittable::XZRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white_material.clone())));
+        world.list.push(Arc::new(
+            hittable::XYRect::new(0.0, 555.0, 0.0, 555.0, 555.0, white_material.clone())));
+
+        world
+    }
+
+    // Return
+    let params = example_params(image_width, image_height, samples_per_pixel, max_depth);
+    (params, example_camera(params.aspect_ratio), example_scene())
+}

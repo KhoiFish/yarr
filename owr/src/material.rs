@@ -30,6 +30,14 @@ pub struct Lambertian {
     pub albedo: Arc<dyn Texture>
 }
 
+impl Lambertian {
+    pub fn new(albedo: Arc<dyn Texture>) -> Self {
+        Self {
+            albedo
+        }
+    }
+}
+
 impl Material for Lambertian {
     fn scatter(&self, r_in : &Ray<Float>, hit: &HitRecord) -> Option<ScatterResult> {
         let mut scatter_direction = hit.normal + utils::random_unit_vec3();

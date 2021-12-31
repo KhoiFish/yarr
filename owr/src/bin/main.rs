@@ -27,6 +27,7 @@ pub fn main() {
         2 => { second_weekend_example_5dot1(image_width, image_height, samples_per_pixel, max_depth) }
         3 => { second_weekend_example_6dot2(image_width, image_height, samples_per_pixel, max_depth, image::open("./earthmap.jpeg").unwrap().to_rgba8()) }
         4 => { second_weekend_example_7dot4(image_width, image_height, samples_per_pixel, max_depth) }
+        5 => { second_weekend_example_7dot6(image_width, image_height, samples_per_pixel, max_depth) }
         _ => { first_weekend_example(image_width, image_height, samples_per_pixel, max_depth) }
     };
 

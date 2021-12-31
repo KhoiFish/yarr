@@ -163,3 +163,113 @@ impl Hittable for XYRect {
 
 unsafe impl Sync for XYRect {}
 unsafe impl Send for XYRect {}
+
+// --------------------------------------------------------------------------------------------------------------------
+// XZ Rect
+
+pub struct XZRect {
+    pub x0: Float,   
+    pub x1: Float,
+    pub z0: Float,   
+    pub z1: Float,
+    pub k: Float,
+    pub material: Arc<dyn Material>,
+}
+
+impl XZRect {
+    pub fn new(x0: Float, x1: Float, z0: Float, z1: Float, k: Float, material: Arc<dyn Material>) -> Self {
+        Self {
+            x0,
+            x1,
+            z0,
+            z1,
+            k,
+            material
+        }
+    }
+}
+
+impl Hittable for XZRect {
+    fn hit(&self, r: &Ray<Float>, t_min: Float, t_max: Float) -> Option<HitRecord> {
+        let t = (self.k - r.orig.y()) / r.dir.y();
+        if t < t_min || t > t_max {
+            return Option::None;
+        }
+
+        let x = r.orig.x() + t*r.dir.x();
+        let z = r.orig.z() + t*r.dir.z();
+        if x < self.x0 || x > self.x1 || z < self.z0 || z > self.z1 {
+            return Option::None;
+        }
+
+        let u = (x - self.x0) / (self.x1 - self.x0);
+        let v = (z - self.z0) / (self.z1 - self.z0);
+
+        Some(HitRecord::new(&r, &r.at(t), &Vec3::new(0.0, 1.0, 0.0), t, u, v, self.material.clone()))
+    }
+
+    fn bounding_box(&self, _time0: Float, _time1: Float) -> Option<Aabb> {
+        Some(Aabb {
+            min: Vec3::new(self.x0, self.z0, self.k - 0.0001),
+            max: Vec3::new(self.x1, self.z1, self.k + 0.0001)
+        })
+    }
+}
+
+unsafe impl Sync for XZRect {}
+unsafe impl Send for XZRect {}
+
+// --------------------------------------------------------------------------------------------------------------------
+// XZ Rect
+
+pub struct YZRect {
+    pub y0: Float,   
+    pub y1: Float,
+    pub z0: Float,   
+    pub z1: Float,
+    pub k: Float,
+    pub material: Arc<dyn Material>,
+}
+
+impl YZRect {
+    pub fn new(y0: Float, y1: Float, z0: Float, z1: Float, k: Float, material: Arc<dyn Material>) -> Self {
+        Self {
+            y0,
+            y1,
+            z0,
+            z1,
+            k,
+            material
+        }
+    }
+}
+
+impl Hittable for YZRect {
+    fn hit(&self, r: &Ray<Float>, t_min: Float, t_max: Float) -> Option<HitRecord> {
+        let t = (self.k - r.orig.x()) / r.dir.x();
+        if t < t_min || t > t_max {
+            return Option::None;
+        }
+
+        let y = r.orig.y() + t*r.dir.y();
+        let z = r.orig.z() + t*r.dir.z();
+        if y < self.y0 || y > self.y1 || z < self.z0 || z > self.z1 {
+            return Option::None;
+        }
+
+        let u = (y - self.y0) / (self.y1 - self.y0);
+        let v = (z - self.z0) / (self.z1 - self.z0);
+
+        Some(HitRecord::new(&r, &r.at(t), &Vec3::new(1.0, 0.0, 0.0), t, u, v, self.material.clone()))
+    }
+
+    fn bounding_box(&self, _time0: Float, _time1: Float) -> Option<Aabb> {
+        Some(Aabb {
+            min: Vec3::new(self.y0, self.z0, self.k - 0.0001),
+            max: Vec3::new(self.y1, self.z1, self.k + 0.0001)
+        })
+    }
+}
+
+unsafe impl Sync for YZRect {}
+unsafe impl Send for YZRect {}
