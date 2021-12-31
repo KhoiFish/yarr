@@ -12,29 +12,29 @@ extern crate image;
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn shoot_ray(r : &Ray<Float>, world: &Arc<dyn Hittable>, depth: u32) -> Vec3<Float> {
+pub fn shoot_ray(r : &Ray<Float>, background: &Vec3<Float>, world: &Arc<dyn Hittable>, depth: u32) -> Vec3<Float> {
     if depth <= 0 {
         return Vec3::<Float>::default();
     }
 
     match world.hit(&r, 0.001, Float::MAX) {
+        // Hit something
         Some(hit) => {
             match hit.material.scatter(&r, &hit) {
                 Some(scatter_result) => {
-                    return shoot_ray(&scatter_result.scattered, world, depth-1) * scatter_result.attenuation;
+                    let emitted = hit.material.emitted(hit.u, hit.v, &hit.point);
+                    return emitted + shoot_ray(&scatter_result.scattered, &background, world, depth-1) * scatter_result.attenuation;
                 }
                 _ => {
-                    return Vec3::<Float>::default();
+                    return hit.material.emitted(hit.u, hit.v, &hit.point);
                 }
             }
         }
-        _ => {}
+        // No hits
+        _ => {
+            return *background;
+        }
     }
-
-    let unit_direction = r.dir.unit_vector();
-    let t = 0.5 * (unit_direction.y() + 1.0);
-
-    (Vec3::new(1.0, 1.0, 1.0) * (1.0 - t)) + (Vec3::new(0.5, 0.7, 1.0) * t)
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -44,7 +44,7 @@ pub fn one_sample(image_x: u32, image_y: u32, params: &RaytracerParams, camera: 
     let v = ((image_y as Float) + utils::random_range(0.0, 1.0)) / ((params.image_height - 1) as Float);
     let r = camera.get_ray(u, v);
     
-    shoot_ray(&r, &world, params.max_depth)
+    shoot_ray(&r, &camera.get_background(), &world, params.max_depth)
 }
 
 // --------------------------------------------------------------------------------------------------------------------

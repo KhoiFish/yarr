@@ -20,6 +20,7 @@ pub struct ScatterResult {
 
 pub trait Material: Sync + Send {
     fn scatter(&self, r_in : &Ray<Float>, hit: &HitRecord) -> Option<ScatterResult>;
+    fn emitted(&self, _u: Float, _v: Float, _p: &Vec3<Float>) -> Vec3<Float> { Vec3::default() }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -113,3 +114,23 @@ impl Material for Dielectric {
 
 unsafe impl Sync for Dielectric {}
 unsafe impl Send for Dielectric {}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Diffuse light
+
+pub struct DiffuseLight {
+    pub emit: Arc<dyn Texture>
+}
+
+impl Material for DiffuseLight {
+    fn scatter(&self, _r_in : &Ray<Float>, _hit: &HitRecord) -> Option<ScatterResult> { 
+        Option::None
+    }
+
+    fn emitted(&self, u: Float, v: Float, p: &Vec3<Float>) -> Vec3<Float> {
+        self.emit.value(u, v, &p)
+    }
+}
+
+unsafe impl Sync for DiffuseLight {}
+unsafe impl Send for DiffuseLight {}

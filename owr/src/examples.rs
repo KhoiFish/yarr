@@ -65,7 +65,8 @@ pub fn first_weekend_example(image_width: u32, image_height: u32, samples_per_pi
                 aperture,
                 focus_dist,
                 0.0,
-                1.0
+                1.0,
+                Vec3::new(0.70, 0.80, 1.00)
             );
         }
     
@@ -162,7 +163,8 @@ pub fn second_weekend_example_4dot4(image_width: u32, image_height: u32, samples
                 aperture,
                 focus_dist,
                 0.0,
-                1.0
+                1.0,
+                Vec3::new(0.70, 0.80, 1.00)
             );
         }
     
@@ -216,7 +218,8 @@ pub fn second_weekend_example_5dot1(image_width: u32, image_height: u32, samples
                 aperture,
                 focus_dist,
                 0.0,
-                1.0
+                1.0,
+                Vec3::new(0.70, 0.80, 1.00)
             );
         }
     
@@ -270,7 +273,8 @@ pub fn second_weekend_example_6dot2(image_width: u32, image_height: u32, samples
                 aperture,
                 focus_dist,
                 0.0,
-                1.0
+                1.0,
+                Vec3::new(0.70, 0.80, 1.00)
             );
         }
     
