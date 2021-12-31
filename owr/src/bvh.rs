@@ -133,9 +133,9 @@ impl Hittable for BvhNode {
         let right_hit = self.right.hit(&r, t_min, right_tmax);
 
         if right_hit.is_some() {
-            return Some(right_hit.unwrap());
+            return right_hit;
         } else if left_hit.is_some() {
-            return Some(left_hit.unwrap());
+            return left_hit;
         } else {
             return Option::None;
         }
