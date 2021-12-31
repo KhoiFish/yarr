@@ -5,6 +5,8 @@ use owr::bvh;
 use std::env;
 use std::sync::Arc;
 
+extern crate image;
+
 // --------------------------------------------------------------------------------------------------------------------
 
 pub fn main() {
@@ -16,6 +18,7 @@ pub fn main() {
         0 => { first_weekend_example(576, 1024, 32, 50) }
         1 => { second_weekend_example_4dot4(576, 1024, 32, 50) }
         2 => { second_weekend_example_5dot1(576, 1024, 32, 50) }
+        3 => { second_weekend_example_6dot2(576, 1024, 32, 50, image::open("./earthmap.jpeg").unwrap().to_rgba8()) }
         _ => { first_weekend_example(576, 1024, 32, 50) }
     };
 

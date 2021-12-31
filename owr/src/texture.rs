@@ -2,6 +2,7 @@ use crate::types::*;
 use crate::vec3::Vec3;
 use crate::perlin::Perlin;
 
+extern crate image;
 use std::sync::Arc;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -92,5 +93,39 @@ impl Noise {
 impl Texture for Noise {
     fn value(&self, u: Float, v: Float, p: &Vec3<Float>) -> Vec3<Float> {
         self.marble_look(u, v, p)
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+pub struct Image {
+    image: image::RgbaImage
+}
+
+impl Image {
+    pub fn new(image: image::RgbaImage) -> Self {
+        Self {
+            image
+        }
+    }
+}
+
+impl Texture for Image {
+    fn value(&self, u: Float, v: Float, _p: &Vec3<Float>) -> Vec3<Float> {
+        // Clamp input texture coordinates to [0,1] x [1,0]
+        let u = Float::clamp(u, 0.0, 1.0);
+        let v = 1.0 - Float::clamp(v, 0.0, 1.0);
+
+        let mut i = (u * self.image.width() as Float) as u32;
+        let mut j = (v * self.image.height() as Float) as u32;
+
+        // Clamp integer mapping, since actual coordinates should be less than 1.0
+        if i >= self.image.width() { i = self.image.width() - 1; }
+        if j >= self.image.height() { j = self.image.height() - 1; }
+
+        let color_scale = 1.0 / 255.0;
+        let pixel = self.image.get_pixel(i, j);
+
+        return Vec3::new(color_scale * pixel[0] as Float, color_scale * pixel[1] as Float, color_scale * pixel[2] as Float);
     }
 }
