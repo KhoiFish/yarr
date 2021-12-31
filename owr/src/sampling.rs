@@ -65,7 +65,7 @@ pub fn multi_sample(enable_average_sum: bool, image_x: u32, image_y: u32, params
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn multi_sample_image(enable_average_sum: bool, enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec::<Float> {
+pub fn multi_sample_buffer(enable_average_sum: bool, enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec::<Float> {
     // How many pixels?
     let num_pixels = (params.image_width * params.image_height) as usize;
 

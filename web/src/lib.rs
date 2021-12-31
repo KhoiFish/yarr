@@ -6,7 +6,9 @@ use owr::camera;
 use owr::hittable;
 use owr::utils as owr_utils;
 use owr::log_print;
-use owr::bvh;
+
+// TODO: figure out why bvh is much slower...
+//use owr::bvh;
 
 use wasm_bindgen::{prelude::*, Clamped};
 use std::sync::Arc;
@@ -74,8 +76,8 @@ impl WebRaytracer {
     }
 
     #[cfg(not(feature = "parallel"))]
-    pub fn multi_sample_image(&self, enable_average_sum: bool) -> Vec<Float> {
-         owr::sampling::multi_sample_image(enable_average_sum, false, &self.params, &self.camera, &self.world)
+    pub fn multi_sample_buffer(&self, enable_average_sum: bool) -> Vec<Float> {
+         owr::sampling::multi_sample_buffer(enable_average_sum, false, &self.params, &self.camera, &self.world)
     }
 
     // ------------------------------------------------------------------------
@@ -87,8 +89,8 @@ impl WebRaytracer {
     }
 
     #[cfg(feature = "parallel")]
-    pub fn multi_sample_image(&self, enable_average_sum: bool) -> Vec<Float> {
-        owr::sampling::multi_sample_image(enable_average_sum, true, &self.params, &self.camera, &self.world)
+    pub fn multi_sample_buffer(&self, enable_average_sum: bool) -> Vec<Float> {
+        owr::sampling::multi_sample_buffer(enable_average_sum, true, &self.params, &self.camera, &self.world)
    }
 }
 
@@ -110,8 +112,8 @@ pub fn render_image(raytracer: &WebRaytracer) -> Clamped<Vec<u8>> {
 }
 
 #[wasm_bindgen]
-pub fn multi_sample_image(raytracer: &WebRaytracer, enable_average_sum: bool) -> Vec<Float> {
-    raytracer.multi_sample_image(enable_average_sum)
+pub fn multi_sample_buffer(raytracer: &WebRaytracer, enable_average_sum: bool) -> Vec<Float> {
+    raytracer.multi_sample_buffer(enable_average_sum)
 }
 
 #[wasm_bindgen]
