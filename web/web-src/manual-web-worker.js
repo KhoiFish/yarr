@@ -45,7 +45,7 @@ async function init(workerId) {
 
 async function workerRenderImage(imageWidth, imageHeight, samplesPerPixel, maxDepth) {
     var raytracer = wasmModule.create_webraytracer(imageWidth, imageHeight, samplesPerPixel, maxDepth);
-    return await wasmModule.multi_sample_image(raytracer, false);
+    return await wasmModule.multi_sample_buffer(raytracer, false);
 }
 
 async function workerRenderImageProgressive(previewCb, imageWidth, imageHeight, samplesPerPixel, maxDepth, regionX, regionY, regionWidth, regionHeight)  {
