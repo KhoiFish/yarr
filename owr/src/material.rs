@@ -122,6 +122,14 @@ pub struct DiffuseLight {
     pub emit: Arc<dyn Texture>
 }
 
+impl DiffuseLight {
+    pub fn new(emit_texture: Arc<dyn Texture>) -> Self {
+        Self {
+            emit: emit_texture.clone()
+        }
+    }
+}
+
 impl Material for DiffuseLight {
     fn scatter(&self, _r_in : &Ray<Float>, _hit: &HitRecord) -> Option<ScatterResult> { 
         Option::None

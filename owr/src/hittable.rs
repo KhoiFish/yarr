@@ -108,3 +108,58 @@ impl Hittable for HittableList {
 // Pull in these traits so we can enable multi-threading
 unsafe impl Sync for HittableList {}
 unsafe impl Send for HittableList {}
+
+// --------------------------------------------------------------------------------------------------------------------
+// XY Rect
+
+pub struct XYRect {
+    pub x0: Float,   
+    pub x1: Float,
+    pub y0: Float,   
+    pub y1: Float,
+    pub k: Float,
+    pub material: Arc<dyn Material>,
+}
+
+impl XYRect {
+    pub fn new(x0: Float, x1: Float, y0: Float, y1: Float, k: Float, material: Arc<dyn Material>) -> Self {
+        Self {
+            x0,
+            x1,
+            y0,
+            y1,
+            k,
+            material
+        }
+    }
+}
+
+impl Hittable for XYRect {
+    fn hit(&self, r: &Ray<Float>, t_min: Float, t_max: Float) -> Option<HitRecord> {
+        let t = (self.k - r.orig.z()) / r.dir.z();
+        if t < t_min || t > t_max {
+            return Option::None;
+        }
+
+        let x = r.orig.x() + t*r.dir.x();
+        let y = r.orig.y() + t*r.dir.y();
+        if x < self.x0 || x > self.x1 || y < self.y0 || y > self.y1 {
+            return Option::None;
+        }
+
+        let u = (x - self.x0) / (self.x1 - self.x0);
+        let v = (y - self.y0) / (self.y1 - self.y0);
+
+        Some(HitRecord::new(&r, &r.at(t), &Vec3::new(0.0, 0.0, 1.0), t, u, v, self.material.clone()))
+    }
+
+    fn bounding_box(&self, _time0: Float, _time1: Float) -> Option<Aabb> {
+        Some(Aabb {
+            min: Vec3::new(self.x0, self.y0, self.k - 0.0001),
+            max: Vec3::new(self.x1, self.y1, self.k + 0.0001)
+        })
+    }
+}
+
+unsafe impl Sync for XYRect {}
+unsafe impl Send for XYRect {}

@@ -1,7 +1,7 @@
 use std::io;
 use std::io::Write;
 use std::sync::Arc;
-use crate::{log_print};
+use crate::{log_print, hittable};
 use crate::vec3::Vec3;
 use crate::hittable::{Hittable, HittableList};
 use crate::sphere::{Sphere, MovingSphere};
@@ -294,4 +294,63 @@ pub fn second_weekend_example_6dot2(image_width: u32, image_height: u32, samples
     // Return
     let params = example_params(image_width, image_height, samples_per_pixel, max_depth);
     (params, example_camera(params.aspect_ratio), example_scene(image))
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+pub fn second_weekend_example_7dot4(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> (RaytracerParams, camera::Camera, HittableList)  {
+    fn example_params(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> RaytracerParams {
+        RaytracerParams {
+            aspect_ratio: (image_width as Float) / (image_height as Float),
+            image_width,
+            image_height,
+            samples_per_pixel,
+            max_depth,
+        }
+    }
+
+    pub fn example_camera(aspect_ratio: Float) -> camera::Camera {
+        let camera;
+        {
+            let look_from = Vec3::new(13.0, 2.0, 3.0);
+            let look_at = Vec3::new(0.0, 0.0, 0.0);
+            let up = Vec3::new(0.0, 1.0, 0.0);
+            let focus_dist = 10.0;
+            let aperture = 0.0;
+    
+            camera = camera::Camera::new(
+                &look_from,
+                &look_at,
+                &up,
+                45.0,
+                aspect_ratio,
+                aperture,
+                focus_dist,
+                0.0,
+                1.0,
+                Vec3::default()
+            );
+        }
+    
+        camera
+    }
+    
+    fn example_scene() -> HittableList {
+        let mut world = HittableList::default();
+
+        let noise_texture =  Arc::new(texture::Noise::new(4.0));
+        let material = Arc::new(material::Lambertian { albedo: noise_texture.clone() });
+        world.list.push(Arc::new(Sphere { center: Vec3::new(0.0, -1000.0, 0.0), radius: 1000.0, material: material.clone() }));
+        world.list.push(Arc::new(Sphere { center: Vec3::new(0.0,  2.0, 0.0), radius: 2.0, material: material.clone() }));
+
+        let diff_light_texture = Arc::new(texture::SolidColor::new(&Vec3::new(4.0, 4.0, 4.0)));
+        let diff_light = Arc::new(material::DiffuseLight::new(diff_light_texture));
+        world.list.push(Arc::new(hittable::XYRect::new(3.0, 5.0, 1.0, 3.0, -2.0, diff_light.clone())));
+
+        world
+    }
+
+    // Return
+    let params = example_params(image_width, image_height, samples_per_pixel, max_depth);
+    (params, example_camera(params.aspect_ratio), example_scene())
 }
