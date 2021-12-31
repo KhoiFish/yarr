@@ -19,6 +19,13 @@ impl Aabb {
         }
     }
 
+    pub fn new(other: &Self, offset: &Vec3<Float>) -> Self {
+        Self {
+            min: other.min + *offset,
+            max: other.max + *offset
+        }
+    }
+
     pub fn hit(&self, r: &Ray<Float>, t_min: Float, t_max: Float) -> bool {
         for i in 0..3 {
             if r.dir[i].abs() < 1e-8 {

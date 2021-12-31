@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 use vecmath;
-use std::ops::{Add, Sub, Mul, Div, Index};
+use std::ops::{Add, Sub, Mul, Div, Index, IndexMut};
 use crate::types::*;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -110,5 +110,11 @@ impl<T> Index<usize> for  Vec3<T> where T: Copy {
 
     fn index(&self, i: usize) -> &Self::Output {
         &self.data[i]
+    }
+}
+
+impl<T> IndexMut<usize> for  Vec3<T> where T: Copy {
+    fn index_mut(&mut self, i: usize) -> &mut Self::Output {
+        &mut self.data[i]
     }
 }

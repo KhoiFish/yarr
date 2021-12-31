@@ -450,3 +450,27 @@ pub fn second_weekend_example_8dot0(image_width: u32, image_height: u32, samples
 
     ret
 }
+
+// --------------------------------------------------------------------------------------------------------------------
+
+pub fn second_weekend_example_8dot2(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> (RaytracerParams, camera::Camera, HittableList)  {
+    let mut ret = second_weekend_example_7dot6(image_width, image_height, samples_per_pixel, max_depth);
+
+    let white_material = 
+        Arc::new(material::Lambertian::new(
+        Arc::new(texture::SolidColor::new(&Vec3::new(0.73, 0.73, 0.73)))));
+
+    let box1 =
+        Arc::new(hittable::Box::new(&Vec3::new(0.0, 0.0, 0.0), &Vec3::new(165.0, 330.0, 165.0), white_material.clone()));
+    let box1_rotated = Arc::new(hittable::RotateY::new(box1, 15.0));
+    let box1_rotated_and_translated = Arc::new(hittable::Translate::new(box1_rotated, Vec3::new(265.0, 0.0, 295.0)));
+    ret.2.list.push(box1_rotated_and_translated);
+
+    let box2 =
+        Arc::new(hittable::Box::new(&Vec3::new(0.0, 0.0, 0.0), &Vec3::new(165.0, 165.0, 165.0), white_material.clone()));
+    let box2_rotated = Arc::new(hittable::RotateY::new(box2, -18.0));
+    let box2_rotated_and_translated = Arc::new(hittable::Translate::new(box2_rotated, Vec3::new(130.0, 0.0, 65.0)));
+    ret.2.list.push(box2_rotated_and_translated);
+
+    ret
+}
