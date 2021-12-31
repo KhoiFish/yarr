@@ -6,7 +6,7 @@ use std::env;
 use std::sync::Arc;
 
 extern crate image;
-use std::time::{Instant, Duration};
+use std::time::{Instant};
 
 // --------------------------------------------------------------------------------------------------------------------
 
