@@ -17,6 +17,7 @@ pub fn main() {
     let image_height = 1024;
     let samples_per_pixel = 32;
     let max_depth = 50;
+    let output_filename = "output.png";
 
     // Select scene from commandline args
     let scene_num = if args.len() > 1 { args[1].parse().unwrap() } else { 0 };
@@ -41,6 +42,6 @@ pub fn main() {
     // Render and write out image
     log_print!("Rendering scene {}...\n", scene_num);
     let final_image = render_image(true, &example_scene.0, &example_scene.1, &hittables);
-    final_image.unwrap().save("output.png").unwrap();
-    log_print!("Done.\n");
+    final_image.unwrap().save(output_filename).unwrap();
+    log_print!("Done, results written to {}\n", output_filename);
 }
