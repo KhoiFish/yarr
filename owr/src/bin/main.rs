@@ -12,14 +12,20 @@ extern crate image;
 pub fn main() {
     let args: Vec<String> = env::args().collect();
 
+    // Some default parameters. TODO: make them configurable from the command-line
+    let image_width = 576;
+    let image_height = 1024;
+    let samples_per_pixel = 32;
+    let max_depth = 50;
+
     // Select scene from commandline args
     let scene_num = if args.len() > 1 { args[1].parse().unwrap() } else { 0 };
     let example_scene = match scene_num {
-        0 => { first_weekend_example(576, 1024, 32, 50) }
-        1 => { second_weekend_example_4dot4(576, 1024, 32, 50) }
-        2 => { second_weekend_example_5dot1(576, 1024, 32, 50) }
-        3 => { second_weekend_example_6dot2(576, 1024, 32, 50, image::open("./earthmap.jpeg").unwrap().to_rgba8()) }
-        _ => { first_weekend_example(576, 1024, 32, 50) }
+        0 => { first_weekend_example(image_width, image_height, samples_per_pixel, max_depth) }
+        1 => { second_weekend_example_4dot4(image_width, image_height, samples_per_pixel, max_depth) }
+        2 => { second_weekend_example_5dot1(image_width, image_height, samples_per_pixel, max_depth) }
+        3 => { second_weekend_example_6dot2(image_width, image_height, samples_per_pixel, max_depth, image::open("./earthmap.jpeg").unwrap().to_rgba8()) }
+        _ => { first_weekend_example(image_width, image_height, samples_per_pixel, max_depth) }
     };
 
     // Build bvh?
