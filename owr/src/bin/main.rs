@@ -37,7 +37,7 @@ pub fn main() {
     };
 
     // Build bvh?
-    let build_bvh = if args.len() > 2 { args[2].parse().unwrap() } else { false };
+    let build_bvh = if args.len() > 2 { args[2].parse().unwrap() } else { true };
     log_print!("Build bvh: {}\n", build_bvh);
 
     // Build bvh if set

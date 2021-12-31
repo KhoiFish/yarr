@@ -6,9 +6,7 @@ use owr::camera;
 use owr::hittable;
 use owr::utils as owr_utils;
 use owr::log_print;
-
-// TODO: figure out why bvh is much slower...
-//use owr::bvh;
+use owr::bvh;
 
 use wasm_bindgen::{prelude::*, Clamped};
 use std::sync::Arc;
@@ -55,10 +53,7 @@ impl WebRaytracer {
         Self {
             params: example_scene.0,
             camera: example_scene.1,
-            world: Arc::new(example_scene.2)
-            
-            // TODO: figure out why bvh is much slower...
-            //world: bvh::BvhNode::build_bvh(&example_scene.2, 0.0, 0.0)
+            world: bvh::BvhNode::build_bvh(&example_scene.2, 0.0, 1.0)
         }
     }
 
