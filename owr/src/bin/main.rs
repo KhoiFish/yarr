@@ -6,6 +6,7 @@ use std::env;
 use std::sync::Arc;
 
 extern crate image;
+use std::time::{Instant, Duration};
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -15,7 +16,7 @@ pub fn main() {
     // Some default parameters. TODO: make them configurable from the command-line
     let image_width = 512;
     let image_height = 512;
-    let samples_per_pixel = 50;
+    let samples_per_pixel = 32;
     let max_depth = 50;
     let output_filename = "output.png";
 
@@ -47,7 +48,8 @@ pub fn main() {
 
     // Render and write out image
     log_print!("Rendering scene {}...\n", scene_num);
+    let now = Instant::now();
     let final_image = render_image(true, &example_scene.0, &example_scene.1, &hittables);
     final_image.unwrap().save(output_filename).unwrap();
-    log_print!("Done, results written to {}\n", output_filename);
+    log_print!("Completed in {}s. Results written to {}\n", now.elapsed().as_secs_f32(), output_filename);
 }
