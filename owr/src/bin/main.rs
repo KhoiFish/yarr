@@ -13,9 +13,9 @@ pub fn main() {
     let args: Vec<String> = env::args().collect();
 
     // Some default parameters. TODO: make them configurable from the command-line
-    let image_width = 576;
-    let image_height = 1024;
-    let samples_per_pixel = 32;
+    let image_width = 512;
+    let image_height = 512;
+    let samples_per_pixel = 50;
     let max_depth = 50;
     let output_filename = "output.png";
 
@@ -31,6 +31,7 @@ pub fn main() {
         6 => { second_weekend_example_8dot0(image_width, image_height, samples_per_pixel, max_depth) }
         7 => { second_weekend_example_8dot2(image_width, image_height, samples_per_pixel, max_depth) }
         8 => { second_weekend_example_9dot1(image_width, image_height, samples_per_pixel, max_depth) }
+        9 => { second_weekend_final_scene(image_width, image_height, samples_per_pixel, max_depth, image::open("./earthmap.jpeg").unwrap().to_rgba8()) }
         _ => { first_weekend_example(image_width, image_height, samples_per_pixel, max_depth) }
     };
 
