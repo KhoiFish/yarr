@@ -41,6 +41,20 @@ impl Perlin {
         }
     }
 
+    pub fn turb(&self, p: &Vec3<Float>, depth: u32) -> Float {
+        let mut accum = 0.0;
+        let mut temp_p = p.clone();
+        let mut weight = 1.0;
+
+        for _ in 0..depth {
+            accum += weight * self.smoother_noise(&temp_p);
+            weight *= 0.5;
+            temp_p = temp_p * 2.0;
+        }
+
+        accum.abs()
+    }
+
     pub fn smoother_noise(&self, point: &Vec3<Float>) -> Float {
         let mut u = point.x() - Float::floor(point.x());
         let mut v = point.y() - Float::floor(point.y());

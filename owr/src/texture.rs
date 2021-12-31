@@ -78,10 +78,19 @@ impl Noise {
             scale
         }
     }
+
+    #[allow(dead_code)]
+    fn netted_look(&self, _u: Float, _v: Float, p: &Vec3<Float>) -> Vec3<Float> {
+        Vec3::new(1.0, 1.0, 1.0)  * self.perlin.turb( &(*p * self.scale), 7)
+    }
+
+    fn marble_look(&self, _u: Float, _v: Float, p: &Vec3<Float>) -> Vec3<Float> {
+        Vec3::new(1.0, 1.0, 1.0) * 0.5 * (1.0 + Float::sin(self.scale * p.z() + 10.0 * self.perlin.turb(&p, 7)))
+    }
 }
 
 impl Texture for Noise {
-    fn value(&self, _u: Float, _v: Float, p: &Vec3<Float>) -> Vec3<Float> {
-        Vec3::new(1.0, 1.0, 1.0) * 0.5 * (1.0 + self.perlin.smoother_noise(&(*p * self.scale)))
+    fn value(&self, u: Float, v: Float, p: &Vec3<Float>) -> Vec3<Float> {
+        self.marble_look(u, v, p)
     }
 }
