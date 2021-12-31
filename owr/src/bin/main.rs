@@ -30,6 +30,7 @@ pub fn main() {
         5 => { second_weekend_example_7dot6(image_width, image_height, samples_per_pixel, max_depth) }
         6 => { second_weekend_example_8dot0(image_width, image_height, samples_per_pixel, max_depth) }
         7 => { second_weekend_example_8dot2(image_width, image_height, samples_per_pixel, max_depth) }
+        8 => { second_weekend_example_9dot1(image_width, image_height, samples_per_pixel, max_depth) }
         _ => { first_weekend_example(image_width, image_height, samples_per_pixel, max_depth) }
     };
 

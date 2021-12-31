@@ -1,7 +1,10 @@
 use crate::ray::Ray;
+use crate::utils::random_float;
 use crate::vec3::Vec3;
 use crate::material::{Material};
 use crate::aabb::Aabb;
+use crate::texture;
+use crate::material;
 use std::sync::Arc;
 use crate::{types::*, log_print};
 
@@ -487,3 +490,88 @@ impl Hittable for RotateY {
 
 unsafe impl Sync for RotateY {}
 unsafe impl Send for RotateY {}
+
+// --------------------------------------------------------------------------------------------------------------------
+// Constant medium
+
+pub struct ConstantMedium {
+    boundary: Arc<dyn Hittable>,
+    phase_function: Arc<dyn Material>,
+    neg_inv_density: Float
+}
+
+impl ConstantMedium {
+    pub fn new(boundary: Arc<dyn Hittable>, density: Float, texture: Arc<dyn texture::Texture>) -> Self {
+        Self {
+            boundary,
+            phase_function: Arc::new(material::Isotropic::new(texture)),
+            neg_inv_density: -1.0 / density
+        }
+    }
+
+    pub fn new_with_constant_color(boundary: Arc<dyn Hittable>, density: Float, color: &Vec3<Float>) -> Self {
+        Self {
+            boundary,
+            phase_function: Arc::new(material::Isotropic::new_from_color(&color)),
+            neg_inv_density: -1.0 / density
+        }
+    }
+}
+
+impl Hittable for ConstantMedium {
+    fn hit(&self, r: &Ray<Float>, t_min: Float, t_max: Float) -> Option<HitRecord> {
+        let hit1_option = self.boundary.hit(&r, Float::MIN, Float::MAX);
+        if hit1_option.is_none() {
+            return Option::None;
+        }
+
+        let mut rec1 = hit1_option.unwrap();
+        let hit2_option = self.boundary.hit(&r, rec1.t + 0.0001, Float::MAX);
+        if hit2_option.is_none() {
+            return Option::None;
+        }
+        let mut rec2 = hit2_option.unwrap();
+
+        if rec1.t < t_min { rec1.t = t_min };
+        if rec2.t > t_max { rec2.t = t_max };
+
+        if rec1.t >= rec2.t {
+            return Option::None;
+        }
+
+        if rec1.t < 0.0 {
+            rec1.t = 0.0;
+        }
+
+        let ray_length = r.dir.length();
+        let distance_inside_boundary = (rec2.t - rec1.t) * ray_length;
+        let hit_distance = self.neg_inv_density * Float::ln(random_float());
+
+        if hit_distance > distance_inside_boundary {
+            return Option::None;
+        }
+
+        let t = rec1.t + hit_distance / ray_length;
+        let point = r.at(t);
+        let normal = Vec3::new(1.0, 0.0, 0.0);
+        let front_facing = true;
+
+
+        Some( HitRecord {
+            t,
+            u: 0.0,
+            v: 0.0,
+            point,
+            normal,
+            front_facing,
+            material: self.phase_function.clone()
+        })
+    }
+
+    fn bounding_box(&self, time0: Float, time1: Float) -> Option<Aabb> {
+        self.boundary.bounding_box(time0, time1)
+    }
+}
+
+unsafe impl Sync for ConstantMedium {}
+unsafe impl Send for ConstantMedium {}
