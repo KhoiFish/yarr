@@ -1,6 +1,6 @@
 #![cfg(target_family = "wasm")]
 
-use owr::examples::*;
+use owr::examples::scene_select;
 use owr::types::*;
 use owr::camera;
 use owr::hittable;
@@ -48,8 +48,8 @@ pub struct WebRaytracer {
 }
 
 impl WebRaytracer {
-    pub fn new(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, enable_bvh: bool) -> Self {
-        let example_scene = first_weekend_example(image_width, image_height, samples_per_pixel, max_depth);
+    pub fn new(scene_num: u32, image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, enable_bvh: bool) -> Self {
+        let example_scene = scene_select(scene_num, image_width, image_height, samples_per_pixel, max_depth);
         Self {
             params: example_scene.0,
             camera: example_scene.1,
@@ -92,8 +92,8 @@ impl WebRaytracer {
 // --------------------------------------------------------------------------------------------------------------------
 
 #[wasm_bindgen]
-pub fn create_webraytracer(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, enable_bvh: bool) -> WebRaytracer {
-    WebRaytracer::new(image_width, image_height, samples_per_pixel, max_depth, enable_bvh)
+pub fn create_webraytracer(scene_num: u32, image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, enable_bvh: bool) -> WebRaytracer {
+    WebRaytracer::new(scene_num, image_width, image_height, samples_per_pixel, max_depth, enable_bvh)
 }
 
 #[wasm_bindgen]

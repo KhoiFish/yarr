@@ -4,10 +4,10 @@ import * as Comlink from 'comlink';
 // --------------------------------------------------------------------------------------------------------------------
 
 function wrapRenderImageFunc(importedHandler) {
-    return ({ width, height, numSamples, maxDepth }) =>
+    return ({ sceneNum, width, height, numSamples, maxDepth, enableBvh }) =>
     {
         const start = performance.now();
-        const raytracer = importedHandler.create_webraytracer(width, height, numSamples, maxDepth);
+        const raytracer = importedHandler.create_webraytracer(sceneNum, width, height, numSamples, maxDepth, enableBvh );
         const rawImageData = importedHandler.render_image(raytracer);
         const time = performance.now() - start;
         return {

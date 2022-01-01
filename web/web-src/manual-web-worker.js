@@ -43,13 +43,13 @@ async function init(workerId) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function workerRenderImage(imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
-    var raytracer = wasmModule.create_webraytracer(imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
+async function workerRenderImage(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
+    var raytracer = wasmModule.create_webraytracer(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
     return await wasmModule.multi_sample_buffer(raytracer, false);
 }
 
-async function workerRenderImageProgressive(previewCb, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh, regionX, regionY, regionWidth, regionHeight)  {
-    var raytracer = wasmModule.create_webraytracer(imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
+async function workerRenderImageProgressive(sceneNum, previewCb, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh, regionX, regionY, regionWidth, regionHeight)  {
+    var raytracer = wasmModule.create_webraytracer(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
     for(var y = regionY; y < (regionY + regionHeight); y++) {
         for(var x = regionX; x < (regionX + regionWidth); x++) {
             var colorU32 = await wasmModule.multi_sample_point(raytracer, x, (imageHeight-y));

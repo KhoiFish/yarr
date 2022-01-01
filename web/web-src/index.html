@@ -2,11 +2,29 @@
 <html>
   <head>
     <meta content="text/html;charset=utf-8" http-equiv="Content-Type" content="width=device-width, initial-scale=1"/>
+    <link rel="stylesheet" href="styles.css">
     <title>YARR Web Raytracer Demo</title>
   </head>
   <body>
       <!-- <label id="numSamplesTitle">Num Samples: </label>
       <output id="numSamplesLabel">1</output> -->
+      <div class="dropdown">
+        <button onclick="myFunction()" class="dropbtn">Scene Selector</button>
+          <label id="sceneNumTitle">Scene: </label>
+          <output id="sceneNum">0</output>
+          <div id="myDropdown" class="dropdown-content">
+            <a href="#scene" onclick="sceneSelect('0'); return false;">0 - 1st Week - Final</a>
+            <a href="#scene" onclick="sceneSelect('1'); return false;">1 - 2nd Week - 4.1</a>
+            <a href="#scene" onclick="sceneSelect('2'); return false;">2 - 2nd Week - 5.1</a>
+            <a href="#scene" onclick="sceneSelect('3'); return false;">3 - 2nd Week - 6.2</a>
+            <a href="#scene" onclick="sceneSelect('4'); return false;">4 - 2nd Week - 7.4</a>
+            <a href="#scene" onclick="sceneSelect('5'); return false;">5 - 2nd Week - 7.6</a>
+            <a href="#scene" onclick="sceneSelect('6'); return false;">6 - 2nd Week - 8.0</a>
+            <a href="#scene" onclick="sceneSelect('7'); return false;">7 - 2nd Week - 8.2</a>
+            <a href="#scene" onclick="sceneSelect('8'); return false;">8 - 2nd Week - 9.1</a>
+            <a href="#scene" onclick="sceneSelect('9'); return false;">9 - 2nd Week - Final</a>
+        </div>
+      </div>
       <div>
         <label id="numSamplesTitle">Num Samples</label>
         <input type="range" min="1" max="1000" value="32" class="slider" list="numSamplesTickMarks" id="numSamplesSlider">
@@ -54,6 +72,32 @@
     </div>
     <br />
     <canvas id="canvas" width="512" height="512"></canvas>
+    <script>
+      /* When the user clicks on the button, 
+      toggle between hiding and showing the dropdown content */
+      function myFunction() {
+        document.getElementById("myDropdown").classList.toggle("show");
+      }
+      
+      // Close the dropdown if the user clicks outside of it
+      window.onclick = function(event) {
+        if (!event.target.matches('.dropbtn')) {
+          var dropdowns = document.getElementsByClassName("dropdown-content");
+          var i;
+          for (i = 0; i < dropdowns.length; i++) {
+            var openDropdown = dropdowns[i];
+            if (openDropdown.classList.contains('show')) {
+              openDropdown.classList.remove('show');
+            }
+          }
+        }
+      }
+
+      function sceneSelect(sceneNum) {
+        console.log(sceneNum);
+        document.getElementById('sceneNum').value = sceneNum;
+      }
+    </script>
     <script type="module" src="index.js"></script>
   </body>
 </html>

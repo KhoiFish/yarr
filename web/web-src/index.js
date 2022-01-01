@@ -12,6 +12,7 @@ const timeOutput = document.getElementById('time');
 const numThreadsOutput = document.getElementById('numThreads');
 const buttonAvailableMap = new Map();
 const enableBvhCheckbox = document.getElementById('bvhCheckbox');
+const sceneNumOutput = document.getElementById('sceneNum');
 var previewImgData;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -28,9 +29,11 @@ function setupRenderBtn(buttonId, handler) {
     Object.assign(button, {
         async onclick() {
             setEnableAvaialbleButtons(false);
+            const sceneNum = parseInt(sceneNumOutput.value);
             const numSamples = parseInt(numSamplesSlider.value);
             const maxDepth = parseInt(maxDepthSlider.value);
             let { rawImageData, time } = await handler.renderImage({
+                sceneNum,
                 width,
                 height,
                 numSamples,
@@ -70,9 +73,10 @@ function setupPreviewRenderBtn(buttonId) {
             const drawInteral = setInterval(previewDraw, 250);
 
             // Kick off the progressive raytracing
+            const sceneNum = parseInt(sceneNumOutput.value);
             const numSamples = parseInt(numSamplesSlider.value);
             const maxDepth = parseInt(maxDepthSlider.value);
-            let { time } = await ManualWorkerPool.workerPoolRenderImageProgressive({ previewCb, width, height, numSamples, maxDepth, enableBvh: enableBvhCheckbox.checked });
+            let { time } = await ManualWorkerPool.workerPoolRenderImageProgressive({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh: enableBvhCheckbox.checked });
 
             // Done rendering
             updateTimeLabel(time);

@@ -36,7 +36,7 @@ pub fn run_and_print_ppm(params: &RaytracerParams, camera: &camera::Camera, worl
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn scene_select(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, scene_num : u32) -> (RaytracerParams, camera::Camera, HittableList) {
+pub fn scene_select(scene_num : u32, image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> (RaytracerParams, camera::Camera, HittableList) {
     match scene_num {
         0 => { first_weekend_example(image_width, image_height, samples_per_pixel, max_depth) }
         1 => { second_weekend_example_4dot4(image_width, image_height, samples_per_pixel, max_depth) }

@@ -22,7 +22,7 @@ pub fn main() {
 
     // Select scene from commandline args
     let scene_num = if args.len() > 1 { args[1].parse().unwrap() } else { 0 };
-    let example_scene = scene_select(image_width, image_height, samples_per_pixel, max_depth, scene_num);
+    let example_scene = scene_select(scene_num, image_width, image_height, samples_per_pixel, max_depth);
 
     // Build bvh?
     let build_bvh = if args.len() > 2 { args[2].parse().unwrap() } else { true };

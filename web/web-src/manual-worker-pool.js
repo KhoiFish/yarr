@@ -45,7 +45,7 @@ function convertToU8Range(c) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function kickOffWorkerPoolRenderImage(imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
+async function kickOffWorkerPoolRenderImage(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
     // Distribute the sampling across the worker threads
     var numSamplesPerWorkerTable = [];
     var numWorkers = 0;
@@ -69,7 +69,7 @@ async function kickOffWorkerPoolRenderImage(imageWidth, imageHeight, samplesPerP
     // Kick off the work for the worker threads
     var workerResults = []
     for (var workerId = 0; workerId < numSamplesPerWorkerTable.length; workerId++)  {
-        workerResults.push(workerPool[workerId].workerRenderImage(imageWidth, imageHeight, numSamplesPerWorkerTable[workerId], maxDepth, enableBvh));
+        workerResults.push(workerPool[workerId].workerRenderImage(sceneNum, imageWidth, imageHeight, numSamplesPerWorkerTable[workerId], maxDepth, enableBvh));
     }
 
     // Wait for results from all threads
@@ -102,9 +102,9 @@ async function kickOffWorkerPoolRenderImage(imageWidth, imageHeight, samplesPerP
     return finalResults;
 }
   
-async function workerPoolRenderImage({ width, height, numSamples, maxDepth, enableBvh }) {
+async function workerPoolRenderImage({ sceneNum, width, height, numSamples, maxDepth, enableBvh }) {
     const start = performance.now();
-    var rawImageData = await kickOffWorkerPoolRenderImage(width, height, numSamples, maxDepth, enableBvh);
+    var rawImageData = await kickOffWorkerPoolRenderImage(sceneNum, width, height, numSamples, maxDepth, enableBvh);
     const time = performance.now() - start;
     return {
         rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
@@ -114,7 +114,7 @@ async function workerPoolRenderImage({ width, height, numSamples, maxDepth, enab
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function kickOffWorkerPoolRenderImageProgressive(previewCb, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
+async function kickOffWorkerPoolRenderImageProgressive(sceneNum, previewCb, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
     // Divide into regions
     const maxRegionWidth = Math.floor(imageWidth / MAX_NUM_WORKERS);
     const workersList = [];
@@ -122,7 +122,7 @@ async function kickOffWorkerPoolRenderImageProgressive(previewCb, imageWidth, im
     for (var x = 0; x < imageWidth; x += maxRegionWidth) {
         var regionWidth = Math.min(maxRegionWidth, (imageWidth - x));
         var regionHeight = imageHeight;
-        workersList.push(workerPool[numWorkers++].workerRenderImageProgressive(Comlink.proxy(previewCb), imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh, x, 0, regionWidth, regionHeight));
+        workersList.push(workerPool[numWorkers++].workerRenderImageProgressive(sceneNum, Comlink.proxy(previewCb), imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh, x, 0, regionWidth, regionHeight));
     }
 
     // Wait for everything to come back
@@ -131,9 +131,9 @@ async function kickOffWorkerPoolRenderImageProgressive(previewCb, imageWidth, im
     }
 }
   
-async function workerPoolRenderImageProgressive({ previewCb, width, height, numSamples, maxDepth, enableBvh }) {
+async function workerPoolRenderImageProgressive({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh }) {
     const start = performance.now();
-    await kickOffWorkerPoolRenderImageProgressive(previewCb, width, height, numSamples, maxDepth, enableBvh);
+    await kickOffWorkerPoolRenderImageProgressive(sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh);
     const time = performance.now() - start;
     return {
         time
