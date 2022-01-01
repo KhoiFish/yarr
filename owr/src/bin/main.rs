@@ -22,19 +22,7 @@ pub fn main() {
 
     // Select scene from commandline args
     let scene_num = if args.len() > 1 { args[1].parse().unwrap() } else { 0 };
-    let example_scene = match scene_num {
-        0 => { first_weekend_example(image_width, image_height, samples_per_pixel, max_depth) }
-        1 => { second_weekend_example_4dot4(image_width, image_height, samples_per_pixel, max_depth) }
-        2 => { second_weekend_example_5dot1(image_width, image_height, samples_per_pixel, max_depth) }
-        3 => { second_weekend_example_6dot2(image_width, image_height, samples_per_pixel, max_depth, image::open("./earthmap.jpeg").unwrap().to_rgba8()) }
-        4 => { second_weekend_example_7dot4(image_width, image_height, samples_per_pixel, max_depth) }
-        5 => { second_weekend_example_7dot6(image_width, image_height, samples_per_pixel, max_depth) }
-        6 => { second_weekend_example_8dot0(image_width, image_height, samples_per_pixel, max_depth) }
-        7 => { second_weekend_example_8dot2(image_width, image_height, samples_per_pixel, max_depth) }
-        8 => { second_weekend_example_9dot1(image_width, image_height, samples_per_pixel, max_depth) }
-        9 => { second_weekend_final_scene(image_width, image_height, samples_per_pixel, max_depth, image::open("./earthmap.jpeg").unwrap().to_rgba8()) }
-        _ => { first_weekend_example(image_width, image_height, samples_per_pixel, max_depth) }
-    };
+    let example_scene = scene_select(image_width, image_height, samples_per_pixel, max_depth, scene_num);
 
     // Build bvh?
     let build_bvh = if args.len() > 2 { args[2].parse().unwrap() } else { true };
