@@ -41,6 +41,16 @@ Although this project includes a manually managed web worker pool implementation
 cargo install
 ```
 
+#### Install wasm-pack
+This is needed to build wasm bindings from rust to JavaScript/Node.
+```console
+cargo install wasm-pack
+```
+
+##### If you're on Windows
+You may run into a problem installing wasm-pack on Windows. Try downloading and installing manually from here if you do:
+[Windows wasm-pack installer](https://rustwasm.github.io/wasm-pack/installer/)
+
 #### Add toolchain sources
 ```console
 rustup component add rust-src --toolchain nightly-2021-07-29
@@ -52,10 +62,6 @@ This downloads and installs the dependencies needed to build and locally host th
 cd web
 npm install
 ```
-
-#### If you're on Windows
-For some reason, on windows environments wasm-pack can't be found (even though it's included in the npm package). Install wasm-pack manually here if you run into build problems:
-[Windows wasm-pack installer](https://rustwasm.github.io/wasm-pack/installer/)
 
 ## How to Build
 You can use the scripts provided in this repo to build and host a local web server, or use these commands directly:
