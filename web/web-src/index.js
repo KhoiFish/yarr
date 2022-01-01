@@ -11,6 +11,7 @@ const ctx = canvas.getContext('2d');
 const timeOutput = document.getElementById('time');
 const numThreadsOutput = document.getElementById('numThreads');
 const buttonAvailableMap = new Map();
+const enableBvhCheckbox = document.getElementById('bvhCheckbox');
 var previewImgData;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -33,7 +34,8 @@ function setupRenderBtn(buttonId, handler) {
                 width,
                 height,
                 numSamples,
-                maxDepth
+                maxDepth,
+                enableBvh: enableBvhCheckbox.checked
             });
             updateTimeLabel(time);
             ctx.putImageData(new ImageData(rawImageData, width, height), 0, 0);
@@ -70,7 +72,7 @@ function setupPreviewRenderBtn(buttonId) {
             // Kick off the progressive raytracing
             const numSamples = parseInt(numSamplesSlider.value);
             const maxDepth = parseInt(maxDepthSlider.value);
-            let { time } = await ManualWorkerPool.workerPoolRenderImageProgressive({ previewCb, width, height, numSamples, maxDepth });
+            let { time } = await ManualWorkerPool.workerPoolRenderImageProgressive({ previewCb, width, height, numSamples, maxDepth, enableBvh: enableBvhCheckbox.checked });
 
             // Done rendering
             updateTimeLabel(time);

@@ -48,12 +48,12 @@ pub struct WebRaytracer {
 }
 
 impl WebRaytracer {
-    pub fn new(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> Self {
+    pub fn new(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, enable_bvh: bool) -> Self {
         let example_scene = first_weekend_example(image_width, image_height, samples_per_pixel, max_depth);
         Self {
             params: example_scene.0,
             camera: example_scene.1,
-            world: bvh::BvhNode::build_bvh(&example_scene.2, 0.0, 1.0)
+            world: if enable_bvh { bvh::BvhNode::build_bvh(&example_scene.2, 0.0, 1.0) } else { Arc::new(example_scene.2) }
         }
     }
 
@@ -92,8 +92,8 @@ impl WebRaytracer {
 // --------------------------------------------------------------------------------------------------------------------
 
 #[wasm_bindgen]
-pub fn create_webraytracer(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> WebRaytracer {
-    WebRaytracer::new(image_width, image_height, samples_per_pixel, max_depth)
+pub fn create_webraytracer(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, enable_bvh: bool) -> WebRaytracer {
+    WebRaytracer::new(image_width, image_height, samples_per_pixel, max_depth, enable_bvh)
 }
 
 #[wasm_bindgen]
