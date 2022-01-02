@@ -36,18 +36,18 @@ pub fn run_and_print_ppm(params: &RaytracerParams, camera: &camera::Camera, worl
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn scene_select(scene_num : u32, image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> (RaytracerParams, camera::Camera, HittableList) {
+pub fn scene_select(scene_num : u32, image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, image: image::RgbaImage) -> (RaytracerParams, camera::Camera, HittableList) {
     match scene_num {
         0 => { first_weekend_example(image_width, image_height, samples_per_pixel, max_depth) }
         1 => { second_weekend_example_4dot4(image_width, image_height, samples_per_pixel, max_depth) }
         2 => { second_weekend_example_5dot1(image_width, image_height, samples_per_pixel, max_depth) }
-        3 => { second_weekend_example_6dot2(image_width, image_height, samples_per_pixel, max_depth, image::open("./earthmap.jpeg").unwrap().to_rgba8()) }
+        3 => { second_weekend_example_6dot2(image_width, image_height, samples_per_pixel, max_depth, image) }
         4 => { second_weekend_example_7dot4(image_width, image_height, samples_per_pixel, max_depth) }
         5 => { second_weekend_example_7dot6(image_width, image_height, samples_per_pixel, max_depth) }
         6 => { second_weekend_example_8dot0(image_width, image_height, samples_per_pixel, max_depth) }
         7 => { second_weekend_example_8dot2(image_width, image_height, samples_per_pixel, max_depth) }
         8 => { second_weekend_example_9dot1(image_width, image_height, samples_per_pixel, max_depth) }
-        9 => { second_weekend_final_scene(image_width, image_height, samples_per_pixel, max_depth, image::open("./earthmap.jpeg").unwrap().to_rgba8()) }
+        9 => { second_weekend_final_scene(image_width, image_height, samples_per_pixel, max_depth, image) }
         _ => { first_weekend_example(image_width, image_height, samples_per_pixel, max_depth) }
     }
 }
@@ -263,7 +263,7 @@ pub fn second_weekend_example_5dot1(image_width: u32, image_height: u32, samples
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn second_weekend_example_6dot2(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, image: image::RgbaImage) -> (RaytracerParams, camera::Camera, HittableList)  {
+pub fn second_weekend_example_6dot2(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, earth_image: image::RgbaImage) -> (RaytracerParams, camera::Camera, HittableList)  {
     fn example_params(image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32) -> RaytracerParams {
         RaytracerParams {
             aspect_ratio: (image_width as Float) / (image_height as Float),
@@ -312,7 +312,7 @@ pub fn second_weekend_example_6dot2(image_width: u32, image_height: u32, samples
 
     // Return
     let params = example_params(image_width, image_height, samples_per_pixel, max_depth);
-    (params, example_camera(params.aspect_ratio), example_scene(image))
+    (params, example_camera(params.aspect_ratio), example_scene(earth_image))
 }
 
 // --------------------------------------------------------------------------------------------------------------------

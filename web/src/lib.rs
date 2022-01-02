@@ -10,6 +10,7 @@ use owr::bvh;
 
 use wasm_bindgen::{prelude::*, Clamped};
 use std::sync::Arc;
+extern crate image;
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -48,8 +49,8 @@ pub struct WebRaytracer {
 }
 
 impl WebRaytracer {
-    pub fn new(scene_num: u32, image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, enable_bvh: bool) -> Self {
-        let example_scene = scene_select(scene_num, image_width, image_height, samples_per_pixel, max_depth);
+    pub fn new(scene_num: u32, image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, enable_bvh: bool, image: image::RgbaImage) -> Self {
+        let example_scene = scene_select(scene_num, image_width, image_height, samples_per_pixel, max_depth, image);
         Self {
             params: example_scene.0,
             camera: example_scene.1,
@@ -93,7 +94,8 @@ impl WebRaytracer {
 
 #[wasm_bindgen]
 pub fn create_webraytracer(scene_num: u32, image_width: u32, image_height: u32, samples_per_pixel: u32, max_depth: u32, enable_bvh: bool) -> WebRaytracer {
-    WebRaytracer::new(scene_num, image_width, image_height, samples_per_pixel, max_depth, enable_bvh)
+    let blank_image = image::RgbaImage::new(512, 512);
+    WebRaytracer::new(scene_num, image_width, image_height, samples_per_pixel, max_depth, enable_bvh, blank_image)
 }
 
 #[wasm_bindgen]
