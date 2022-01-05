@@ -6,6 +6,9 @@ name = "owr"
 version = "0.1.0"
 edition = "2021"
 
+[features]
+progress-ui = ["indicatif"]
+
 [dependencies]
 piston-float = "1.0.1"
 vecmath = "1.0.0"
@@ -13,4 +16,4 @@ fastrand = "1.5.0"
 rayon = "1.5.1"
 web-sys = { version = "0.3.55", features = ["console"]}
 image = "0.23.14"
-indicatif = {version = "0.17.0-beta.1", features = ["rayon"]}
+indicatif = {version = "0.17.0-beta.1", features = ["rayon"], optional = true}

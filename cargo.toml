@@ -1,2 +1,5 @@
 [workspace]
 members = ["owr", "web"]
+
+[profile.release]
+opt-level = 3

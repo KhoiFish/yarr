@@ -7,9 +7,11 @@ use crate::camera;
 use crate::utils;
 
 use rayon::prelude::*;
-use indicatif::{ParallelProgressIterator, ProgressIterator, ProgressBar};
 use std::sync::Arc;
 extern crate image;
+
+#[cfg(feature = "progress-ui")]
+use indicatif::{ParallelProgressIterator, ProgressIterator, ProgressBar};
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -87,17 +89,20 @@ fn multisample_image(enable_progress_bar: bool, params: &RaytracerParams, camera
     let grid = get_grid(&params);
 
     if enable_progress_bar {
-        let pb = ProgressBar::new(grid.len() as u64);
-        pb.set_draw_delta(64);
+        #[cfg(feature = "progress-ui")]
+        {
+            let pb = ProgressBar::new(grid.len() as u64);
+            pb.set_draw_delta(64);
 
-        return grid.iter().progress_with(pb).flat_map(|&point| -> Color {
-            color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
-        }).collect()
-    } else {
-        return grid.iter().flat_map(|&point| -> Color {
-            color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
-        }).collect()
+            return grid.iter().progress_with(pb).flat_map(|&point| -> Color {
+                color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
+            }).collect()
+        }
     }
+
+    return grid.iter().flat_map(|&point| -> Color {
+        color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
+    }).collect();
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -106,17 +111,20 @@ fn multisample_image_parallel(enable_progress_bar: bool, params: &RaytracerParam
     let grid = get_grid(&params);
 
     if enable_progress_bar {
-        let pb = ProgressBar::new(grid.len() as u64);
-        pb.set_draw_delta(64);
+        #[cfg(feature = "progress-ui")]
+        {
+            let pb = ProgressBar::new(grid.len() as u64);
+            pb.set_draw_delta(64);
 
-        return grid.par_iter().progress_with(pb).flat_map(|&point| -> Color {
-            color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
-        }).collect()
-    } else {
-        return grid.par_iter().flat_map(|&point| -> Color {
-            color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
-        }).collect()
+            return grid.par_iter().progress_with(pb).flat_map(|&point| -> Color {
+                color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
+            }).collect()
+        }
     }
+
+    return grid.par_iter().flat_map(|&point| -> Color {
+        color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
+    }).collect();
 }
 
 // --------------------------------------------------------------------------------------------------------------------
