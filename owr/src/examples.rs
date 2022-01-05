@@ -20,7 +20,7 @@ extern crate image;
 pub fn run_and_print_ppm(params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) {
     log_print!("P3\n{0} {1}\n255\n", params.image_width, params.image_height);
 
-    let results = render_image(true, &params, &camera, world).unwrap().into_raw();
+    let results = render_image(true, true, &params, &camera, world).unwrap().into_raw();
     let mut count = 0;
     for &color in &results {
         count = count + 1;

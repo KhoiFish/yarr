@@ -19,6 +19,8 @@ pub fn main() {
     let samples_per_pixel = 32;
     let max_depth = 50;
     let output_filename = "output.png";
+    let enable_parallel = true;
+    let enable_progress_bar = true;
 
     // Select scene from commandline args
     let scene_num = if args.len() > 1 { args[1].parse().unwrap() } else { 0 };
@@ -37,7 +39,7 @@ pub fn main() {
     // Render and write out image
     log_print!("Rendering scene {}...\n", scene_num);
     let now = Instant::now();
-    let final_image = render_image(true, &example_scene.0, &example_scene.1, &hittables);
+    let final_image = render_image(enable_parallel, enable_progress_bar, &example_scene.0, &example_scene.1, &hittables);
     final_image.unwrap().save(output_filename).unwrap();
     log_print!("Completed in {}s. Results written to {}\n", now.elapsed().as_secs_f32(), output_filename);
 }

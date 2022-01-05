@@ -66,7 +66,7 @@ pub fn multi_sample(enable_average_sum: bool, image_x: u32, image_y: u32, params
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn multi_sample_buffer(enable_average_sum: bool, enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec::<Float> {
+fn get_grid(params: &RaytracerParams) -> Vec::<(u32, u32)> {
     // How many pixels?
     let num_pixels = (params.image_width * params.image_height) as usize;
 
@@ -77,6 +77,52 @@ pub fn multi_sample_buffer(enable_average_sum: bool, enable_parallel: bool, para
             grid.push((x,y));
         }
     }
+
+    grid
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+fn multisample_image(enable_progress_bar: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec<u8> {
+    let grid = get_grid(&params);
+
+    if enable_progress_bar {
+        let pb = ProgressBar::new(grid.len() as u64);
+        pb.set_draw_delta(64);
+
+        return grid.iter().progress_with(pb).flat_map(|&point| -> Color {
+            color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
+        }).collect()
+    } else {
+        return grid.iter().flat_map(|&point| -> Color {
+            color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
+        }).collect()
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+fn multisample_image_parallel(enable_progress_bar: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec<u8> {
+    let grid = get_grid(&params);
+
+    if enable_progress_bar {
+        let pb = ProgressBar::new(grid.len() as u64);
+        pb.set_draw_delta(64);
+
+        return grid.par_iter().progress_with(pb).flat_map(|&point| -> Color {
+            color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
+        }).collect()
+    } else {
+        return grid.par_iter().flat_map(|&point| -> Color {
+            color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
+        }).collect()
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+pub fn multi_sample_buffer(enable_average_sum: bool, enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec::<Float> {
+    let grid = get_grid(&params);
 
     // Iterate and collect results
     if enable_parallel {
@@ -96,34 +142,13 @@ pub fn multi_sample_buffer(enable_average_sum: bool, enable_parallel: bool, para
 
 // --------------------------------------------------------------------------------------------------------------------
 
-pub fn render_image(enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Option<image::RgbaImage> {
-    // How many pixels?
-    let num_pixels = (params.image_width * params.image_height) as usize;
-
-    // Create a grid so we can divide the work
-    let mut grid = Vec::<(u32, u32)>::with_capacity(num_pixels);
-    for y in (0..params.image_height).rev() {
-        for x in 0..params.image_width {
-            grid.push((x,y));
-        }
-    }
-    
-    // Progress bar setup
-    let pb = ProgressBar::new(grid.len() as u64);
-    pb.set_draw_delta(64);
-
+pub fn render_image(enable_parallel: bool, enable_progress_bar: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Option<image::RgbaImage> {
     // Iterate and collect results
     let results;
     if enable_parallel {
-        results = grid.par_iter().progress_with(pb)
-            .flat_map(|&point| -> Color {
-                color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
-            }).collect();
+        results = multisample_image_parallel(enable_progress_bar, &params, &camera, &world);
     } else {
-        results = grid.iter().progress_with(pb)
-            .flat_map(|&point| -> Color {
-                color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
-            }).collect();
+        results = multisample_image(enable_progress_bar, &params, &camera, &world);
     }
 
     image::RgbaImage::from_raw(params.image_width, params.image_height, results)
