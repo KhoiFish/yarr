@@ -7,7 +7,7 @@ use crate::camera;
 use crate::utils;
 
 use rayon::prelude::*;
-use indicatif::{ParallelProgressIterator, ProgressIterator};
+use indicatif::{ParallelProgressIterator, ProgressIterator, ProgressBar};
 use std::sync::Arc;
 extern crate image;
 
@@ -107,16 +107,20 @@ pub fn render_image(enable_parallel: bool, params: &RaytracerParams, camera: &ca
             grid.push((x,y));
         }
     }
+    
+    // Progress bar setup
+    let pb = ProgressBar::new(grid.len() as u64);
+    pb.set_draw_delta(64);
 
     // Iterate and collect results
     let results;
     if enable_parallel {
-        results = grid.par_iter().progress_count(grid.len() as u64)
+        results = grid.par_iter().progress_with(pb)
             .flat_map(|&point| -> Color {
                 color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
             }).collect();
     } else {
-        results = grid.iter().progress_count(grid.len() as u64)
+        results = grid.iter().progress_with(pb)
             .flat_map(|&point| -> Color {
                 color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
             }).collect();
