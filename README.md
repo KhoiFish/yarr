@@ -73,9 +73,9 @@ cargo build --release
 ```
 
 ### Testing the native console app 
-This outputs a file, output.png to the current directory.
+This outputs a file, output.png to the current directory. We pass in 'progress-ui' which enables a progress bar using the indicatif library.
 ```console
-cargo run --release
+cargo run --release --features='progress-ui'
 ```
 
 ### Building the web app
