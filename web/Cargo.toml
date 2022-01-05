@@ -21,3 +21,6 @@ image = "0.23.14"
 [features]
 default = ["console_error_panic_hook"]
 parallel = ["rayon", "wasm-bindgen-rayon"]
+
+[package.metadata.wasm-pack.profile.release]
+wasm-opt = ['-O4']
