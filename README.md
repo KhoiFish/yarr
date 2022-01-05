@@ -69,7 +69,7 @@ You can use the scripts provided in this repo to build and host a local web serv
 ### Build a native console app
 This compiles to native code on your platform. Great for comparing perf between native vs web.
 ```console
-cargo build --release
+cargo build --release --features='progress-ui'
 ```
 
 ### Testing the native console app 
