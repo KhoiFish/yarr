@@ -3,11 +3,23 @@ import * as Comlink from 'comlink';
 
 // --------------------------------------------------------------------------------------------------------------------
 
-function wrapRenderImageFunc(importedHandler) {
+function createResourceCache(importedHandler, resourceMap) {
+    var resourceCache = importedHandler.create_empty_resource_cache();
+    for (let [path, data] of resourceMap) {
+        importedHandler.insert_resource(resourceCache, path, data);
+    }
+
+    return resourceCache;
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+function wrapRenderImageFunc(importedHandler, resourceCache) {
     return ({ sceneNum, width, height, numSamples, maxDepth, enableBvh }) =>
     {
+        // Render
         const start = performance.now();
-        const raytracer = importedHandler.create_webraytracer(sceneNum, width, height, numSamples, maxDepth, enableBvh );
+        const raytracer = importedHandler.create_webraytracer(resourceCache, sceneNum, width, height, numSamples, maxDepth, enableBvh );
         const rawImageData = importedHandler.render_image(raytracer);
         const time = performance.now() - start;
         return {
@@ -19,7 +31,7 @@ function wrapRenderImageFunc(importedHandler) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function initHandlers() {
+async function initHandlers(resourceMap) {
     let [singleThreadExports, multiThreadExports] = await Promise.all(
         [
             // Single-thread
@@ -29,7 +41,7 @@ async function initHandlers() {
                 await singleThreadImport.default();
 
                 return Comlink.proxy({
-                    renderImage: wrapRenderImageFunc(singleThreadImport)
+                    renderImage: wrapRenderImageFunc(singleThreadImport, createResourceCache(singleThreadImport, resourceMap))
                 });
             })(),
 
@@ -46,7 +58,7 @@ async function initHandlers() {
                 await multiThreadImport.initThreadPool(navigator.hardwareConcurrency);
 
                 return Comlink.proxy({
-                    renderImage: wrapRenderImageFunc(multiThreadImport)
+                    renderImage: wrapRenderImageFunc(multiThreadImport, createResourceCache(multiThreadImport, resourceMap))
                 });
             })(),
         ]);
@@ -62,5 +74,5 @@ async function initHandlers() {
 // Main entry
 
 Comlink.expose({
-    handlers: initHandlers()
+    initHandlers
 });

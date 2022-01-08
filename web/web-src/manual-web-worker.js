@@ -3,6 +3,7 @@ import * as Comlink from 'comlink';
 // --------------------------------------------------------------------------------------------------------------------
 
 var wasmModule;
+var workerResourceCache;
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -31,7 +32,7 @@ function xmur3(str) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function init(workerId) {
+async function init(workerId, resourceMap) {
     // Load our web assembly module
     wasmModule = await import('../../target/web/pkg/web.js');
     await wasmModule.default();
@@ -39,17 +40,23 @@ async function init(workerId) {
     // Seed random
     const seedFunc = xmur3(makeid(32));
     await wasmModule.seed_rand(seedFunc());
+
+    // Create resource cache
+    workerResourceCache = wasmModule.create_empty_resource_cache();
+    for (let [path, data] of resourceMap) {
+        wasmModule.insert_resource(workerResourceCache, path, data);
+    }
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
 async function workerRenderImage(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
-    var raytracer = wasmModule.create_webraytracer(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
+    var raytracer = wasmModule.create_webraytracer(workerResourceCache, sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
     return await wasmModule.multi_sample_buffer(raytracer, false);
 }
 
 async function workerRenderImageProgressive(sceneNum, previewCb, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh, regionX, regionY, regionWidth, regionHeight)  {
-    var raytracer = wasmModule.create_webraytracer(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
+    var raytracer = wasmModule.create_webraytracer(workerResourceCache, sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
     for(var y = regionY; y < (regionY + regionHeight); y++) {
         for(var x = regionX; x < (regionX + regionWidth); x++) {
             var colorU32 = await wasmModule.multi_sample_point(raytracer, x, (imageHeight-y));

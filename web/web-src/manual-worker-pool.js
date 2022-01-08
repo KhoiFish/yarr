@@ -7,14 +7,14 @@ const workerPool = [];
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function initWorkerPool() {
+async function initWorkerPool(resourceMap) {
     for (var i = 0; i < MAX_NUM_WORKERS; i++ ) {
         let worker = await Comlink.wrap(
             new Worker(new URL('./manual-web-worker.js', import.meta.url), {
                 type: 'module'
             })
         );
-        await worker.init(i);
+        await worker.init(i, resourceMap);
         workerPool.push(worker);
     }
 }

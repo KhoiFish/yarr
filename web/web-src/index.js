@@ -1,5 +1,6 @@
 import * as Comlink from 'comlink';
 import * as ManualWorkerPool from './manual-worker-pool.js';
+import * as WasmModule from '../../target/web/pkg/web.js';
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -99,15 +100,25 @@ function setEnableAvaialbleButtons(enable) {
 // --------------------------------------------------------------------------------------------------------------------
 
 async function init() {
+    // Load wasm module and load our resources (images)
+    await WasmModule.default();
+    const resourceCache = await WasmModule.create_and_load_resource_cache();
+
+    // Convert to a JS map, this allows for structured cloning (deep copies) of the
+    // loaded resources when we pass the map to other web workers.
+    // TODO: write code to populate the map automatically instead of doing it manual
+    const resourceMap = new Map();
+    resourceMap.set('earthmap.jpeg', WasmModule.get_resource(resourceCache, "earthmap.jpeg"));
+
     // Get handlers to rust wasm api
     let wasmHandlers = await Comlink.wrap(
         new Worker(new URL('./wasm-worker.js', import.meta.url), {
             type: 'module'
         })
-    ).handlers;
+    ).initHandlers(resourceMap);
 
     // Spin up our manual web worker pool
-    await ManualWorkerPool.initWorkerPool();
+    await ManualWorkerPool.initWorkerPool(resourceMap);
 
     // Set label to how many threads detected
     numThreadsOutput.value = `Num threads: ${ManualWorkerPool.MAX_NUM_WORKERS}`;
