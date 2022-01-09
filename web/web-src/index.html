@@ -1,12 +1,13 @@
 <!DOCTYPE html>
 <html>
+
+  <!-- HEAD -->
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="min.css">
     <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link rel="stylesheet" href="styles.css">
     <style>
       body, h1,h2,h3,h4,h5,h6 {font-family: "Montserrat", sans-serif}
       .w3-row-padding img {margin-bottom: 12px}
@@ -14,10 +15,10 @@
       /* Remove margins from "page content" on small screens */
       @media only screen and (max-width: 600px) {#main {margin-left: 0; margin-right: 0;}}
     </style>
-
     <title>YARR Raytracer Web Demo</title>
   </head>
   
+  <!-- MAIN BODY AND DIV START -->
   <body class="w3-black">
     <div class="w3-padding-large" id="main">
 
@@ -104,7 +105,7 @@
         
       </div>
 
-      <!-- BUTTONS -->
+      <!-- Render Buttons -->
       <div class="w3-bar w3-border w3-dark-grey" id="buttons">
           <input class="w3-bar-item w3-button" style="width:25%" id="singleThreadBtn" value="Single-thread" disabled />
           <input class="w3-bar-item w3-button" style="width:25%" id="multiThreadBtn" value="Rayon multi-threads" disabled />
@@ -141,13 +142,16 @@
       </div>
       <br />
 
-      <!-- CANVAS -->
+      <!-- Canvas -->
       <p align="center">
         <canvas id="canvas" width="512" height="512"></canvas>
       </p>
       
-      <!-- MAIN SCRIPT INCLUDE -->
+      <!-- Main Script Include -->
       <script type="module" src="index.js"></script>
+
     </div>
   </body>
+  <!-- MAIN BODY AND DIV END -->
+
 </html>
