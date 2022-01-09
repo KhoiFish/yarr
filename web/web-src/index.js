@@ -107,9 +107,11 @@ async function init() {
 
     // Convert to a JS map, this allows for structured cloning (deep copies) of the
     // loaded resources when we pass the map to other web workers.
-    // TODO: write code to populate the map automatically instead of doing it manual
     const resourceMap = new Map();
-    resourceMap.set('earthmap.jpeg', WasmModule.get_resource(resourceCache, "earthmap.jpeg"));
+    for (var i = 0; i < resourceInfo.length; i++) {
+        var resource = resourceInfo[i].path;
+        resourceMap.set(resource, WasmModule.get_resource(resourceCache, resource));
+    }
 
     // Get handlers to rust wasm api
     let wasmHandlers = await Comlink.wrap(
