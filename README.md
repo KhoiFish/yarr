@@ -1,34 +1,24 @@
-# YARR - a Native & Web-based Raytracer
+# YARR - Native & Web-based Raytracing
 
-### _Try it here @ [Web Demo Link](https://khoifish.github.io/)_
+### _Try it here: [Web Demo Link](https://khoifish.github.io/)_
 
-<img src="images/preview.png" alt="YARR - Yet Another Rust Raytracer" />
+<img src="images/final2_512x512_10000_samples.png" alt="YARR - Yet Another Rust Raytracer" />
 
 ### Pirate speak for ___"Yet Another Rust Raytracer"___
 
-Ahoy, me fellow mateys! 
-
-YARR is the result of my personal journey with learning Rust. It also led me to cross-compiling to WebAssembly along the way. 
-
-Rust is well suited for systems programming, where close-to-the-metal control, performance, and data safety are crucial to the craft. Building a raytracer is a great way to learn a modern language like Rust; writing a raytracer using Rust can hone skills in software design, multi-threading/parallelism, and performance-minded implementation. 
+YARR is the result of my personal journey with learning Rust. It also led me to cross-compiling to WebAssembly along the way.
 
 I'm a C/C++ programmer at heart, yet my heart grows ever so fonder for Rust. **Rust gives C++ a run for its money.**
 
 - Based on Peter Shirley's great "Raytracing in One Weekend" book series
 - Core implementation in Rust, with some JavaScript glue for the web
-- Builds natively for Windows, MacOS, Linux & dub-dub-dub (JavaScript & WebAssembly)
-- Multi-threaded via rayon crate, wasm-bind-rayon, and as well as a manually managed web worker pool
+- Builds natively for Windows, MacOS, Linux & Web (JavaScript & WebAssembly)
+- Multi-threaded via rayon, wasm-bind-rayon, and a manually managed web worker pool
 - Tested on iOS/Android via Chrome browser
-
-## Get the Source
-```console
-git clone https://github.com/KhoiFish/yarr.git
-```
 
 ## Software Prerequisites
 
-To build this project, you'll need to install the following software. 
-_Note: the following commands are assumed to be from the root directory of the project._
+To build this project, you'll need to install the following software. _Note: the following commands are assumed to be from the root directory of the project._
 
 ### Install rust
 https://www.rust-lang.org/tools/install
@@ -36,66 +26,57 @@ https://www.rust-lang.org/tools/install
 ### Install npm
 https://nodejs.org/en/download/
 
-### Install nightly rust
-Although this project includes a manually managed web worker pool implementation, the other mulit-threaded solution uses wasm-bindgen-rayon, which requires a build of the rust toolchain with atomics and shared memory enabled. Hopefully these features will be built as part of the standard stable release of Rust in the future.
-
 #### Install toolchain
+One of the multi-threaded paths uses wasm-bindgen-rayon, which requires atomics and shared memory. These features are not included in stable rust, so you'll need to use a nightly version of rust to compile with these features enabled.
 ```console
 cargo install
 ```
 
-#### Install wasm-pack
-This is needed to build wasm bindings from rust to JavaScript/Node.
-```console
-cargo install wasm-pack
-```
-
-##### If you're on Windows
-You may run into a problem installing wasm-pack on Windows. Try downloading and installing manually from here if you do:
-[Windows wasm-pack installer](https://rustwasm.github.io/wasm-pack/installer/)
-
-#### Add toolchain sources
+And add nightly toolchain sources:
 ```console
 rustup component add rust-src --toolchain nightly-2021-07-29
 ```
 
-### Install npm packages
-This downloads and installs the dependencies needed to build and locally host the web app.
+#### Install wasm-pack
 ```console
-cd web
-npm install
+cargo install wasm-pack
+```
+Windows users: the previous step may fail for you. If so, try the manual installer: [Windows wasm-pack installer](https://rustwasm.github.io/wasm-pack/installer/)
+
+
+### Install npm packages
+```console
+npm --prefix ./web install
 ```
 
 ## Build & Run Console App
 
 #### Build
-This compiles to native code on your platform. Great for comparing perf between native vs web.
 ```console
 cargo build --release --features='progress-ui'
 ```
 
 #### Run
-This outputs a file, output.png to the current directory. We pass in 'progress-ui' which enables a progress bar using the indicatif library.
+This outputs a file, output.png to the current directory.
 ```console
 cargo run --release --features='progress-ui'
 ```
 
 ## Build & Run Web App
 #### Build
-This uses npm to kick off build and package it.
 ```console
 npm --prefix ./web run build
 ```
 
 #### Run & Host
-Run this to try the WebAssembly app. The node-js serve app is configured to serve cross-origin headers, needed to run the multi-threaded implementation using wasm-bind-rayon.
+The node-js serve app is configured to serve cross-origin headers, needed by wasm-bind-rayon.
 ```console
 npm --prefix ./web run host
 ```
 
 ## References
 ### Learning rust
-I recently joined the _Rust Gang_ by reading [Programming Rust: Fast, Safe Systems Development](https://www.amazon.com/Programming-Rust-Fast-Systems-Development/dp/1492052590). It introduces and deep-dives the Rust language from the perspective of systems development. It's also surprisingly fun to read with light and professional humor. If you are coming from another systems language such as C/C++, this is the book for you.
+I recently joined the _Rust Gang_ by reading [Programming Rust: Fast, Safe Systems Development](https://www.amazon.com/Programming-Rust-Fast-Systems-Development/dp/1492052590). It introduces and deep-dives the Rust language from the perspective of systems development. Sprinkled with light "programmer humor", it's a surprisingly fun read. If you are coming from another systems language such as C/C++, this is the book for you.
 
 ### Learning raytracing
 If you're new to raytracing, I highly recommend you take a weekend (or two!) and go through Peter Shirley's [RayTracing in One Weekend](https://raytracing.github.io/books/RayTracingInOneWeekend.html) series of books. It's a great read and this project's raytracing core is based on it.
@@ -110,8 +91,9 @@ The following are great resources in learning how to setup Rust & WebAssembly fo
 
 ## Special Thanks
 I'd like to thank the following people:
-* Peter Shirley, whose books really inspired me. As a kid, I always loved computer generated graphics, and his down-to-earth lessons made my childhood dreams of writing my own raytracer come true.
-* Diep Mai, for his friendship, and for introducing me to Rust. I finally got around to learning how-to-rust!
+* Peter Shirley, for the wonderful One Weekend book series
+* Diep Mai, for introducing me to Rust
+* Last but not least, thanks to my wonderful wife for giving me the space to work on this pet project
 
 ## License
-This is free and open-source software distributed under the MIT License. Feel free to use this, and go get 'em tiger.
+This is free and open-source software distributed under the MIT License. Take this and go get 'em tiger.
