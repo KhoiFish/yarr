@@ -4,16 +4,16 @@ import * as WasmModule from '../../target/web/pkg/web.js';
 
 // --------------------------------------------------------------------------------------------------------------------
 
-const numSamplesSlider = document.getElementById('numSamplesSlider');
-const maxDepthSlider = document.getElementById('maxDepthSlider');
 const canvas = document.getElementById('canvas');
 const { width, height } = canvas;
 const ctx = canvas.getContext('2d');
 const timeOutput = document.getElementById('time');
 const numThreadsOutput = document.getElementById('numThreads');
 const buttonAvailableMap = new Map();
-const enableBvhCheckbox = document.getElementById('bvhCheckbox');
 const sceneNumOutput = document.getElementById('sceneNum');
+const samplesNumOutput = document.getElementById('samplesNum');
+const maxDepthNumOutput = document.getElementById('maxDepthNum');
+const bvhEnableOutput = document.getElementById('bvhEnable');
 var previewImgData;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -31,15 +31,16 @@ function setupRenderBtn(buttonId, handler) {
         async onclick() {
             setEnableAvaialbleButtons(false);
             const sceneNum = parseInt(sceneNumOutput.value);
-            const numSamples = parseInt(numSamplesSlider.value);
-            const maxDepth = parseInt(maxDepthSlider.value);
+            const numSamples = parseInt(samplesNumOutput.value);
+            const maxDepth = parseInt(maxDepthNumOutput.value);
+            const enableBvh = (bvhEnableOutput.value === 'true');
             let { rawImageData, time } = await handler.renderImage({
                 sceneNum,
                 width,
                 height,
                 numSamples,
                 maxDepth,
-                enableBvh: enableBvhCheckbox.checked
+                enableBvh
             });
             updateTimeLabel(time);
             ctx.putImageData(new ImageData(rawImageData, width, height), 0, 0);
@@ -75,9 +76,10 @@ function setupPreviewRenderBtn(buttonId) {
 
             // Kick off the progressive raytracing
             const sceneNum = parseInt(sceneNumOutput.value);
-            const numSamples = parseInt(numSamplesSlider.value);
-            const maxDepth = parseInt(maxDepthSlider.value);
-            let { time } = await ManualWorkerPool.workerPoolRenderImageProgressive({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh: enableBvhCheckbox.checked });
+            const numSamples = parseInt(samplesNumOutput.value);
+            const maxDepth = parseInt(maxDepthNumOutput.value);
+            const enableBvh = (bvhEnableOutput.value === 'true');
+            let { time } = await ManualWorkerPool.workerPoolRenderImageProgressive({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh });
 
             // Done rendering
             updateTimeLabel(time);
@@ -124,7 +126,7 @@ async function init() {
     await ManualWorkerPool.initWorkerPool(resourceMap);
 
     // Set label to how many threads detected
-    numThreadsOutput.value = `Num threads: ${ManualWorkerPool.MAX_NUM_WORKERS}`;
+    numThreadsOutput.value = `${ManualWorkerPool.MAX_NUM_WORKERS}`;
 
     // Are threads supported ?
     const threadsSupported = (await wasmHandlers.supportsThreads) ? true : false;
