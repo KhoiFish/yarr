@@ -101,8 +101,9 @@ function setEnableAvaialbleButtons(enable) {
 
 async function init() {
     // Load wasm module and load our resources (images)
+    const resourceInfo = [ { path: "earthmap.jpeg" } ];
     await WasmModule.default();
-    const resourceCache = await WasmModule.create_and_load_resource_cache();
+    const resourceCache = await WasmModule.create_and_load_resource_cache(resourceInfo);
 
     // Convert to a JS map, this allows for structured cloning (deep copies) of the
     // loaded resources when we pass the map to other web workers.

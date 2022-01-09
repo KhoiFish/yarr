@@ -15,6 +15,7 @@ use reqwest;
 use std::path::{Path, PathBuf};
 
 extern crate image;
+use serde::{Serialize, Deserialize};
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -45,6 +46,10 @@ pub fn wasm_alert(name: &str) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+#[derive(Serialize, Deserialize)]
+pub struct ResourceInfo {
+    pub path: String,
+}
 #[wasm_bindgen]
 pub struct ResourceCache {
     cache: HashMap::<PathBuf, Vec<u8>>,
@@ -57,7 +62,7 @@ impl ResourceCache {
         }
     }
 
-    pub fn get(&self, path: impl AsRef<Path>) -> Option<&[u8]> {
+    pub fn get(&self, path: impl AsRef<Path>) -> Option<&Vec<u8>> {
         if self.cache.contains_key(path.as_ref()) {
             Some(self.cache.get(path.as_ref()).unwrap())
         } else {
@@ -69,8 +74,8 @@ impl ResourceCache {
         self.cache.insert(path.as_ref().to_path_buf(), bytes);
     }
 
-    async fn create_and_load(ref_paths: &[impl AsRef<Path>]) -> ResourceCache {
-        let paths : Vec<PathBuf> = ref_paths.iter().map(|p| p.as_ref().to_path_buf()).collect();
+    async fn create_and_load(ref_paths: &Vec<ResourceInfo>) -> ResourceCache {
+        let paths : Vec<PathBuf> = ref_paths.iter().map(|p| PathBuf::from(&p.path)).collect();
         let mut resource_cache = ResourceCache::new();
         for path in paths.iter() {
             let url = reqwest::Url::parse(path.to_str().unwrap()).unwrap_or_else(|_| {
@@ -149,9 +154,9 @@ impl WebRaytracer {
 // --------------------------------------------------------------------------------------------------------------------
 
 #[wasm_bindgen]
-pub async fn create_and_load_resource_cache() -> ResourceCache { 
-    // TODO: accept array of resources to load as input parameters
-    ResourceCache::create_and_load(&["earthmap.jpeg"]).await
+pub async fn create_and_load_resource_cache(js_objects: JsValue) -> ResourceCache { 
+    let info: Vec<ResourceInfo> = js_objects.into_serde().unwrap();
+    ResourceCache::create_and_load(&info).await
 }
 
 #[wasm_bindgen]
@@ -162,7 +167,7 @@ pub fn create_empty_resource_cache() -> ResourceCache {
 #[wasm_bindgen]
 pub fn get_resource(resource_cache: &ResourceCache, path: &str) -> Option::<Vec<u8>> {
     match resource_cache.get(path) {
-        Some(array) => { Some(array.to_vec()) }
+        Some(data) => { Some(data.clone()) }
         _ => { None }
     }
 }
