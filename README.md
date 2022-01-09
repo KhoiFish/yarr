@@ -66,28 +66,28 @@ cd web
 npm install
 ```
 
-## How to Build
-You can use the scripts provided in this repo to build and host a local web server, or use these commands directly:
+## Build & Run Console App
 
-### Build a native console app
+#### Build
 This compiles to native code on your platform. Great for comparing perf between native vs web.
 ```console
 cargo build --release --features='progress-ui'
 ```
 
-### Testing the native console app 
+#### Run
 This outputs a file, output.png to the current directory. We pass in 'progress-ui' which enables a progress bar using the indicatif library.
 ```console
 cargo run --release --features='progress-ui'
 ```
 
-### Building the web app
+## Build & Run Web App
+#### Build
 This uses npm to kick off build and package it.
 ```console
 npm --prefix ./web run build
 ```
 
-### Hosting a local web server
+#### Run & Host
 Run this to try the WebAssembly app. The node-js serve app is configured to serve cross-origin headers, needed to run the multi-threaded implementation using wasm-bind-rayon.
 ```console
 npm --prefix ./web run host
