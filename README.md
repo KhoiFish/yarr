@@ -62,8 +62,7 @@ rustup component add rust-src --toolchain nightly-2021-07-29
 ### Install npm packages
 This downloads and installs the dependencies needed to build and locally host the web app.
 ```console
-cd web
-npm install
+npm --prefix ./web install
 ```
 
 ## Build & Run Console App
