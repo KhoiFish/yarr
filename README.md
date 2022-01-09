@@ -2,7 +2,7 @@
 
 ### _Try it here @ [Web Demo Link](https://khoifish.github.io/)_
 
-<img src="preview.png" alt="YARR - Yet Another Rust Raytracer" />
+<img src="images/preview.png" alt="YARR - Yet Another Rust Raytracer" />
 
 ### Pirate speak for ___"Yet Another Rust Raytracer"___
 
