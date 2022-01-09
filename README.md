@@ -53,13 +53,13 @@ npm --prefix ./web install
 
 #### Build
 ```console
-cargo build --release --features='progress-ui'
+cargo build --release
 ```
 
 #### Run
 This outputs a file, output.png to the current directory.
 ```console
-cargo run --release --features='progress-ui'
+cargo run --release
 ```
 
 ## Build & Run Web App
