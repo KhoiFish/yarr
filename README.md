@@ -92,5 +92,7 @@ I'd like to thank the following people:
 * Diep Mai, for introducing me to Rust
 * Last but not least, thanks to my wonderful wife for giving me the space to work on this pet project
 
+_Icons courtesy of [Flat Icon](https://www.flaticon.com/)_
+
 ## License
 This is free and open-source software distributed under the MIT License. Take this and go get 'em tiger.

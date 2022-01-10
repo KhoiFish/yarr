@@ -8,13 +8,15 @@ const canvas = document.getElementById('canvas');
 const { width, height } = canvas;
 const ctx = canvas.getContext('2d');
 const timeOutput = document.getElementById('time');
+const renderButton =  document.getElementById('renderButton');
 const numThreadsOutput = document.getElementById('numThreads');
-const buttonAvailableMap = new Map();
+const renderFunctionMap = new Map();
 const sceneNumOutput = document.getElementById('sceneNum');
 const samplesNumOutput = document.getElementById('samplesNum');
 const maxDepthNumOutput = document.getElementById('maxDepthNum');
 const bvhEnableOutput = document.getElementById('bvhEnable');
 const resolutionOutput = document.getElementById('resolution');
+const threadsModeOutput = document.getElementById('threadsMode');
 var previewImgData;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -26,35 +28,29 @@ function updateTimeLabel(timeInMs) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-function setupRenderBtn(buttonId, handler) {
-    var button = document.getElementById(buttonId);
-    Object.assign(button, {
-        async onclick() {
-            setEnableRenderUI(false);
-            setEnableAvaialbleButtons(false);
+function getRenderFunction(handler) {
+    return async function () {
+        setEnableRenderUI(false);
+        previewImgData = new ImageData(width, height);
+        ctx.putImageData(previewImgData, 0, 0);
 
-            previewImgData = new ImageData(width, height);
-            ctx.putImageData(previewImgData, 0, 0);
+        const sceneNum = parseInt(sceneNumOutput.value);
+        const numSamples = parseInt(samplesNumOutput.value);
+        const maxDepth = parseInt(maxDepthNumOutput.value);
+        const enableBvh = (bvhEnableOutput.value === 'true');
+        let { rawImageData, time } = await handler.renderImage({
+            sceneNum,
+            width,
+            height,
+            numSamples,
+            maxDepth,
+            enableBvh
+        });
 
-            const sceneNum = parseInt(sceneNumOutput.value);
-            const numSamples = parseInt(samplesNumOutput.value);
-            const maxDepth = parseInt(maxDepthNumOutput.value);
-            const enableBvh = (bvhEnableOutput.value === 'true');
-            let { rawImageData, time } = await handler.renderImage({
-                sceneNum,
-                width,
-                height,
-                numSamples,
-                maxDepth,
-                enableBvh
-            });
-
-            updateTimeLabel(time);
-            ctx.putImageData(new ImageData(rawImageData, width, height), 0, 0);
-            setEnableAvaialbleButtons(true);
-            setEnableRenderUI(true);
-        }
-    });
+        updateTimeLabel(time);
+        ctx.putImageData(new ImageData(rawImageData, width, height), 0, 0);
+        setEnableRenderUI(true);
+    };
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -73,40 +69,26 @@ function previewDraw() {
     ctx.putImageData(previewImgData, 0, 0);
 }
 
-function setupPreviewRenderBtn(buttonId) {
-    var button = document.getElementById(buttonId);
-    Object.assign(button, {
-        async onclick() {            
-            // Kick off preview drawing
-            setEnableRenderUI(false);
-            setEnableAvaialbleButtons(false);
-            previewImgData = new ImageData(width, height);
-            const drawInteral = setInterval(previewDraw, 250);
+function getPreviewFunction() {
+    return async function () {            
+        // Kick off preview drawing
+        setEnableRenderUI(false);
+        previewImgData = new ImageData(width, height);
+        const drawInteral = setInterval(previewDraw, 250);
 
-            // Kick off the progressive raytracing
-            const sceneNum = parseInt(sceneNumOutput.value);
-            const numSamples = parseInt(samplesNumOutput.value);
-            const maxDepth = parseInt(maxDepthNumOutput.value);
-            const enableBvh = (bvhEnableOutput.value === 'true');
-            let { time } = await ManualWorkerPool.workerPoolRenderImageProgressive({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh });
+        // Kick off the progressive raytracing
+        const sceneNum = parseInt(sceneNumOutput.value);
+        const numSamples = parseInt(samplesNumOutput.value);
+        const maxDepth = parseInt(maxDepthNumOutput.value);
+        const enableBvh = (bvhEnableOutput.value === 'true');
+        let { time } = await ManualWorkerPool.workerPoolRenderImageProgressive({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh });
 
-            // Done rendering
-            updateTimeLabel(time);
-            clearInterval(drawInteral);
-            ctx.putImageData(previewImgData, 0, 0);
-            setEnableAvaialbleButtons(true);
-            setEnableRenderUI(true);
-        }
-    });
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-function setEnableAvaialbleButtons(enable) {
-    for (let [buttonId, isAvailable] of buttonAvailableMap) {
-        var buttonEnabled = isAvailable && enable;
-        document.getElementById(buttonId).disabled = !buttonEnabled;
-    }
+        // Done rendering
+        updateTimeLabel(time);
+        clearInterval(drawInteral);
+        ctx.putImageData(previewImgData, 0, 0);
+        setEnableRenderUI(true);
+    };
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -115,12 +97,12 @@ function setEnableRenderUI (enable){
     if (enable) {
         hideDiv('progress');
         showDiv('parameters');
-        showDiv('renderButtons');
+        showDiv('renderButton');
     }
     else {
         showDiv('progress');
         hideDiv('parameters');
-        hideDiv('renderButtons');
+        hideDiv('renderButton');
     }
 }
 
@@ -153,23 +135,26 @@ async function init() {
     // Set label to how many threads detected
     numThreadsOutput.value = `${ManualWorkerPool.MAX_NUM_WORKERS}`;
 
-    // Are threads supported ?
+    // Are rayon threads supported ?
     const threadsSupported = (await wasmHandlers.supportsThreads) ? true : false;
+    if (threadsSupported == false) {
+        // Hide rayon mode from list
+        hideDiv('rayonDropDown');
+    }
 
-    // Map which buttons are available
-    buttonAvailableMap.set('singleThreadBtn', true);
-    buttonAvailableMap.set('multiThreadBtn', threadsSupported);
-    buttonAvailableMap.set('manualWebWorkers', true);
-    buttonAvailableMap.set('manualWebWorkersPreview', true);
+    // Map methods to table
+    renderFunctionMap.set('single', getRenderFunction(wasmHandlers.singleThread));
+    renderFunctionMap.set('rayon', getRenderFunction(wasmHandlers.multiThread));
+    renderFunctionMap.set('workers', getRenderFunction({ renderImage: ManualWorkerPool.workerPoolRenderImage }));
+    renderFunctionMap.set('preview', getPreviewFunction());
 
-    // Setup buttons, they are disabled by default
-    setupRenderBtn('singleThreadBtn', wasmHandlers.singleThread);
-    setupRenderBtn('multiThreadBtn', wasmHandlers.multiThread);
-    setupRenderBtn('manualWebWorkers', { renderImage: ManualWorkerPool.workerPoolRenderImage });
-    setupPreviewRenderBtn('manualWebWorkersPreview');
-
-    // Now enable buttons if they are available
-    setEnableAvaialbleButtons(true);
+    // Set up render button click event
+    Object.assign(renderButton, {
+        async onclick() {
+            const threadMode = threadsModeOutput.value;
+            renderFunctionMap.get(threadMode)();
+        }
+    });
 
     // Update resolution output
     resolutionOutput.value = `${width}x${height}`;
