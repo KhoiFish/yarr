@@ -14,8 +14,8 @@ pub fn main() {
     let args: Vec<String> = env::args().collect();
 
     // Some default parameters. TODO: make them configurable from the command-line
-    let image_width = 512;
-    let image_height = 512;
+    let image_width = 400;
+    let image_height = 400;
     let samples_per_pixel = 32;
     let max_depth = 50;
     let output_filename = "output.png";
