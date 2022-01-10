@@ -15,6 +15,14 @@
       #main {margin-left: 60px; margin-right:60px}
       /* Remove margins from "page content" on small screens */
       @media only screen and (max-width: 600px) {#main {margin-left: 0; margin-right: 0;}}
+      canvas {
+        padding-left: 0;
+        padding-right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+        width: 350;
+      }
     </style>
     <title>YARR Raytracer Web Demo</title>
   </head>
@@ -141,6 +149,10 @@
           <output id="numThreads">8</output>
 
           <p style="display:inline"> | </p>
+          <label id="resolutionTitle">Res: </label>
+          <output id="resolution">N/A</output>
+
+          <p style="display:inline"> | </p>
           <label id="timeTitle">Render time: </label>
           <output id="time">N/A</output>
         </div>
@@ -149,9 +161,7 @@
 
       <!-- -------------------------------------------------------------------- -->
       <!-- Canvas -->
-      <p align="center">
-        <canvas id="canvas" width="400" height="400"></canvas>
-      </p>
+      <canvas id="canvas" width="350" height="350"></canvas>
       
       <!-- -------------------------------------------------------------------- -->
       <!-- Main Script Include -->

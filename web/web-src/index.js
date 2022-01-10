@@ -14,6 +14,7 @@ const sceneNumOutput = document.getElementById('sceneNum');
 const samplesNumOutput = document.getElementById('samplesNum');
 const maxDepthNumOutput = document.getElementById('maxDepthNum');
 const bvhEnableOutput = document.getElementById('bvhEnable');
+const resolutionOutput = document.getElementById('resolution');
 var previewImgData;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -145,6 +146,9 @@ async function init() {
 
     // Now enable buttons if they are available
     setEnableAvaialbleButtons(true);
+
+    // Update resolution output
+    resolutionOutput.value = `${width}x${height}`;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
