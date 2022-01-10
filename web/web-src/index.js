@@ -30,7 +30,12 @@ function setupRenderBtn(buttonId, handler) {
     var button = document.getElementById(buttonId);
     Object.assign(button, {
         async onclick() {
+            setEnableRenderUI(false);
             setEnableAvaialbleButtons(false);
+
+            previewImgData = new ImageData(width, height);
+            ctx.putImageData(previewImgData, 0, 0);
+
             const sceneNum = parseInt(sceneNumOutput.value);
             const numSamples = parseInt(samplesNumOutput.value);
             const maxDepth = parseInt(maxDepthNumOutput.value);
@@ -43,9 +48,11 @@ function setupRenderBtn(buttonId, handler) {
                 maxDepth,
                 enableBvh
             });
+
             updateTimeLabel(time);
             ctx.putImageData(new ImageData(rawImageData, width, height), 0, 0);
             setEnableAvaialbleButtons(true);
+            setEnableRenderUI(true);
         }
     });
 }
@@ -71,6 +78,7 @@ function setupPreviewRenderBtn(buttonId) {
     Object.assign(button, {
         async onclick() {            
             // Kick off preview drawing
+            setEnableRenderUI(false);
             setEnableAvaialbleButtons(false);
             previewImgData = new ImageData(width, height);
             const drawInteral = setInterval(previewDraw, 250);
@@ -87,6 +95,7 @@ function setupPreviewRenderBtn(buttonId) {
             clearInterval(drawInteral);
             ctx.putImageData(previewImgData, 0, 0);
             setEnableAvaialbleButtons(true);
+            setEnableRenderUI(true);
         }
     });
 }
@@ -97,6 +106,21 @@ function setEnableAvaialbleButtons(enable) {
     for (let [buttonId, isAvailable] of buttonAvailableMap) {
         var buttonEnabled = isAvailable && enable;
         document.getElementById(buttonId).disabled = !buttonEnabled;
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
+function setEnableRenderUI (enable){
+    if (enable) {
+        hideDiv('progress');
+        showDiv('parameters');
+        showDiv('renderButtons');
+    }
+    else {
+        showDiv('progress');
+        hideDiv('parameters');
+        hideDiv('renderButtons');
     }
 }
 
@@ -149,6 +173,13 @@ async function init() {
 
     // Update resolution output
     resolutionOutput.value = `${width}x${height}`;
+
+    // Everything loaded, hide loading screen
+    hideDiv('loading');
+    showDiv('paramInfo');
+
+    // Enable render UI
+    setEnableRenderUI(true);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
