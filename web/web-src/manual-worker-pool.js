@@ -116,7 +116,7 @@ async function workerPoolRenderImage({ sceneNum, width, height, numSamples, maxD
 
 async function kickOffWorkerPoolRenderImageProgressive(sceneNum, previewCb, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
     // Divide into regions
-    const maxRegionWidth = Math.floor(imageWidth / MAX_NUM_WORKERS);
+    const maxRegionWidth = Math.ceil(imageWidth / MAX_NUM_WORKERS);
     const workersList = [];
     var numWorkers = 0;
     for (var x = 0; x < imageWidth; x += maxRegionWidth) {
