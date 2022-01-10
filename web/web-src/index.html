@@ -1,7 +1,8 @@
 <!DOCTYPE html>
 <html>
 
-  <!-- HEAD -->
+  <!-- -------------------------------------------------------------------- -->
+  <!-- Head -->
   <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -18,20 +19,24 @@
     <title>YARR Raytracer Web Demo</title>
   </head>
   
-  <!-- MAIN BODY AND DIV START -->
+  <!-- -------------------------------------------------------------------- -->
+  <!-- Body -->
   <body class="w3-black">
     <div class="w3-padding-large" id="main">
 
-      <!-- HEADER -->
+      <!-- -------------------------------------------------------------------- -->
+      <!-- Header -->
       <header class="w3-container w3-padding-32 w3-center w3-black" id="home">
-        <h1 class="w3-jumbo"><span class="w3-hide-small">YARR</span> - Web Demo</h1>
-        <p>Raytracing with WebAssembly (cross-compiled from Rust)</p>
-        <p>Visit the project page and get the source here: <a href="https://github.com/KhoiFish/yarr">YARR GitHub</a></p>
+        <h1 class="w3-jumbo"><span class="w3-hide-small"></span>YARR Demo</h1>
+        <p>Raytracing powered by WebAssembly</p>
+        <p>Visit the project page and get the source here:<br /><a href="https://github.com/KhoiFish/yarr">YARR GitHub</a></p>
       </header>
 
-      <!-- PARAMETERS -->
+      <!-- -------------------------------------------------------------------- -->
+      <!-- Parameters -->
       <div class="w3-bar w3-border w3-dark-grey" id="parameters">
-        <!-- Common scripts -->
+
+        <!-- UI helper functions -->
         <script>
           function toggleButtonShow(id) {
             var x = document.getElementById(id);
@@ -48,7 +53,7 @@
         </script>
         
         <!-- Scene Selection -->
-        <div class="w3-bar-item w3-dropdown-click" style="width:25%">
+        <div class="w3-dropdown-click" style="width:25%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('sceneDropDown'); return false;">Scene</button>
           <div id="sceneDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#scene" class="w3-bar-item w3-button" onclick="paramSelect('sceneDropDown', 'sceneNum', '0'); return false;">0 - 1st Week - Final</a>
@@ -65,7 +70,7 @@
         </div>
 
         <!-- Num Samples -->
-        <div class="w3-bar-item w3-dropdown-click" style="width:25%">
+        <div class="w3-dropdown-click" style="width:25%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('samplesDropDown'); return false;">Samples</button>
           <div id="samplesDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#samples" class="w3-bar-item w3-button" onclick="paramSelect('samplesDropDown', 'samplesNum', '1'); return false;">1</a>
@@ -82,8 +87,8 @@
         </div>
 
         <!-- Max Depth -->
-        <div class="w3-bar-item w3-dropdown-click" style="width:25%">
-          <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('maxDepthDropDown'); return false;">Ray Depth</button>
+        <div class="w3-dropdown-click" style="width:25%">
+          <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('maxDepthDropDown'); return false;">Depth</button>
           <div id="maxDepthDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#maxDepth" class="w3-bar-item w3-button" onclick="paramSelect('maxDepthDropDown', 'maxDepthNum', '1'); return false;">1</a>
             <a href="#maxDepth" class="w3-bar-item w3-button" onclick="paramSelect('maxDepthDropDown', 'maxDepthNum', '10'); return false;">10</a>
@@ -94,25 +99,25 @@
         </div>
 
         <!-- BVH -->
-        <div class="w3-bar-item w3-dropdown-click" style="width:25%">
-          <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('bvhDropDown'); return false;">Enable BVH</button>
+        <div class="w3-dropdown-click" style="width:25%">
+          <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('bvhDropDown'); return false;">BVH</button>
           <div id="bvhDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#enableBvh" class="w3-bar-item w3-button" onclick="paramSelect('bvhDropDown', 'bvhEnable', 'true'); return false;">true</a>
             <a href="#enableBvh" class="w3-bar-item w3-button" onclick="paramSelect('bvhDropDown', 'bvhEnable', 'false'); return false;">false</a>
           </div>
         </div>
-
-        
       </div>
 
+      <!-- -------------------------------------------------------------------- -->
       <!-- Render Buttons -->
       <div class="w3-bar w3-border w3-dark-grey" id="buttons">
-          <input class="w3-bar-item w3-button" style="width:25%" id="singleThreadBtn" value="Single-thread" disabled />
-          <input class="w3-bar-item w3-button" style="width:25%" id="multiThreadBtn" value="Rayon multi-threads" disabled />
-          <input class="w3-bar-item w3-button" style="width:25%" id="manualWebWorkers" value="Manual web workers" disabled />
-          <input class="w3-bar-item w3-button" style="width:25%" id="manualWebWorkersPreview" value="Preview (web workers)" disabled />
+        <button class="w3-bar-item w3-button" style="width:25%" id="singleThreadBtn" value="Single-thread" disabled>Single-thread</button>
+        <button class="w3-bar-item w3-button" style="width:25%" id="multiThreadBtn" value="Rayon multi-threads" disabled>Rayon threads</button>
+        <button class="w3-bar-item w3-button" style="width:25%" id="manualWebWorkers" value="Manual web workers" disabled>Web workers</button>
+        <button class="w3-bar-item w3-button" style="width:25%" id="manualWebWorkersPreview" value="Preview (web workers)" disabled>Preview render</button>
       </div>
 
+      <!-- -------------------------------------------------------------------- -->
       <!-- Parameter Info -->
       <div class="w3-bar w3-border w3-dark-grey" id="paramInfo">  
         <div align="center">
@@ -128,7 +133,7 @@
           <output id="maxDepthNum">50</output>
 
           <p style="display:inline"> | </p>
-          <label id="bvhEnableTitle">Enable BVH: </label>
+          <label id="bvhEnableTitle">BVH: </label>
           <output id="bvhEnable">false</output>
 
           <p style="display:inline"> | </p>
@@ -137,21 +142,21 @@
 
           <p style="display:inline"> | </p>
           <label id="timeTitle">Render time: </label>
-          <output id="time">(no results yet)</output>
+          <output id="time">N/A</output>
         </div>
       </div>
       <br />
 
+      <!-- -------------------------------------------------------------------- -->
       <!-- Canvas -->
       <p align="center">
         <canvas id="canvas" width="512" height="512"></canvas>
       </p>
       
+      <!-- -------------------------------------------------------------------- -->
       <!-- Main Script Include -->
       <script type="module" src="index.js"></script>
 
     </div>
   </body>
-  <!-- MAIN BODY AND DIV END -->
-
 </html>
