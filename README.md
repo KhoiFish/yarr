@@ -18,13 +18,10 @@ I'm a C/C++ programmer at heart, yet my heart grows ever so fonder for Rust. **R
 
 ## Software Prerequisites
 
-To build this project, you'll need to install the following software. _Note: the following commands are assumed to be from the root directory of the project._
+Before you start, clone the source project. __*All commands listed below assumes you are in the root source directory.*__
 
-### Install rust
-https://www.rust-lang.org/tools/install
-
-### Install npm
-https://nodejs.org/en/download/
+### Install Rust, Nightly Toolchain & NPM Packages
+If you haven't already, you'll need [Rust](https://www.rust-lang.org/tools/install) and [NPM](https://nodejs.org/en/download/) installed.
 
 #### Install toolchain
 One of the multi-threaded paths uses wasm-bindgen-rayon, which requires atomics and shared memory. These features are not included in stable rust, so you'll need to use a nightly version of rust to compile with these features enabled.
@@ -44,7 +41,7 @@ cargo install wasm-pack
 Windows users: the previous step may fail for you. If so, try the manual installer: [Windows wasm-pack installer](https://rustwasm.github.io/wasm-pack/installer/)
 
 
-### Install npm packages
+#### Install npm packages
 ```console
 npm --prefix ./web install
 ```
