@@ -4,6 +4,7 @@ import * as Comlink from 'comlink';
 
 var wasmModule;
 var workerResourceCache;
+var webRaytracer;
 
 // --------------------------------------------------------------------------------------------------------------------
 
@@ -50,19 +51,13 @@ async function init(workerId, resourceMap) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function workerRenderImage(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
-    var raytracer = wasmModule.create_webraytracer(workerResourceCache, sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
-    return await wasmModule.multi_sample_buffer(raytracer, false);
+async function workerCreateRaytracer(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
+    webRaytracer = wasmModule.create_webraytracer(workerResourceCache, sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
 }
 
-async function workerRenderImageProgressive(sceneNum, previewCb, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh, regionX, regionY, regionWidth, regionHeight)  {
-    var raytracer = wasmModule.create_webraytracer(workerResourceCache, sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
-    for(var y = regionY; y < (regionY + regionHeight); y++) {
-        for(var x = regionX; x < (regionX + regionWidth); x++) {
-            var colorU32 = await wasmModule.multi_sample_point(raytracer, x, (imageHeight-y));
-            await previewCb(x, y, colorU32);
-        }
-    }
+async function workerRenderRegion({ x, y, w, h }) {
+    var rawImageData = await wasmModule.multi_sample_region(webRaytracer, x, y, w, h);
+    return Comlink.transfer(rawImageData, [rawImageData.buffer]);
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -70,7 +65,6 @@ async function workerRenderImageProgressive(sceneNum, previewCb, imageWidth, ima
 
 Comlink.expose({
     init,
-    workerRenderImage,
-    workerRenderImageProgressive
+    workerCreateRaytracer,
+    workerRenderRegion
 });
-  

@@ -55,17 +55,8 @@ function getRenderFunction(handler) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
-function previewCb(x, y, colorU32) {
-    // Note we intentionally skip alpha (i = 4)
-    var offset = ((y * width) + x) * 4;
-    for (var i = 0; i < 3; i++) {
-        // Shift and mask off the channel value
-        previewImgData.data[offset + i] = (colorU32 >> (8 * (3 - i))) & 0xff;
-    }
-    previewImgData.data[offset + 3] = 255;
-}
-
-function previewDraw() {
+function previewCb(imageWidth, source, { x, y, w, h }) {
+    ManualWorkerPool.copyScanLines(imageWidth, source, { x, y, w, h }, previewImgData.data);
     ctx.putImageData(previewImgData, 0, 0);
 }
 
@@ -74,18 +65,17 @@ function getPreviewFunction() {
         // Kick off preview drawing
         setEnableRenderUI(false);
         previewImgData = new ImageData(width, height);
-        const drawInteral = setInterval(previewDraw, 250);
+        ctx.putImageData(previewImgData, 0, 0);
 
         // Kick off the progressive raytracing
         const sceneNum = parseInt(sceneNumOutput.value);
         const numSamples = parseInt(samplesNumOutput.value);
         const maxDepth = parseInt(maxDepthNumOutput.value);
         const enableBvh = (bvhEnableOutput.value === 'true');
-        let { time } = await ManualWorkerPool.workerPoolRenderImageProgressive({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh });
+        let { rawImageData, time } = await ManualWorkerPool.workerPoolRenderImage({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh });
 
         // Done rendering
         updateTimeLabel(time);
-        clearInterval(drawInteral);
         ctx.putImageData(previewImgData, 0, 0);
         setEnableRenderUI(true);
     };
@@ -145,7 +135,7 @@ async function init() {
     // Map methods to table
     renderFunctionMap.set('single', getRenderFunction(wasmHandlers.singleThread));
     renderFunctionMap.set('rayon', getRenderFunction(wasmHandlers.multiThread));
-    renderFunctionMap.set('workers', getRenderFunction({ renderImage: ManualWorkerPool.workerPoolRenderImage }));
+    renderFunctionMap.set('workers', getRenderFunction({ renderImage: ManualWorkerPool.workerPoolRenderImageNoPreview }));
     renderFunctionMap.set('preview', getPreviewFunction());
 
     // Set up render button click event

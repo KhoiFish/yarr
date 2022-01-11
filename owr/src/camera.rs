@@ -25,8 +25,8 @@ impl Camera {
             aspect_ratio: Float, aperture: Float, focus_dist: Float, time0: Float, time1: Float, background: Vec3<Float>) -> Self {
         let theta = fov.to_radians();
         let h = (theta/2.0).tan();
-        let viewport_height = 2.0 * h;
-        let viewport_width = aspect_ratio * viewport_height;
+        let viewport_height = 2.0 * h * -1.0;
+        let viewport_width = aspect_ratio * viewport_height * -1.0;
         
         let w = (*look_from - *look_at).unit_vector();
         let u = up.cross(&w).unit_vector();

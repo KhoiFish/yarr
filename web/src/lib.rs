@@ -124,6 +124,10 @@ impl WebRaytracer {
         sample
     }
 
+    pub fn multi_sample_region(&self, x0: u32, y0: u32, w: u32, h: u32) -> Vec<u8> {
+        owr::sampling::multisample_image_region(x0, y0, w, h, &self.params, &self.camera, &self.world)
+    }
+
     // ------------------------------------------------------------------------
     // Single-threaded
 
@@ -219,4 +223,9 @@ pub fn multi_sample_buffer(raytracer: &WebRaytracer, enable_average_sum: bool) -
 #[wasm_bindgen]
 pub fn multi_sample_point(raytracer: &WebRaytracer, x: u32, y: u32) -> u32 {
     raytracer.multi_sample_point(x, y)
+}
+
+#[wasm_bindgen]
+pub fn multi_sample_region(raytracer: &WebRaytracer, x0: u32, y0: u32, w: u32, h: u32) -> Vec<u8> {
+    raytracer.multi_sample_region(x0, y0, w, h)
 }

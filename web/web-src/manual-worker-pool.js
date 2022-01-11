@@ -27,119 +27,127 @@ function assert(condition, message) {
     }
 }
 
-var rgbToHex = function (rgba) { 
-    var hex = Number(rgba).toString(16);
-    if (hex.length < 2) {
-        hex = "0" + hex;
-    }
-    return hex;
-};
-
-function gammaCorrect(c) {
-    return Math.max(0.0, Math.min(Math.sqrt(c), 0.999));
-}
-
-function convertToU8Range(c) {
-    return (c * 256);
-}
-
 // --------------------------------------------------------------------------------------------------------------------
 
-async function kickOffWorkerPoolRenderImage(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
-    // Distribute the sampling across the worker threads
-    var numSamplesPerWorkerTable = [];
-    var numWorkers = 0;
-    {
-        var numSamplesToDo = samplesPerPixel;
-        var currentWorkerId = 0;
-        do {
-            if (numWorkers < MAX_NUM_WORKERS) {
-                numSamplesPerWorkerTable.push(0);
-                numWorkers++;
-                currentWorkerId = (numSamplesPerWorkerTable.length - 1);
-            } else {
-                currentWorkerId = (currentWorkerId + 1) % MAX_NUM_WORKERS;
+function buildScanLines(imageWidth, imageHeight, maxScanLineHeight) {
+    // Sanity check
+    assert(imageHeight >= maxScanLineHeight);
+
+    // Create list of tiles
+    var scanLines = [];
+    for (var y = 0; y < imageHeight; y += maxScanLineHeight) {
+        var h = Math.min(maxScanLineHeight, imageHeight - y);
+        scanLines.push({ x: 0, y, w: imageWidth, h });
+    }
+
+    return scanLines;
+}
+
+function copyScanLines(imageWidth, source, { x, y, w, h }, destBuffer) {
+    const oneScanLineSize = (imageWidth * 4);
+    const offset = oneScanLineSize * y;
+    destBuffer.set(source, offset);
+}
+
+async function renderImageScanlines(previewCb, scanLines, sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
+    // Create buffer to store final results
+    var finalBufferSize = 0;
+    var finalResults = null;
+    if (previewCb == null) {
+        finalBufferSize = imageWidth * imageHeight * 4;
+        finalResults = new Uint8ClampedArray(finalBufferSize);
+    }
+
+    // Have our workers create the raytracer objects
+    for (var workerId = 0; workerId < workerPool.length; workerId++) {
+        await workerPool[workerId].workerCreateRaytracer(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
+    }
+
+    // Form scanline workers with extra meta data
+    var scanLineWorkers = []
+    for (var workerId = 0; workerId < workerPool.length; workerId++) {
+        scanLineWorkers.push({ worker: workerPool[workerId], scanLine: null, isWorking: false, resultsPromise: null });
+    }
+
+    // Raytrace the tiles
+    while (scanLines.length > 0) {
+        // Find a free worker
+        var workerFound = false;
+        for (var workerId = 0; workerId < scanLineWorkers.length; workerId++) {
+            // If we find a free worker, pop off the scanline and kick off the worker
+            if (scanLineWorkers[workerId].isWorking == false) {
+                var scanLine = scanLines.pop();
+                scanLineWorkers[workerId].scanLine = scanLine;
+                scanLineWorkers[workerId].resultsPromise = scanLineWorkers[workerId].worker.workerRenderRegion(scanLine);
+                scanLineWorkers[workerId].isWorking = true;
+                workerFound = true;
+                break;
             }
-
-            numSamplesPerWorkerTable[currentWorkerId]++;
-            numSamplesToDo--;
-        } while (numSamplesToDo > 0)
-    }
-    
-    // Kick off the work for the worker threads
-    var workerResults = []
-    for (var workerId = 0; workerId < numSamplesPerWorkerTable.length; workerId++)  {
-        workerResults.push(workerPool[workerId].workerRenderImage(sceneNum, imageWidth, imageHeight, numSamplesPerWorkerTable[workerId], maxDepth, enableBvh));
-    }
-
-    // Wait for results from all threads
-    var resultsList = []
-    for (var workerId = 0; workerId < workerResults.length; workerId++)  {
-        resultsList.push(await workerResults[workerId]);
-    }
-
-    // Convert to final form
-    var finalBufferSize = imageWidth * imageHeight * 4;
-    var finalResults = new Uint8ClampedArray(finalBufferSize);
-    var sumScale = 1.0 / samplesPerPixel;
-    var componentCount = 0;
-    for (var i = 0; i < finalBufferSize; i++) {
-        // Skip alpha, it is always 1.0
-        componentCount = (componentCount + 1) % 4;
-        if (componentCount == 0) {
-            finalResults[i] = 255;
-            continue;
         }
 
-        // Sum up results and normalize the color
-        var sum = 0.0;
-        for (var resultIndex = 0; resultIndex < resultsList.length; resultIndex++) {
-            sum += resultsList[resultIndex][i];
+        // All workers are busy, we must wait for at least one to be frees
+        if (workerFound == false) {
+            for (var workerId = 0; workerId < scanLineWorkers.length; workerId++) {
+                if (scanLineWorkers[workerId].isWorking == true) {
+                    // Copy results to final buffer
+                    var results = await scanLineWorkers[workerId].resultsPromise;
+                    scanLineWorkers[workerId].isWorking = false;
+                    if (previewCb != null) {
+                        previewCb(imageWidth, results, scanLineWorkers[workerId].scanLine);
+                    } else {
+                        copyScanLines(imageWidth, results, scanLineWorkers[workerId].scanLine, finalResults);
+                    }
+
+                    // This worker is free now, get it on the next iteration
+                    break;
+                }
+            }
         }
-        finalResults[i] = convertToU8Range(gammaCorrect(sum * sumScale));
+    }
+
+    // Wait for any last workers to come back
+    for (var workerId = 0; workerId < scanLineWorkers.length; workerId++) {
+        if (scanLineWorkers[workerId].isWorking == true) {
+            // Copy results to final buffer
+            var results = await scanLineWorkers[workerId].resultsPromise;
+            scanLineWorkers[workerId].isWorking = false;
+            if (previewCb != null) {
+                previewCb(imageWidth, results, scanLineWorkers[workerId].scanLine);
+            } else {
+                copyScanLines(imageWidth, results, scanLineWorkers[workerId].scanLine, finalResults);
+            }
+        }
     }
 
     return finalResults;
 }
+
+// --------------------------------------------------------------------------------------------------------------------
   
-async function workerPoolRenderImage({ sceneNum, width, height, numSamples, maxDepth, enableBvh }) {
+async function workerPoolRenderImage({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh }) {
     const start = performance.now();
-    var rawImageData = await kickOffWorkerPoolRenderImage(sceneNum, width, height, numSamples, maxDepth, enableBvh);
+    const maxScanLineHeight = Math.ceil(height / MAX_NUM_WORKERS);
+    const scanLines = buildScanLines(width, height, maxScanLineHeight);
+    const rawImageData =  await renderImageScanlines(previewCb, scanLines, sceneNum, width, height, numSamples, maxDepth, enableBvh);
     const time = performance.now() - start;
-    return {
-        rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
-        time
-    };
+
+    if (previewCb != null) {
+        return {
+            rawImageData: null,
+            time
+        };
+    } else {    
+        return {
+            rawImageData: Comlink.transfer(rawImageData, [rawImageData.buffer]),
+            time
+        };
+    }
+}
+
+async function workerPoolRenderImageNoPreview({ sceneNum, width, height, numSamples, maxDepth, enableBvh }) {
+    return await workerPoolRenderImage({ sceneNum,previewCb: null, width, height, numSamples, maxDepth, enableBvh });
 }
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function kickOffWorkerPoolRenderImageProgressive(sceneNum, previewCb, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
-    // Divide into regions
-    const maxRegionWidth = Math.ceil(imageWidth / MAX_NUM_WORKERS);
-    const workersList = [];
-    var numWorkers = 0;
-    for (var x = 0; x < imageWidth; x += maxRegionWidth) {
-        var regionWidth = Math.min(maxRegionWidth, (imageWidth - x));
-        var regionHeight = imageHeight;
-        workersList.push(workerPool[numWorkers++].workerRenderImageProgressive(sceneNum, Comlink.proxy(previewCb), imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh, x, 0, regionWidth, regionHeight));
-    }
-
-    // Wait for everything to come back
-    for (var i = 0; i < workersList.length; i++) {
-        await workersList[i];
-    }
-}
-  
-async function workerPoolRenderImageProgressive({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh }) {
-    const start = performance.now();
-    await kickOffWorkerPoolRenderImageProgressive(sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh);
-    const time = performance.now() - start;
-    return {
-        time
-    };
-}
-
-// --------------------------------------------------------------------------------------------------------------------
-
-export { MAX_NUM_WORKERS, initWorkerPool, workerPoolRenderImage, workerPoolRenderImageProgressive };
+export { MAX_NUM_WORKERS, initWorkerPool, workerPoolRenderImage, workerPoolRenderImageNoPreview, copyScanLines };

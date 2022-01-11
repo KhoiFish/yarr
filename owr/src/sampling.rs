@@ -68,14 +68,16 @@ pub fn multi_sample(enable_average_sum: bool, image_x: u32, image_y: u32, params
 
 // --------------------------------------------------------------------------------------------------------------------
 
-fn get_grid(params: &RaytracerParams) -> Vec::<(u32, u32)> {
+fn get_grid(x0: u32, y0: u32, width: u32, height: u32) -> Vec::<(u32, u32)> {
     // How many pixels?
-    let num_pixels = (params.image_width * params.image_height) as usize;
+    let num_pixels = (width * height) as usize;
 
     // Create a grid so we can divide the work
+    let x1 = x0 + width;
+    let y1 = y0 + height;
     let mut grid = Vec::<(u32, u32)>::with_capacity(num_pixels);
-    for y in (0..params.image_height).rev() {
-        for x in 0..params.image_width {
+    for y in y0..y1 {
+        for x in x0..x1 {
             grid.push((x,y));
         }
     }
@@ -85,8 +87,18 @@ fn get_grid(params: &RaytracerParams) -> Vec::<(u32, u32)> {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+pub fn multisample_image_region(x0: u32, y0: u32, width: u32, height: u32, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec<u8> {
+    let grid = get_grid(x0, y0, width, height);
+
+    return grid.iter().flat_map(|&point| -> Color {
+        color::vec3_to_color(&multi_sample(true, point.0, point.1, &params, &camera, &world), 1.0)
+    }).collect();
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 fn multisample_image(enable_progress_bar: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec<u8> {
-    let grid = get_grid(&params);
+    let grid = get_grid(0, 0, params.image_width, params.image_height);
 
     if enable_progress_bar {
         #[cfg(feature = "progress-ui")]
@@ -108,7 +120,7 @@ fn multisample_image(enable_progress_bar: bool, params: &RaytracerParams, camera
 // --------------------------------------------------------------------------------------------------------------------
 
 fn multisample_image_parallel(enable_progress_bar: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec<u8> {
-    let grid = get_grid(&params);
+    let grid = get_grid(0, 0, params.image_width, params.image_height);
 
     if enable_progress_bar {
         #[cfg(feature = "progress-ui")]
@@ -130,7 +142,7 @@ fn multisample_image_parallel(enable_progress_bar: bool, params: &RaytracerParam
 // --------------------------------------------------------------------------------------------------------------------
 
 pub fn multi_sample_buffer(enable_average_sum: bool, enable_parallel: bool, params: &RaytracerParams, camera: &camera::Camera, world: &Arc<dyn Hittable>) -> Vec::<Float> {
-    let grid = get_grid(&params);
+    let grid = get_grid(0, 0, params.image_width, params.image_height);
 
     // Iterate and collect results
     if enable_parallel {
