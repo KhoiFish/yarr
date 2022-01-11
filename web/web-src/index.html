@@ -93,13 +93,23 @@
       </div>
 
       <!-- -------------------------------------------------------------------- -->
+      <!-- Render Button -->
+      <div id="renderButton" class="w3-display-container">
+        <div class="w3-button w3-ripple w3-display-topmiddle" style="width:100px; height:100px; margin:0; padding:0">
+          <img src="pirate-ship.png" style="width:100%; height:100%;">
+        </div>
+        <br /><br /><br /><br /><br /><br />
+        <h2 class="w3-display-bottommiddle w3-text-white" style="text-shadow:2px 2px 0 #444">Set Sail</h2>
+      </div>
+
+      <!-- -------------------------------------------------------------------- -->
       <!-- Parameters -->
       <div class="w3-bar w3-border w3-dark-grey w3-hide" id="parameters">
         
         <!-- Scene Selection -->
         <div class="w3-dropdown-click w3-border" style="width:20%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('sceneDropDown'); return false;">Scene</button>
-          <div id="sceneDropDown" class="w3-dropdown-content w3-bar-block w3-card-4 w3-center">
+          <div id="sceneDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#scene" class="w3-bar-item w3-button" onclick="paramSelect('sceneDropDown', 'sceneNum', '0'); return false;">0 - 1st Week - Final</a>
             <a href="#scene" class="w3-bar-item w3-button" onclick="paramSelect('sceneDropDown', 'sceneNum', '1'); return false;">1 - 2nd Week - 4.1</a>
             <a href="#scene" class="w3-bar-item w3-button" onclick="paramSelect('sceneDropDown', 'sceneNum', '2'); return false;">2 - 2nd Week - 5.1</a>
@@ -116,7 +126,7 @@
         <!-- Num Samples -->
         <div class="w3-dropdown-click w3-border" style="width:20%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('samplesDropDown'); return false;">Samples</button>
-          <div id="samplesDropDown" class="w3-dropdown-content w3-bar-block w3-card-4 w3-center">
+          <div id="samplesDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#samples" class="w3-bar-item w3-button" onclick="paramSelect('samplesDropDown', 'samplesNum', '1'); return false;">1</a>
             <a href="#samples" class="w3-bar-item w3-button" onclick="paramSelect('samplesDropDown', 'samplesNum', '10'); return false;">10</a>
             <a href="#samples" class="w3-bar-item w3-button" onclick="paramSelect('samplesDropDown', 'samplesNum', '32'); return false;">32</a>
@@ -133,7 +143,7 @@
         <!-- Max Depth -->
         <div class="w3-dropdown-click w3-border" style="width:20%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('maxDepthDropDown'); return false;">Depth</button>
-          <div id="maxDepthDropDown" class="w3-dropdown-content w3-bar-block w3-card-4 w3-center">
+          <div id="maxDepthDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#maxDepth" class="w3-bar-item w3-button" onclick="paramSelect('maxDepthDropDown', 'maxDepthNum', '1'); return false;">1</a>
             <a href="#maxDepth" class="w3-bar-item w3-button" onclick="paramSelect('maxDepthDropDown', 'maxDepthNum', '10'); return false;">10</a>
             <a href="#maxDepth" class="w3-bar-item w3-button" onclick="paramSelect('maxDepthDropDown', 'maxDepthNum', '32'); return false;">32</a>
@@ -145,7 +155,7 @@
         <!-- BVH -->
         <div class="w3-dropdown-click w3-border" style="width:15%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('bvhDropDown'); return false;">BVH</button>
-          <div id="bvhDropDown" class="w3-dropdown-content w3-bar-block w3-card-4 w3-center">
+          <div id="bvhDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#enableBvh" class="w3-bar-item w3-button" onclick="paramSelect('bvhDropDown', 'bvhEnable', 'true'); return false;">true</a>
             <a href="#enableBvh" class="w3-bar-item w3-button" onclick="paramSelect('bvhDropDown', 'bvhEnable', 'false'); return false;">false</a>
           </div>
@@ -154,7 +164,7 @@
         <!-- Threads -->
         <div class="w3-dropdown-click w3-border" style="width:25%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('threadsDropDown'); return false;">Threads</button>
-          <div id="threadsDropDown" class="w3-dropdown-content w3-bar-block w3-card-4 w3-center">
+          <div id="threadsDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a id="singleDropDown" href="#threads" class="w3-bar-item w3-button" onclick="paramSelect('threadsDropDown', 'threadsMode', 'single'); return false;">Single</a>
             <a id="rayonDropDown" href="#threads" class="w3-bar-item w3-button" onclick="paramSelect('threadsDropDown', 'threadsMode', 'rayon'); return false;">Rayon</a>
             <a id="workersDropDown" href="#threads" class="w3-bar-item w3-button" onclick="paramSelect('threadsDropDown', 'threadsMode', 'workers'); return false;">Workers</a>
@@ -209,18 +219,6 @@
           Aye, exploring the open waters...<br /><br />
           <i class="fa fa-spinner fa-pulse" style="font-size:64px"></i>
         </p>
-      </div>
-
-      <!-- -------------------------------------------------------------------- -->
-      <!-- Render Button -->
-      <div id="renderButton" class="w3-display-container">
-        <br /><br /><br /><br />
-        <div class="w3-button w3-ripple w3-display-topmiddle" style="width:100px; height:100px; margin:0; padding:0">
-          <img src="pirate-ship.png" style="width:100%; height:100%;">
-        </div>
-        <br />
-        <br />
-        <h2 class="w3-display-bottommiddle w3-text-white" style="text-shadow:2px 2px 0 #444">Set Sail</h2>
       </div>
 
       <!-- -------------------------------------------------------------------- -->
