@@ -51,27 +51,16 @@ npm --prefix ./web install
 ```
 
 ## Build & Run Console App
-
-#### Build
+Running will output a file (output.png) to the current directory.
 ```console
 cargo build --release
-```
-
-#### Run
-This outputs a file, output.png to the current directory.
-```console
 cargo run --release
 ```
 
 ## Build & Run Web App
-#### Build
-```console
-npm --prefix ./web run build
-```
-
-#### Run & Host
 The node-js serve app is configured to serve cross-origin headers, needed by wasm-bind-rayon.
 ```console
+npm --prefix ./web run build
 npm --prefix ./web run host
 ```
 
