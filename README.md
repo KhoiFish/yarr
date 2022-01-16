@@ -23,8 +23,12 @@ Before you start, clone the source project. __*All commands listed below assumes
 ### Install Rust, Nightly Toolchain & NPM Packages
 If you haven't already, you'll need [Rust](https://www.rust-lang.org/tools/install) and [NPM](https://nodejs.org/en/download/) installed.
 
+One of the best tools for Rust development is [VSCode](https://code.visualstudio.com/). I have this installed with these extensions: gitlens, rustanalyzer, bettertoml and powershell (for windows). If you're on windows, you'll need powershell 7.0+ (which is the version that comes with the VSCode powershell extension).
+
 #### Install toolchain
-One of the multi-threaded paths uses wasm-bindgen-rayon, which requires atomics and shared memory. These features are not included in stable rust, so you'll need to use a nightly version of rust to compile with these features enabled.
+One of the multi-threaded paths uses wasm-bindgen-rayon, which requires atomics and shared memory. These features are not included in stable rust, so you'll need to use a nightly version of rust to compile with these features enabled. 
+
+After this command, you may get an error: __'found a virtual manifest 'some_location' instead of a package manifest'__, _you can safely ignore this_.
 ```console
 cargo install
 ```
@@ -38,7 +42,7 @@ rustup component add rust-src --toolchain nightly-2021-07-29
 ```console
 cargo install wasm-pack
 ```
-Windows users: the previous step may fail for you. If so, try the manual installer: [Windows wasm-pack installer](https://rustwasm.github.io/wasm-pack/installer/)
+__Windows users__: the previous step may fail for you. If so, try the manual installer: [Windows wasm-pack installer](https://rustwasm.github.io/wasm-pack/installer/)
 
 
 #### Install npm packages
