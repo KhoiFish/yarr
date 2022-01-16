@@ -140,8 +140,7 @@ async function init() {
     // Map methods to table
     renderFunctionMap.set('single', getRenderFunction(wasmHandlers.singleThread));
     renderFunctionMap.set('rayon', getRenderFunction(wasmHandlers.multiThread));
-    renderFunctionMap.set('workers', getRenderFunction({ renderImage: ManualWorkerPool.workerPoolRenderImageNoPreview }));
-    renderFunctionMap.set('preview', getPreviewFunction());
+    renderFunctionMap.set('workers', getPreviewFunction());
 
     // Set up render button click event
     Object.assign(renderButton, {
