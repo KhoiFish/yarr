@@ -49,6 +49,18 @@ function copyScanLines(imageWidth, source, { x, y, w, h }, destBuffer) {
     destBuffer.set(source, offset);
 }
 
+async function scanLineWorkerFunc(previewCb, worker, scanLines, imageWidth, imageHeight, finalResults) {
+    while (scanLines.length > 0) {
+        var scanLine = scanLines.pop();
+        var results = await worker.workerRenderRegion(scanLine);
+        if (previewCb != null) {
+            previewCb(imageWidth, results, scanLine);
+        } else {
+            copyScanLines(imageWidth, results, scanLine, finalResults);
+        }
+    }
+}
+
 async function renderImageScanlines(previewCb, scanLines, sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh) {
     // Create buffer to store final results
     var finalBufferSize = 0;
@@ -63,60 +75,15 @@ async function renderImageScanlines(previewCb, scanLines, sceneNum, imageWidth, 
         await workerPool[workerId].workerCreateRaytracer(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
     }
 
-    // Form scanline workers with extra meta data
-    var scanLineWorkers = []
+    // Kick off all the workers
+    var workerPromises = [];
     for (var workerId = 0; workerId < workerPool.length; workerId++) {
-        scanLineWorkers.push({ worker: workerPool[workerId], scanLine: null, isWorking: false, resultsPromise: null });
+        workerPromises.push(scanLineWorkerFunc(previewCb, workerPool[workerId], scanLines, imageWidth, imageHeight, finalResults));
     }
 
-    // Raytrace the tiles
-    while (scanLines.length > 0) {
-        // Find a free worker
-        var workerFound = false;
-        for (var workerId = 0; workerId < scanLineWorkers.length; workerId++) {
-            // If we find a free worker, pop off the scanline and kick off the worker
-            if (scanLineWorkers[workerId].isWorking == false) {
-                var scanLine = scanLines.pop();
-                scanLineWorkers[workerId].scanLine = scanLine;
-                scanLineWorkers[workerId].resultsPromise = scanLineWorkers[workerId].worker.workerRenderRegion(scanLine);
-                scanLineWorkers[workerId].isWorking = true;
-                workerFound = true;
-                break;
-            }
-        }
-
-        // All workers are busy, we must wait for at least one to be frees
-        if (workerFound == false) {
-            for (var workerId = 0; workerId < scanLineWorkers.length; workerId++) {
-                if (scanLineWorkers[workerId].isWorking == true) {
-                    // Copy results to final buffer
-                    var results = await scanLineWorkers[workerId].resultsPromise;
-                    scanLineWorkers[workerId].isWorking = false;
-                    if (previewCb != null) {
-                        previewCb(imageWidth, results, scanLineWorkers[workerId].scanLine);
-                    } else {
-                        copyScanLines(imageWidth, results, scanLineWorkers[workerId].scanLine, finalResults);
-                    }
-
-                    // This worker is free now, get it on the next iteration
-                    break;
-                }
-            }
-        }
-    }
-
-    // Wait for any last workers to come back
-    for (var workerId = 0; workerId < scanLineWorkers.length; workerId++) {
-        if (scanLineWorkers[workerId].isWorking == true) {
-            // Copy results to final buffer
-            var results = await scanLineWorkers[workerId].resultsPromise;
-            scanLineWorkers[workerId].isWorking = false;
-            if (previewCb != null) {
-                previewCb(imageWidth, results, scanLineWorkers[workerId].scanLine);
-            } else {
-                copyScanLines(imageWidth, results, scanLineWorkers[workerId].scanLine, finalResults);
-            }
-        }
+    // Wait till all workers are done
+    for (var workerId = 0; workerId < workerPromises.length; workerId++) {
+        await workerPromises[workerId];
     }
 
     return finalResults;
@@ -126,7 +93,7 @@ async function renderImageScanlines(previewCb, scanLines, sceneNum, imageWidth, 
   
 async function workerPoolRenderImage({ sceneNum, previewCb, width, height, numSamples, maxDepth, enableBvh }) {
     const start = performance.now();
-    const maxScanLineHeight = Math.ceil(height / MAX_NUM_WORKERS);
+    const maxScanLineHeight = 4;
     const scanLines = buildScanLines(width, height, maxScanLineHeight);
     const rawImageData =  await renderImageScanlines(previewCb, scanLines, sceneNum, width, height, numSamples, maxDepth, enableBvh);
     const time = performance.now() - start;
@@ -145,7 +112,7 @@ async function workerPoolRenderImage({ sceneNum, previewCb, width, height, numSa
 }
 
 async function workerPoolRenderImageNoPreview({ sceneNum, width, height, numSamples, maxDepth, enableBvh }) {
-    return await workerPoolRenderImage({ sceneNum,previewCb: null, width, height, numSamples, maxDepth, enableBvh });
+    return await workerPoolRenderImage({ sceneNum, previewCb: null, width, height, numSamples, maxDepth, enableBvh });
 }
 
 // --------------------------------------------------------------------------------------------------------------------

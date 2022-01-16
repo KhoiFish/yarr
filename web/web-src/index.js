@@ -57,6 +57,9 @@ function getRenderFunction(handler) {
 
 function previewCb(imageWidth, source, { x, y, w, h }) {
     ManualWorkerPool.copyScanLines(imageWidth, source, { x, y, w, h }, previewImgData.data);
+}
+
+function previewDraw() {
     ctx.putImageData(previewImgData, 0, 0);
 }
 
@@ -66,6 +69,7 @@ function getPreviewFunction() {
         setEnableRenderUI(false);
         previewImgData = new ImageData(width, height);
         ctx.putImageData(previewImgData, 0, 0);
+        const drawInteral = setInterval(previewDraw, 250);
 
         // Kick off the progressive raytracing
         const sceneNum = parseInt(sceneNumOutput.value);
@@ -76,6 +80,7 @@ function getPreviewFunction() {
 
         // Done rendering
         updateTimeLabel(time);
+        clearInterval(drawInteral);
         ctx.putImageData(previewImgData, 0, 0);
         setEnableRenderUI(true);
     };
