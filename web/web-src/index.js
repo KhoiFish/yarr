@@ -17,6 +17,7 @@ const maxDepthNumOutput = document.getElementById('maxDepthNum');
 const bvhEnableOutput = document.getElementById('bvhEnable');
 const resolutionOutput = document.getElementById('resolution');
 const threadsModeOutput = document.getElementById('threadsMode');
+const resourceMap = new Map();
 var previewImgData;
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -28,11 +29,24 @@ function updateTimeLabel(timeInMs) {
 
 // --------------------------------------------------------------------------------------------------------------------
 
+async function initializeWorkerPool(numThreads) {
+    // Only re-initialze if thread count is different
+    if (ManualWorkerPool.getNumWorkers() != numThreads) {
+        await ManualWorkerPool.initWorkerPool(numThreads, resourceMap);
+    }
+}
+
+// --------------------------------------------------------------------------------------------------------------------
+
 function getRenderFunction(handler) {
     return async function () {
         setEnableRenderUI(false);
         previewImgData = new ImageData(width, height);
         ctx.putImageData(previewImgData, 0, 0);
+        
+        // Re-init worker pool (if necessary)
+        const numThreads = parseInt(numThreadsOutput.value);
+        await initializeWorkerPool(numThreads);
 
         const sceneNum = parseInt(sceneNumOutput.value);
         const numSamples = parseInt(samplesNumOutput.value);
@@ -71,6 +85,10 @@ function getPreviewFunction() {
         ctx.putImageData(previewImgData, 0, 0);
         const drawInteral = setInterval(previewDraw, 250);
 
+        // Re-init worker pool (if necessary)
+        const numThreads = parseInt(numThreadsOutput.value);
+        await initializeWorkerPool(numThreads);
+
         // Kick off the progressive raytracing
         const sceneNum = parseInt(sceneNumOutput.value);
         const numSamples = parseInt(samplesNumOutput.value);
@@ -91,12 +109,14 @@ function getPreviewFunction() {
 function setEnableRenderUI (enable){
     if (enable) {
         hideDiv('progress');
-        showDiv('parameters');
+        showDiv('parametersRow1');
+        showDiv('parametersRow2');
         showDiv('renderButton');
     }
     else {
         showDiv('progress');
-        hideDiv('parameters');
+        hideDiv('parametersRow1');
+        hideDiv('parametersRow2');
         hideDiv('renderButton');
     }
 }
@@ -111,7 +131,6 @@ async function init() {
 
     // Convert to a JS map, this allows for structured cloning (deep copies) of the
     // loaded resources when we pass the map to other web workers.
-    const resourceMap = new Map();
     for (var i = 0; i < resourceInfo.length; i++) {
         var resource = resourceInfo[i].path;
         resourceMap.set(resource, WasmModule.get_resource(resourceCache, resource));
@@ -124,11 +143,10 @@ async function init() {
         })
     ).initHandlers(resourceMap);
 
-    // Spin up our manual web worker pool
-    await ManualWorkerPool.initWorkerPool(resourceMap);
-
-    // Set label to how many threads detected
-    numThreadsOutput.value = `${ManualWorkerPool.MAX_NUM_WORKERS}`;
+    // Try and detect num hardware threads, or default to 8
+    var numThreads = navigator.hardwareConcurrency || 8;
+    await initializeWorkerPool(numThreads);
+    numThreadsOutput.value = `${numThreads}`;
 
     // Are rayon threads supported ?
     const threadsSupported = (await wasmHandlers.supportsThreads) ? true : false;

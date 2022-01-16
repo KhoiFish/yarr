@@ -103,11 +103,10 @@
       </div>
 
       <!-- -------------------------------------------------------------------- -->
-      <!-- Parameters -->
-      <div class="w3-bar w3-border w3-dark-grey w3-hide" id="parameters">
-        
+      <!-- Parameters Row 1 -->
+      <div class="w3-bar w3-border w3-dark-grey w3-hide" id="parametersRow1">
         <!-- Scene Selection -->
-        <div class="w3-dropdown-click w3-border" style="width:20%">
+        <div class="w3-dropdown-click w3-border" style="width:33%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('sceneDropDown'); return false;">Scene</button>
           <div id="sceneDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#scene" class="w3-bar-item w3-button" onclick="paramSelect('sceneDropDown', 'sceneNum', '0'); return false;">0 - 1st Week - Final</a>
@@ -124,7 +123,7 @@
         </div>
 
         <!-- Num Samples -->
-        <div class="w3-dropdown-click w3-border" style="width:20%">
+        <div class="w3-dropdown-click w3-border" style="width:33%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('samplesDropDown'); return false;">Samples</button>
           <div id="samplesDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#samples" class="w3-bar-item w3-button" onclick="paramSelect('samplesDropDown', 'samplesNum', '1'); return false;">1</a>
@@ -141,7 +140,7 @@
         </div>
 
         <!-- Max Depth -->
-        <div class="w3-dropdown-click w3-border" style="width:20%">
+        <div class="w3-dropdown-click w3-border" style="width:34%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('maxDepthDropDown'); return false;">Depth</button>
           <div id="maxDepthDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#maxDepth" class="w3-bar-item w3-button" onclick="paramSelect('maxDepthDropDown', 'maxDepthNum', '1'); return false;">1</a>
@@ -150,10 +149,14 @@
             <a href="#maxDepth" class="w3-bar-item w3-button" onclick="paramSelect('maxDepthDropDown', 'maxDepthNum', '50'); return false;">50</a>
             <a href="#maxDepth" class="w3-bar-item w3-button" onclick="paramSelect('maxDepthDropDown', 'maxDepthNum', '100'); return false;">100</a>
           </div>
-        </div>
+        </div>        
+      </div>
 
+      <!-- -------------------------------------------------------------------- -->
+      <!-- Parameters Row 2 -->
+      <div class="w3-bar w3-border w3-dark-grey w3-hide" id="parametersRow2">
         <!-- BVH -->
-        <div class="w3-dropdown-click w3-border" style="width:15%">
+        <div class="w3-dropdown-click w3-border" style="width:33%">
           <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('bvhDropDown'); return false;">BVH</button>
           <div id="bvhDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a href="#enableBvh" class="w3-bar-item w3-button" onclick="paramSelect('bvhDropDown', 'bvhEnable', 'true'); return false;">true</a>
@@ -161,16 +164,33 @@
           </div>
         </div>
 
-        <!-- Threads -->
-        <div class="w3-dropdown-click w3-border" style="width:25%">
-          <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('threadsDropDown'); return false;">Threads</button>
+        <!-- Thread Mode -->
+        <div class="w3-dropdown-click w3-border" style="width:33%">
+          <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('threadsDropDown'); return false;">Thread Mode</button>
           <div id="threadsDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
             <a id="singleDropDown" href="#threads" class="w3-bar-item w3-button" onclick="paramSelect('threadsDropDown', 'threadsMode', 'single'); return false;">Single</a>
             <a id="rayonDropDown" href="#threads" class="w3-bar-item w3-button" onclick="paramSelect('threadsDropDown', 'threadsMode', 'rayon'); return false;">Rayon</a>
             <a id="previewDropDown" href="#threads" class="w3-bar-item w3-button" onclick="paramSelect('threadsDropDown', 'threadsMode', 'workers'); return false;">Workers w/ Preview</a>
           </div>
         </div>
-        
+
+        <!-- Num Threads -->
+        <div class="w3-dropdown-click w3-border" style="width:34%">
+          <button class="w3-button w3-white" style="width:100%" onclick="toggleButtonShow('numThreadsDropDown'); return false;">Num Threads</button>
+          <div id="numThreadsDropDown" class="w3-dropdown-content w3-bar-block w3-card-4">
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '1'); return false;">1</a>
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '2'); return false;">2</a>
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '4'); return false;">4</a>
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '6'); return false;">6</a>
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '8'); return false;">8</a>
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '10'); return false;">10</a>
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '12'); return false;">12</a>
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '16'); return false;">16</a>
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '24'); return false;">24</a>
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '32'); return false;">32</a>
+            <a href="#numThreads" class="w3-bar-item w3-button" onclick="paramSelect('numThreadsDropDown', 'numThreads', '64'); return false;">64</a>
+          </div>
+        </div>
       </div>
 
       <!-- -------------------------------------------------------------------- -->

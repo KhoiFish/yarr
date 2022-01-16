@@ -2,21 +2,36 @@ import * as Comlink from 'comlink';
 
 // --------------------------------------------------------------------------------------------------------------------
 
-const MAX_NUM_WORKERS = navigator.hardwareConcurrency || 8;
-const workerPool = [];
+var WorkerPool = [];
+var _workersUnwrapped = [];
 
 // --------------------------------------------------------------------------------------------------------------------
 
-async function initWorkerPool(resourceMap) {
-    for (var i = 0; i < MAX_NUM_WORKERS; i++ ) {
-        let worker = await Comlink.wrap(
-            new Worker(new URL('./manual-web-worker.js', import.meta.url), {
-                type: 'module'
-            })
-        );
-        await worker.init(i, resourceMap);
-        workerPool.push(worker);
+async function initWorkerPool(numWorkers, resourceMap) {
+    // Clear out existing pool, if it exists
+    for (var i = 0; i < WorkerPool.length; i++) {
+        _workersUnwrapped[i].terminate();
+        _workersUnwrapped[i] = null;
+        WorkerPool[i] = null;
     }
+    _workersUnwrapped = [];
+    WorkerPool = [];
+
+    // Create new pool
+    for (var i = 0; i < numWorkers; i++ ) {
+        let worker = new Worker(new URL('./manual-web-worker.js', import.meta.url), {
+            type: 'module'
+        });
+        let proxy = await Comlink.wrap(worker);
+
+        await proxy.init(i, resourceMap);
+        _workersUnwrapped.push(worker);
+        WorkerPool.push(proxy);
+    }
+}
+
+function getNumWorkers() {
+    return WorkerPool.length;
 }
 
 // --------------------------------------------------------------------------------------------------------------------
@@ -72,14 +87,14 @@ async function renderImageScanlines(previewCb, scanLines, sceneNum, imageWidth, 
     }
 
     // Have our workers create the raytracer objects
-    for (var workerId = 0; workerId < workerPool.length; workerId++) {
-        await workerPool[workerId].workerCreateRaytracer(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
+    for (var workerId = 0; workerId < WorkerPool.length; workerId++) {
+        await WorkerPool[workerId].workerCreateRaytracer(sceneNum, imageWidth, imageHeight, samplesPerPixel, maxDepth, enableBvh);
     }
 
     // Kick off all the workers
     var workerPromises = [];
-    for (var workerId = 0; workerId < workerPool.length; workerId++) {
-        workerPromises.push(scanLineWorkerFunc(previewCb, workerPool[workerId], scanLines, imageWidth, imageHeight, finalResults));
+    for (var workerId = 0; workerId < WorkerPool.length; workerId++) {
+        workerPromises.push(scanLineWorkerFunc(previewCb, WorkerPool[workerId], scanLines, imageWidth, imageHeight, finalResults));
     }
 
     // Wait till all workers are done
@@ -118,4 +133,4 @@ async function workerPoolRenderImageNoPreview({ sceneNum, width, height, numSamp
 
 // --------------------------------------------------------------------------------------------------------------------
 
-export { MAX_NUM_WORKERS, initWorkerPool, workerPoolRenderImage, workerPoolRenderImageNoPreview, copyScanLines };
+export { initWorkerPool, getNumWorkers, workerPoolRenderImage, workerPoolRenderImageNoPreview, copyScanLines };
