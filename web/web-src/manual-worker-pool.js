@@ -35,9 +35,10 @@ function buildScanLines(imageWidth, imageHeight, maxScanLineHeight) {
 
     // Create list of tiles
     var scanLines = [];
-    for (var y = 0; y < imageHeight; y += maxScanLineHeight) {
-        var h = Math.min(maxScanLineHeight, imageHeight - y);
-        scanLines.push({ x: 0, y, w: imageWidth, h });
+    for (var y1 = imageHeight; y1 > 0; y1 -= maxScanLineHeight) {
+        var y0 = Math.max(0, y1 - maxScanLineHeight);
+        var h = y1 - y0;
+        scanLines.push({ x: 0, y: y0, w: imageWidth, h });
     }
 
     return scanLines;
