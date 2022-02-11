@@ -2,7 +2,7 @@
   "private": true,
   "scripts": {
     "build:wasm-st": "wasm-pack build --target web --out-dir ../target/web/pkg",
-    "build:wasm-mt": "cross-env RUSTFLAGS=\"-C target-feature=+atomics,+bulk-memory,+mutable-globals\" rustup run nightly-2021-07-29 wasm-pack build --target web --out-dir ../target/web/pkg-parallel -- --features parallel -Z build-std=panic_abort,std",
+    "build:wasm-mt": "cross-env RUSTFLAGS=\"-C target-feature=+atomics,+bulk-memory,+mutable-globals\" rustup run nightly-2022-02-05 wasm-pack build --target web --out-dir ../target/web/pkg-parallel -- --features parallel -Z build-std=panic_abort,std",
     "build:wasm": "run-p build:wasm-st build:wasm-mt",
     "build:copyfiles": "ncp ./web-src/index.html ../target/web/dist/index.html && ncp ./web-src/w3.css ../target/web/dist/w3.css && ncp ../images/earthmap.jpeg ../target/web/dist/earthmap.jpeg && ncp ../images/pirate.png ../target/web/dist/pirate.png && ncp ../images/pirate-ship.png ../target/web/dist/pirate-ship.png",
     "build": "npm run build:wasm && webpack build ./web-src/index.js --mode production -o ../target/web/dist --output-filename index.js && npm run build:copyfiles",
@@ -20,4 +20,4 @@
     "serve": "^13.0.2",
     "wasm-feature-detect": "^1.2.10"
   }
-}
+}  

@@ -35,7 +35,7 @@ cargo install
 
 And add nightly toolchain sources:
 ```console
-rustup component add rust-src --toolchain nightly-2021-07-29
+rustup component add rust-src --toolchain nightly-2022-02-05
 ```
 
 #### Install wasm-pack
