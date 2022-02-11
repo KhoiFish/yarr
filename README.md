@@ -44,6 +44,7 @@ cargo install wasm-pack
 ```
 __Windows users__: the previous step may fail for you. If so, try the manual installer: [Windows wasm-pack installer](https://rustwasm.github.io/wasm-pack/installer/)
 
+__Mac users with M1 chips__: you will need to have Rosetta installed as some of the tools (like wasm-bin-gen) are pre-compiled against x86.
 
 #### Install npm packages
 ```console
